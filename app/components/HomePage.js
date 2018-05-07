@@ -25,7 +25,6 @@ class HomePage extends Component<Props> {
   props: Props;
 
   selectFolder(isMaster: boolean) {
-    console.log(`selectFolder(${isMaster})`, this);
     dialog.showOpenDialog({
       properties: ['openDirectory']
     }, this.setFolder(isMaster));
