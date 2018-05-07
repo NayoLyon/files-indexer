@@ -1,21 +1,41 @@
 // @flow
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import styles from './Home.css';
 
 type Props = {
   startIndexation: () => void,
   masterFolder: string,
-  dbSize: number
+  dbSize: number,
+  indexing: boolean,
+  isIndexed: boolean,
+  step: string,
+  progress: number
 };
 
-export default class Home extends Component<Props> {
+class Indexation extends Component<Props> {
   props: Props;
 
   render() {
     let content = null;
-    if (this.props.dbSize === 0) {
+    if (!this.props.isIndexed && !this.props.indexing) {
       content = <button onClick={this.props.startIndexation}>Start Indexation</button>;
+    } else if (this.props.indexing) {
+      content = (
+        <div>
+          <h2>{this.props.step} at {this.props.progress}%</h2>
+        </div>
+      );
+    } else if (this.props.isIndexed) {
+      // TODO displaying database content...
+      content = (
+        <div>
+          <h2>Folder indexed...</h2>
+          <p>{this.props.dbSize} elements indexed.</p>
+          <Link to="/scan">Now scan folder</Link>
+        </div>
+      );
     }
     return (
       <div>
@@ -34,3 +54,16 @@ export default class Home extends Component<Props> {
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    masterFolder: state.folders.masterPath,
+    dbSize: state.indexation.dbSize,
+    indexing: state.indexation.indexing,
+    isIndexed: state.indexation.isIndexed,
+    step: state.indexation.step,
+    progress: state.indexation.progress
+  };
+}
+
+export default connect(mapStateToProps)(Indexation);
