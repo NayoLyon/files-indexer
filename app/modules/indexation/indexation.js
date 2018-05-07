@@ -1,6 +1,5 @@
 // @flow
 import { INDEXATION_LOAD_DATABASE, INDEXATION_START, INDEXATION_END, INDEXATION_PROGRESS } from './indexationAction';
-import { SELECT_MASTER_FOLDER } from '../folders/foldersAction';
 import type { Action } from '../actionType';
 
 export type indexationStateType = {
@@ -25,13 +24,6 @@ const defaultValue: indexationStateType = {
 // action: actionType) {
 export default function folders(state: indexationStateType = defaultValue, action: Action) {
   switch (action.type) {
-    case SELECT_MASTER_FOLDER:
-      return Object.assign(
-        {}, state,
-        {
-          folder: action.path
-        }
-      );
     case INDEXATION_LOAD_DATABASE:
       return Object.assign(
         {},
