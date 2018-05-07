@@ -3,7 +3,8 @@ import thunk from 'redux-thunk';
 import { createHashHistory } from 'history';
 import { routerMiddleware, routerActions } from 'react-router-redux';
 import { createLogger } from 'redux-logger';
-import rootReducer from '../modules/index';
+import rootReducer, { fullStateType } from '../modules/index';
+import * as foldersActions from '../modules/folders/foldersAction';
 
 const history = createHashHistory();
 
@@ -32,6 +33,7 @@ const configureStore = (initialState?: fullStateType) => {
 
   // Redux DevTools Configuration
   const actionCreators = {
+    ...foldersActions,
     ...routerActions,
   };
   // If Redux DevTools Extension is installed use it, otherwise use Redux compose
