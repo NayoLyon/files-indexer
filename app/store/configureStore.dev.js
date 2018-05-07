@@ -5,6 +5,7 @@ import { routerMiddleware, routerActions } from 'react-router-redux';
 import { createLogger } from 'redux-logger';
 import rootReducer, { fullStateType } from '../modules/index';
 import * as foldersActions from '../modules/folders/foldersAction';
+import * as indexationActions from '../modules/indexation/indexationAction';
 
 const history = createHashHistory();
 
@@ -33,6 +34,7 @@ const configureStore = (initialState?: fullStateType) => {
 
   // Redux DevTools Configuration
   const actionCreators = {
+    ...indexationActions,
     ...foldersActions,
     ...routerActions,
   };
