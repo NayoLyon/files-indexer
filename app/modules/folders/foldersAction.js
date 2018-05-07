@@ -17,6 +17,6 @@ export function selectMaster(folderPath: string) {
 export function selectToScan(folderPath: string) {
   return {
     type: SELECT_TOSCAN_FOLDER,
-    path: folderPath,
+    path: folderPath
   };
 }

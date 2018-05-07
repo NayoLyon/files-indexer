@@ -27,7 +27,11 @@ export default class Home extends Component<Props> {
           </p>
           <Link
             to="/index"
-            onClick={(e) => { if (!this.props.isScanPossible()) { e.preventDefault(); } }}
+            onClick={e => {
+              if (!this.props.isScanPossible()) {
+                e.preventDefault();
+              }
+            }}
           >
             Start
           </Link>

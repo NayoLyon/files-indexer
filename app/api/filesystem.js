@@ -18,7 +18,9 @@ export function computeHash(fn) {
 }
 
 export async function walkDir(
-  folder: string, progressStart: number, progressEnd: number,
+  folder: string,
+  progressStart: number,
+  progressEnd: number,
   progressCallback: (step: string, progress: number) => void
 ) {
   const [fileList, subFolders] = await readDir(folder);
@@ -35,7 +37,7 @@ export async function walkDir(
       subFolderProgress + progressStep,
       progressCallback
     );
-    subFolderContent.forEach((elt) => {
+    subFolderContent.forEach(elt => {
       fileList.push(elt);
     });
   }
@@ -43,7 +45,7 @@ export async function walkDir(
   return fileList;
 }
 function readDir(folder) {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const content = fs.readdirSync(folder);
 
     const fileList = [];
@@ -52,7 +54,7 @@ function readDir(folder) {
       const file = content[i];
       if (fs.statSync(path.join(folder, file)).isDirectory()) {
         subFolders.push(path.join(folder, file));
-      } else if (!(['.index.db', 'Thumbs.db'].includes(file))) {
+      } else if (!['.index.db', 'Thumbs.db'].includes(file)) {
         fileList.push(path.join(folder, file));
       }
     }

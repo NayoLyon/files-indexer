@@ -24,13 +24,13 @@ function databaseLoaded(dbSize: number, isIndexed: boolean) {
 
 export function startIndexation() {
   return {
-    type: INDEXATION_START,
+    type: INDEXATION_START
   };
 }
 
 export function endIndexation() {
   return {
-    type: INDEXATION_END,
+    type: INDEXATION_END
   };
 }
 

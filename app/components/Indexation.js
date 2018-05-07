@@ -24,7 +24,9 @@ class Indexation extends Component<Props> {
     } else if (this.props.indexing) {
       content = (
         <div>
-          <h2>{this.props.step} at {this.props.progress}%</h2>
+          <h2>
+            {this.props.step} at {this.props.progress}%
+          </h2>
         </div>
       );
     } else if (this.props.isIndexed) {
@@ -47,9 +49,7 @@ class Indexation extends Component<Props> {
         <div>
           <h1>Indexation of folder {this.props.masterFolder}</h1>
         </div>
-        <div>
-          {content}
-        </div>
+        <div>{content}</div>
       </div>
     );
   }

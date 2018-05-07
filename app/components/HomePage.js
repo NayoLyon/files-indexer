@@ -25,13 +25,16 @@ class HomePage extends Component<Props> {
   props: Props;
 
   selectFolder(isMaster: boolean) {
-    dialog.showOpenDialog({
-      properties: ['openDirectory']
-    }, this.setFolder(isMaster));
+    dialog.showOpenDialog(
+      {
+        properties: ['openDirectory']
+      },
+      this.setFolder(isMaster)
+    );
   }
 
   setFolder(isMaster: boolean) {
-    return (filePaths: ?string[]) => {
+    return (filePaths: ?(string[])) => {
       if (typeof filePaths !== 'object' || filePaths.length < 1) {
         return;
       }
@@ -45,10 +48,10 @@ class HomePage extends Component<Props> {
 
   isScanPossible() {
     return (
-      typeof this.props.masterFolder === 'string'
-      && typeof this.props.toScanFolder === 'string'
-      && this.props.masterFolder !== ''
-      && this.props.toScanFolder !== ''
+      typeof this.props.masterFolder === 'string' &&
+      typeof this.props.toScanFolder === 'string' &&
+      this.props.masterFolder !== '' &&
+      this.props.toScanFolder !== ''
     );
   }
 

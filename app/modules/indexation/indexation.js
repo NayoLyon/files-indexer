@@ -1,5 +1,10 @@
 // @flow
-import { INDEXATION_LOAD_DATABASE, INDEXATION_START, INDEXATION_END, INDEXATION_PROGRESS } from './indexationAction';
+import {
+  INDEXATION_LOAD_DATABASE,
+  INDEXATION_START,
+  INDEXATION_END,
+  INDEXATION_PROGRESS
+} from './indexationAction';
 import type { Action } from '../actionType';
 
 export type indexationStateType = {
@@ -25,12 +30,12 @@ const defaultValue: indexationStateType = {
 export default function folders(state: indexationStateType = defaultValue, action: Action) {
   switch (action.type) {
     case INDEXATION_LOAD_DATABASE:
-      return Object.assign(
-        {},
-        state,
-        { dbSize: action.dbSize, dbLoaded: true, isIndexed: action.isIndexed }
-      );
-      // return { ...state, { isIndexed: true } };
+      return Object.assign({}, state, {
+        dbSize: action.dbSize,
+        dbLoaded: true,
+        isIndexed: action.isIndexed
+      });
+    // return { ...state, { isIndexed: true } };
     case INDEXATION_START:
       return Object.assign({}, state, { indexing: true });
     case INDEXATION_END:

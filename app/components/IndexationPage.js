@@ -12,7 +12,7 @@ import { walkDir, computeHash } from '../api/filesystem';
 import { findDb, insertDb } from '../api/database';
 
 type Props = {
-  loadDatabase: (string) => void,
+  loadDatabase: string => void,
   indexProgress: (string, number) => void,
   startIndexation: () => void,
   endIndexation: () => void,
@@ -71,10 +71,7 @@ class IndexationPage extends Component<Props> {
   render() {
     return (
       <Loader loaded={this.props.dbLoaded}>
-        <Indexation
-          index={this.index.bind(this)}
-          dbSize={this.props.dbSize}
-        />
+        <Indexation index={this.index.bind(this)} dbSize={this.props.dbSize} />
       </Loader>
     );
   }

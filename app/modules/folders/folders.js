@@ -18,7 +18,7 @@ export default function folders(state: foldersStateType = defaultValue, action: 
   switch (action.type) {
     case SELECT_MASTER_FOLDER:
       return Object.assign({}, state, { masterPath: action.path });
-      // return { ...state, { path: action.path } };
+    // return { ...state, { path: action.path } };
     case SELECT_TOSCAN_FOLDER:
       return Object.assign({}, state, { toScanPath: action.path });
     default:
