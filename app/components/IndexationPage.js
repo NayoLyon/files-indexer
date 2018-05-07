@@ -63,6 +63,8 @@ class IndexationPage extends Component<Props> {
       }
     }
 
+    this.props.loadDatabase(this.props.masterFolder);
+
     this.props.endIndexation();
   }
 
