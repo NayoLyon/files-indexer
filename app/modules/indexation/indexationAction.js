@@ -8,7 +8,10 @@ export const INDEXATION_PROGRESS = 'INDEXATION_PROGRESS';
 
 export type indexationActionType = {
   +type: string,
-  +dbSize: ?number
+  +dbSize: ?number,
+  +isIndexed: ?boolean,
+  +step: ?string,
+  +progress: ?number
 };
 
 function databaseLoaded(dbSize: number, isIndexed: boolean) {
