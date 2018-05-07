@@ -29,7 +29,7 @@ class IndexationPage extends Component<Props> {
     this.props.loadDatabase(this.props.masterFolder);
   }
 
-  async startIndexation() {
+  async index() {
     const folder = this.props.masterFolder;
     this.props.startIndexation();
 
@@ -72,7 +72,7 @@ class IndexationPage extends Component<Props> {
     return (
       <Loader loaded={this.props.dbLoaded}>
         <Indexation
-          startIndexation={this.startIndexation.bind(this)}
+          index={this.index.bind(this)}
           dbSize={this.props.dbSize}
         />
       </Loader>

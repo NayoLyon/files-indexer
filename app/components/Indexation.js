@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import styles from './Home.css';
 
 type Props = {
-  startIndexation: () => void,
+  index: () => void,
   masterFolder: string,
   dbSize: number,
   indexing: boolean,
@@ -20,7 +20,7 @@ class Indexation extends Component<Props> {
   render() {
     let content = null;
     if (!this.props.isIndexed && !this.props.indexing) {
-      content = <button onClick={this.props.startIndexation}>Start Indexation</button>;
+      content = <button onClick={this.props.index}>Start Indexation</button>;
     } else if (this.props.indexing) {
       content = (
         <div>
