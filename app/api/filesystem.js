@@ -5,12 +5,13 @@ const path = require('path');
 const crypto = require('crypto');
 
 export class FileProps {
-  constructor(id, file, stats) {
+  constructor(id, file, stats, rootPath) {
     this._id = id;
     this.name = path.basename(file);
     this.ext = path.extname(file);
-    this.folder = path.dirname(file);
-    this.path = file;
+    this.folder = path.dirname(file); // Useless ??
+    this.path = file; // Useless ??
+    this.relpath = path.relative(rootPath, file); // Relative to the database... More usefull
     this.size = stats.size;
     this.modified = stats.mtime;
     this.changed = stats.ctime;
@@ -38,7 +39,7 @@ export async function scan(
     const hash = await computeHash(file);
     const stats = fs.statSync(file);
 
-    const fileProps = new FileProps(hash, file, stats);
+    const fileProps = new FileProps(hash, file, stats, folder);
     fileCallback(fileProps);
   }
 }
