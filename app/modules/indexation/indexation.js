@@ -25,9 +25,7 @@ const defaultValue: indexationStateType = {
   progress: 0
 };
 
-// export default function folders(state: foldersStateType = { masterPath: '', toScanPath: '' },
-// action: actionType) {
-export default function folders(state: indexationStateType = defaultValue, action: Action) {
+export default function indexation(state: indexationStateType = defaultValue, action: Action) {
   switch (action.type) {
     case INDEXATION_LOAD_DATABASE:
       return Object.assign({}, state, {
