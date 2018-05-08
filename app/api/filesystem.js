@@ -20,6 +20,27 @@ export class FileProps {
   get id() {
     return this._id;
   }
+  compareSameHash(dbFile) {
+    const result: Map<string, Array<string | number | Date>> = new Map();
+    if (dbFile.name !== this.name) {
+      result.set('name', [this.name, dbFile.name]);
+    }
+    if (dbFile.size !== this.size) {
+      result.set('size', [this.size, dbFile.size]);
+    }
+    if (dbFile.modified.getTime() !== this.modified.getTime()) {
+      result.set('modified', [this.modified, dbFile.modified]);
+    }
+    // Ignore changed and created... They only depend on when the file was copied.
+    // The correct date to check is the modified data.
+    // if (dbFile.changed.getTime() !== this.changed.getTime()) {
+    //   result.set('changed', [this.changed, dbFile.changed]);
+    // }
+    // if (dbFile.created.getTime() !== this.created.getTime()) {
+    //   result.set('created', [this.created, dbFile.created]);
+    // }
+    return result;
+  }
 }
 
 export async function scan(

@@ -1,0 +1,22 @@
+.scrollableTable tbody {
+  display: block;
+  height: 80vh;
+  overflow: auto;
+}
+.scrollableTable thead,
+.scrollableTable tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed; /* even columns width , fix width of table too*/
+}
+.scrollableTable thead {
+  width: calc(100% - 1em); /* scrollbar is average 1em/16px width, remove it from thead width */
+}
+.scrollableTable table {
+  width: 400px;
+}
+
+.scrollableList {
+  height: 80vh;
+  overflow: auto;
+}
