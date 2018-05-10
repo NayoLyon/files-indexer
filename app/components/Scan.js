@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import styles from './Home.css';
+import { Grid, Icon, Header, Button } from 'semantic-ui-react';
 import ScanResult from './ScanResult';
 
 type Props = {
@@ -20,30 +20,32 @@ class Scan extends Component<Props> {
   render() {
     let content = null;
     if (!this.props.isScanned && !this.props.indexing) {
-      content = <button onClick={this.props.scan}>Start Scan</button>;
+      content = <Button onClick={this.props.scan}>Start Scan</Button>;
     } else if (this.props.indexing) {
       content = (
-        <div>
-          <h2>
-            {this.props.step} at {this.props.progress}%
-          </h2>
-        </div>
+        <Header as="h2">
+          {this.props.step} at {this.props.progress}%
+        </Header>
       );
     } else if (this.props.isScanned) {
       content = <ScanResult />;
     }
     return (
-      <div>
-        <div className={styles.backButton} data-tid="backButton">
-          <Link to="/index">
-            <i className="fa fa-arrow-left fa-3x" />
-          </Link>
-        </div>
-        <div>
-          <h1>Scan folder {this.props.toScanFolder}</h1>
-        </div>
-        <div>{content}</div>
-      </div>
+      <Grid padded style={{height: "100vh"}}>
+        <Grid.Column stretched>
+          <Grid.Row style={{flex: "0 0 4rem"}}>
+            <Link to="/index">
+              <Icon name="arrow left" size="huge" />
+            </Link>
+          </Grid.Row>
+          <Grid.Row style={{flex: "0 0 2rem"}}>
+            <Header>Scan folder {this.props.toScanFolder}</Header>
+          </Grid.Row>
+          <Grid.Row style={{flex: "1 1 10%", height: "10%"}}>
+            {content}
+          </Grid.Row>
+        </Grid.Column>
+      </Grid>
     );
   }
 }

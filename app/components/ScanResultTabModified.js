@@ -83,7 +83,7 @@ export default class ScanResultTabModified extends Component<Props> {
   render() {
     const { columns, detailColumns, rows } = this.renderFiles();
     return (
-      <Tab.Pane key={this.props.id}>
+      <Tab.Pane key={this.props.id} style={{overflowY: "auto", height: "calc(100% - 3.5rem)"}}>
         <Table className={styles.scrollableTable} celled structured>
           <Table.Header>
             <Table.Row>

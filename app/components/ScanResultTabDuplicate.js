@@ -1,8 +1,7 @@
 // @flow
 import React, { Component } from 'react';
-import { Tab, Table } from 'semantic-ui-react';
+import { Tab, Table, Visibility } from 'semantic-ui-react';
 import { FileProps } from '../api/filesystem';
-import styles from './ScanResult.css';
 import { printValue } from '../utils/format';
 
 type Props = {
@@ -50,8 +49,8 @@ export default class ScanResultTabDuplicate extends Component<Props> {
   }
   render() {
     return (
-      <Tab.Pane key={this.props.id}>
-        <Table className={styles.scrollableTable} celled structured>
+      <Tab.Pane key={this.props.id} style={{overflowY: "auto", height: "calc(100% - 3.5rem)"}}>
+        <Table celled structured>
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell rowSpan="2">Name</Table.HeaderCell>
@@ -64,7 +63,15 @@ export default class ScanResultTabDuplicate extends Component<Props> {
               <Table.HeaderCell>Relative path</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
-          <Table.Body>{this.renderFiles()}</Table.Body>
+          <Visibility
+            as={Table.Body}
+            continuous={false}
+            once={false}
+            onBottomVisible={() => console.log('This will call API')}
+          >
+            {this.renderFiles()}
+          </Visibility>
+          {/* <Table.Body>{this.renderFiles()}</Table.Body> */}
         </Table>
       </Tab.Pane>
     );

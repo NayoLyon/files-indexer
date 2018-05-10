@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { Tab, List } from 'semantic-ui-react';
 import { FileProps } from '../api/filesystem';
-import styles from './ScanResult.css';
 
 type Props = {
   id: string,
@@ -32,8 +31,8 @@ export default class ScanResultTab extends Component<Props> {
   }
   render() {
     return (
-      <Tab.Pane key={this.props.id}>
-        <List className={styles.scrollableList} selection verticalAlign="middle">
+      <Tab.Pane key={this.props.id} style={{overflowY: "auto", height: "calc(100% - 3.5rem)"}}>
+        <List selection verticalAlign="middle">
           {this.renderFiles()}
         </List>
       </Tab.Pane>
