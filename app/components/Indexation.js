@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import styles from './Home.css';
+import { Grid, Icon, Header, Button } from 'semantic-ui-react';
 
 type Props = {
   index: () => void,
@@ -20,37 +20,39 @@ class Indexation extends Component<Props> {
   render() {
     let content = null;
     if (!this.props.isIndexed && !this.props.indexing) {
-      content = <button onClick={this.props.index}>Start Indexation</button>;
+      content = <Button onClick={this.props.index}>Start Indexation</Button>;
     } else if (this.props.indexing) {
       content = (
-        <div>
-          <h2>
-            {this.props.step} at {this.props.progress}%
-          </h2>
-        </div>
+        <Header as="h2">
+          {this.props.step} at {this.props.progress}%
+        </Header>
       );
     } else if (this.props.isIndexed) {
       // TODO displaying database content...
       content = (
         <div>
-          <h2>Folder indexed...</h2>
+          <Header as="h2">Folder indexed...</Header>
           <p>{this.props.dbSize} elements indexed.</p>
-          <Link to="/scan">Now scan folder</Link>
+          <Link to="/scan">
+            <Button>Now scan folder</Button>
+          </Link>
         </div>
       );
     }
     return (
-      <div>
-        <div className={styles.backButton} data-tid="backButton">
-          <Link to="/">
-            <i className="fa fa-arrow-left fa-3x" />
-          </Link>
-        </div>
-        <div>
-          <h1>Indexation of folder {this.props.masterFolder}</h1>
-        </div>
-        <div>{content}</div>
-      </div>
+      <Grid padded style={{ height: '100vh' }}>
+        <Grid.Column stretched>
+          <Grid.Row style={{ flex: '0 0 4rem' }}>
+            <Link to="/">
+              <Icon name="arrow left" size="huge" />
+            </Link>
+          </Grid.Row>
+          <Grid.Row style={{ flex: '0 0 2rem' }}>
+            <Header>Indexation of folder {this.props.masterFolder}</Header>
+          </Grid.Row>
+          <Grid.Row style={{ flex: '1 1 10%', height: '10%' }}>{content}</Grid.Row>
+        </Grid.Column>
+      </Grid>
     );
   }
 }
