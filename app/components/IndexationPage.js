@@ -39,11 +39,7 @@ class IndexationPage extends Component<Props> {
 
   async index() {
     this.props.startIndexation();
-    await scan(
-      this.props.masterFolder,
-      this.processFile,
-      this.props.indexProgress
-    );
+    await scan(this.props.masterFolder, this.processFile, this.props.indexProgress);
 
     this.props.loadDatabase(this.props.masterFolder);
 

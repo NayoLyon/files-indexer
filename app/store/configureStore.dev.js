@@ -38,15 +38,15 @@ const configureStore = (initialState?: fullStateType) => {
     ...scanActions,
     ...indexationActions,
     ...foldersActions,
-    ...routerActions,
+    ...routerActions
   };
   // If Redux DevTools Extension is installed use it, otherwise use Redux compose
   /* eslint-disable no-underscore-dangle */
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
-      // Options: http://zalmoxisus.github.io/redux-devtools-extension/API/Arguments.html
-      actionCreators,
-    })
+        // Options: http://zalmoxisus.github.io/redux-devtools-extension/API/Arguments.html
+        actionCreators
+      })
     : compose;
   /* eslint-enable no-underscore-dangle */
 
@@ -58,8 +58,7 @@ const configureStore = (initialState?: fullStateType) => {
   const store = createStore(rootReducer, initialState, enhancer);
 
   if (module.hot) {
-    module.hot.accept('../modules', () =>
-      store.replaceReducer(require('../modules'))); // eslint-disable-line global-require
+    module.hot.accept('../modules', () => store.replaceReducer(require('../modules'))); // eslint-disable-line global-require
   }
 
   return store;

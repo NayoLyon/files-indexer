@@ -1,4 +1,3 @@
-
 // For date formatting: https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/DateTimeFormat
 export function printValue(val) {
   if (val instanceof Date) {
