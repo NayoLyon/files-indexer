@@ -31,19 +31,17 @@ class Scan extends Component<Props> {
       content = <ScanResult />;
     }
     return (
-      <Grid padded style={{height: "100vh"}}>
+      <Grid padded style={{ height: '100vh' }}>
         <Grid.Column stretched>
-          <Grid.Row style={{flex: "0 0 4rem"}}>
+          <Grid.Row style={{ flex: '0 0 4rem' }}>
             <Link to="/index">
               <Icon name="arrow left" size="huge" />
             </Link>
           </Grid.Row>
-          <Grid.Row style={{flex: "0 0 2rem"}}>
+          <Grid.Row style={{ flex: '0 0 2rem' }}>
             <Header>Scan folder {this.props.toScanFolder}</Header>
           </Grid.Row>
-          <Grid.Row style={{flex: "1 1 10%", height: "10%"}}>
-            {content}
-          </Grid.Row>
+          <Grid.Row style={{ flex: '1 1 10%', height: '10%' }}>{content}</Grid.Row>
         </Grid.Column>
       </Grid>
     );

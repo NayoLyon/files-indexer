@@ -49,7 +49,7 @@ export default class ScanResultTabDuplicate extends Component<Props> {
   }
   render() {
     return (
-      <Tab.Pane key={this.props.id} style={{overflowY: "auto", height: "calc(100% - 3.5rem)"}}>
+      <Tab.Pane key={this.props.id} style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}>
         <Table celled structured>
           <Table.Header>
             <Table.Row>

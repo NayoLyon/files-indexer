@@ -31,7 +31,7 @@ export default class ScanResultTab extends Component<Props> {
   }
   render() {
     return (
-      <Tab.Pane key={this.props.id} style={{overflowY: "auto", height: "calc(100% - 3.5rem)"}}>
+      <Tab.Pane key={this.props.id} style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}>
         <List selection verticalAlign="middle">
           {this.renderFiles()}
         </List>

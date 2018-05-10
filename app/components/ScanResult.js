@@ -47,7 +47,7 @@ class ScanResult extends Component<Props> {
         )
       });
     }
-    return <Tab style={{height: "100%"}} panes={panes} />;
+    return <Tab style={{ height: '100%' }} panes={panes} />;
   }
 }
 
