@@ -4,6 +4,7 @@ import { AppContainer } from 'react-hot-loader';
 import Store from 'electron-store';
 import Root from './components/Root';
 import { configureStore, history } from './store/configureStore';
+import { onClose } from './api/database';
 import './app.global.css';
 import { selectMaster, selectToScan } from './modules/folders/foldersAction';
 
@@ -20,6 +21,10 @@ if (toScanFolder) {
   store.dispatch(selectToScan(toScanFolder));
 }
 
+// Cleanup database on close
+window.onbeforeunload = () => {
+  onClose();
+};
 render(
   <AppContainer>
     <Root store={store} history={history} />

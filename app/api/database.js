@@ -1,3 +1,5 @@
+import { setSync } from 'winattr';
+
 const Datastore = require('nedb-promise');
 
 const path = require('path');
@@ -8,6 +10,15 @@ function getDbFile(folder: string) {
   return path.join(folder, '.index.db');
 }
 
+export function onClose() {
+  // On close, set all dbFiles to hidden on Windows...
+  // We cannot do it on the fly as NeDB always create a new file and does not allow callback on write...
+  // Force this file to hidden, for windows...
+  dbStore.forEach((db, folder) => {
+    const dbPath = getDbFile(folder);
+    setSync(dbPath, { hidden: true });
+  });
+}
 function getDb(folder: string) {
   const db = dbStore.get(folder);
   if (typeof db === 'undefined') {
