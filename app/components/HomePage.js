@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { remote } from 'electron';
+import Store from 'electron-store';
 import Home from './Home';
 import * as FoldersActions from '../modules/folders/foldersAction';
 
@@ -27,6 +28,7 @@ class HomePage extends Component<Props> {
   selectFolder(isMaster: boolean) {
     dialog.showOpenDialog(
       {
+        defaultPath: isMaster ? this.props.masterFolder : this.props.toScanFolder,
         properties: ['openDirectory']
       },
       this.setFolder(isMaster)
@@ -38,10 +40,13 @@ class HomePage extends Component<Props> {
       if (typeof filePaths !== 'object' || filePaths.length < 1) {
         return;
       }
+      const configStore = new Store();
       if (isMaster) {
         this.props.selectMaster(filePaths[0]);
+        configStore.set('masterFolder', filePaths[0]);
       } else {
         this.props.selectToScan(filePaths[0]);
+        configStore.set('toScanFolder', filePaths[0]);
       }
     };
   }
