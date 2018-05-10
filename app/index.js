@@ -1,7 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
-import 'semantic-ui-css/semantic.css';
 import Root from './components/Root';
 import { configureStore, history } from './store/configureStore';
 import './app.global.css';
