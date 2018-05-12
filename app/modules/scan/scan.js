@@ -19,7 +19,11 @@ export type scanStateType = {
   +progress: number,
   +identicals: Array<FileProps>,
   +newFiles: Array<FileProps>,
-  +modified: Array<{ file: FileProps, diff: Map<string, Array<string | number | Date>> }>,
+  +modified: Array<{
+    file: FileProps,
+    diff: Map<string, Array<string | number | Date>>,
+    dbFile: FilePropsType
+  }>,
   +duplicates: Array<{ file: FileProps, matches: Arrays<FileProps> }>
 };
 
@@ -51,7 +55,10 @@ export default function scan(state: scanStateType = defaultValue, action: Action
       return Object.assign({}, state, { newFiles: [...state.newFiles, action.file] });
     case SCAN_MODIFIED:
       return Object.assign({}, state, {
-        modified: [...state.modified, { file: action.file, diff: action.diff }]
+        modified: [
+          ...state.modified,
+          { file: action.file, diff: action.diff, dbFile: action.dbFile }
+        ]
       });
     case SCAN_DUPLICATE:
       return Object.assign({}, state, {

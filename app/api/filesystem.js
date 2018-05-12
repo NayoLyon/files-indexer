@@ -4,6 +4,19 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+export type FilePropsType = {
+  _id: string,
+  name: string,
+  ext: string,
+  folder: string,
+  path: string,
+  relpath: string,
+  size: number,
+  modified: Date,
+  changed: Date,
+  created: Date
+};
+
 export class FileProps {
   constructor(id, file, stats, rootPath) {
     this._id = id;

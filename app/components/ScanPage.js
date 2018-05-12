@@ -13,7 +13,7 @@ type Props = {
   endScan: () => void,
   scanExists: FileProps => void,
   scanNew: FileProps => void,
-  scanModified: (FileProps, Map<string, Array<string | number | Date>>) => void,
+  scanModified: (FileProps, Map<string, Array<string | number | Date>>, FilePropsType) => void,
   scanDuplicate: (FileProps, Arrays<FileProps>) => void,
   masterFolder: string,
   toScanFolder: string
@@ -46,7 +46,7 @@ class ScanPage extends Component<Props> {
       const inDb = occurences[0];
       const compared: Map<string, Array<string | number | Date>> = fileProps.compareSameHash(inDb);
       if (compared.size > 0) {
-        this.props.scanModified(fileProps, compared);
+        this.props.scanModified(fileProps, compared, inDb);
       } else {
         this.props.scanExists(fileProps);
       }

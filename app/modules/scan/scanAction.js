@@ -52,11 +52,16 @@ export function scanNew(file: FileProps) {
   };
 }
 
-export function scanModified(file: FileProps, diff: Map<string, Array<string | number | Date>>) {
+export function scanModified(
+  file: FileProps,
+  diff: Map<string, Array<string | number | Date>>,
+  dbFile: FilePropsType
+) {
   return {
     type: SCAN_MODIFIED,
     file,
-    diff
+    diff,
+    dbFile
   };
 }
 

@@ -1,13 +1,17 @@
 // @flow
 import React, { Component } from 'react';
 import { Tab, Table } from 'semantic-ui-react';
-import { FileProps } from '../api/filesystem';
+import { FileProps, FilePropsType } from '../api/filesystem';
 import styles from './ScanResult.css';
 import { printValue } from '../utils/format';
 
 type Props = {
   id: string,
-  files: Array<{ file: FileProps, diff: Map<string, Array<string | number | Date>> }>
+  files: Array<{
+    file: FileProps,
+    diff: Map<string, Array<string | number | Date>>,
+    dbFile: FilePropsType
+  }>
 };
 
 export default class ScanResultTabModified extends Component<Props> {
@@ -38,12 +42,12 @@ export default class ScanResultTabModified extends Component<Props> {
         if (curDiff) {
           prevVal.push(
             <Table.Cell key={`${this.props.id}_file_${i}_${elt}db`} textAlign="left">
-              {printValue(curDiff[1])}
+              {printValue(file.dbFile[elt])}
             </Table.Cell>
           );
           prevVal.push(
             <Table.Cell key={`${this.props.id}_file_${i}_${elt}dir`} textAlign="left">
-              {printValue(curDiff[0])}
+              {printValue(file.file[elt])}
             </Table.Cell>
           );
         } else {

@@ -2,7 +2,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Tab } from 'semantic-ui-react';
-import { FileProps } from '../api/filesystem';
+
+import { FileProps, FilePropsType } from '../api/filesystem';
+
 import ScanResultTab from './ScanResultTab';
 import ScanResultTabModified from './ScanResultTabModified';
 import ScanResultTabDuplicate from './ScanResultTabDuplicate';
@@ -10,7 +12,11 @@ import ScanResultTabDuplicate from './ScanResultTabDuplicate';
 type Props = {
   identicals: Array<FileProps>,
   newFiles: Array<FileProps>,
-  modified: Array<{ file: FileProps, diff: Map<string, Array<string | number | Date>> }>,
+  modified: Array<{
+    file: FileProps,
+    diff: Map<string, Array<string | number | Date>>,
+    dbFile: FilePropsType
+  }>,
   duplicates: Array<{ file: FileProps, matches: Arrays<FileProps> }>
 };
 
