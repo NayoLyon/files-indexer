@@ -8,6 +8,10 @@ export const SCAN_EXISTS = 'SCAN_EXISTS';
 export const SCAN_NEW = 'SCAN_NEW';
 export const SCAN_MODIFIED = 'SCAN_MODIFIED';
 export const SCAN_DUPLICATE = 'SCAN_DUPLICATE';
+export const SCAN_ADD_DBREF = 'SCAN_ADD_DBREF';
+export const CONST_SCAN_TYPE_DUPLICATE = 'duplicate';
+export const CONST_SCAN_TYPE_MODIFIED = 'modified';
+export const CONST_SCAN_TYPE_EXISTS = 'exists';
 
 export type scanActionType = {
   +type: string,
@@ -70,5 +74,14 @@ export function scanDuplicate(file: FileProps, matches: Arrays<FilePropsDb>) {
     type: SCAN_DUPLICATE,
     file,
     matches
+  };
+}
+
+export function scanAddRef(file: FileProps, dbFile: FilePropsDb, scanType: string) {
+  return {
+    type: SCAN_ADD_DBREF,
+    file,
+    dbFile,
+    scanType
   };
 }

@@ -6,12 +6,17 @@ import {
   SCAN_EXISTS,
   SCAN_NEW,
   SCAN_MODIFIED,
-  SCAN_DUPLICATE
+  SCAN_DUPLICATE,
+  SCAN_ADD_DBREF
 } from './scanAction';
 import { SELECT_TOSCAN_FOLDER } from '../folders/foldersAction';
 import type { Action } from '../actionType';
 import { FileProps, FilePropsDb } from '../../api/filesystem';
 
+export type scanDbRef = {
+  dbFile: FilePropsDb,
+  files: Map<FileProps, string>
+};
 export type scanStateType = {
   +indexing: boolean,
   +isScanned: boolean,
@@ -24,7 +29,8 @@ export type scanStateType = {
     diff: Map<string, Array<string | number | Date>>,
     dbFile: FilePropsDb
   }>,
-  +duplicates: Array<{ file: FileProps, matches: Arrays<FilePropsDb> }>
+  +duplicates: Array<{ file: FileProps, matches: Arrays<FilePropsDb> }>,
+  +dbFilesRef: Map<string, scanDbRef>
 };
 
 const defaultValue: scanStateType = {
@@ -35,7 +41,8 @@ const defaultValue: scanStateType = {
   identicals: [],
   newFiles: [],
   modified: [],
-  duplicates: []
+  duplicates: [],
+  dbFilesRef: new Map()
 };
 
 export default function scan(state: scanStateType = defaultValue, action: Action) {
@@ -64,6 +71,20 @@ export default function scan(state: scanStateType = defaultValue, action: Action
       return Object.assign({}, state, {
         duplicates: [...state.duplicates, { file: action.file, matches: action.matches }]
       });
+    case SCAN_ADD_DBREF: {
+      const newDbRef = new Map(state.dbFilesRef);
+      const oldDbRef = state.dbFilesRef.get(action.dbFile.id);
+      let newFileMap = new Map();
+      if (oldDbRef) {
+        newFileMap = new Map(oldDbRef.files);
+      }
+      newFileMap.set(action.file, action.scanType);
+      newDbRef.set(action.dbFile.id, {
+        dbFile: action.dbFile,
+        files: newFileMap
+      });
+      return Object.assign({}, state, { dbFilesRef: newDbRef });
+    }
     default:
       return state;
   }
