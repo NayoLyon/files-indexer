@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Grid, Icon, Header, Button } from 'semantic-ui-react';
-import ScanResult from './ScanResult';
+import ScanResultPage from './ScanResultPage';
 
 type Props = {
   scan: () => void,
@@ -28,7 +28,7 @@ class Scan extends Component<Props> {
         </Header>
       );
     } else if (this.props.isScanned) {
-      content = <ScanResult />;
+      content = <ScanResultPage />;
     }
     return (
       <Grid padded style={{ height: '100vh' }}>
