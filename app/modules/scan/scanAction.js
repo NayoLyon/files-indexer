@@ -1,5 +1,5 @@
 // @flow
-import { FileProps } from '../../api/filesystem';
+import { FileProps, FilePropsDb } from '../../api/filesystem';
 
 export const SCAN_START = 'SCAN_START';
 export const SCAN_END = 'SCAN_END';
@@ -15,7 +15,7 @@ export type scanActionType = {
   +progress: ?number,
   +file: ?FileProps,
   +diff: ?Map<string, Array<string | number | Date>>,
-  +matches: ?Array<FileProps>
+  +matches: ?Array<FilePropsDb>
 };
 
 export function startScan() {
@@ -55,7 +55,7 @@ export function scanNew(file: FileProps) {
 export function scanModified(
   file: FileProps,
   diff: Map<string, Array<string | number | Date>>,
-  dbFile: FilePropsType
+  dbFile: FilePropsDb
 ) {
   return {
     type: SCAN_MODIFIED,
@@ -65,7 +65,7 @@ export function scanModified(
   };
 }
 
-export function scanDuplicate(file: FileProps, matches: Arrays<FileProps>) {
+export function scanDuplicate(file: FileProps, matches: Arrays<FilePropsDb>) {
   return {
     type: SCAN_DUPLICATE,
     file,

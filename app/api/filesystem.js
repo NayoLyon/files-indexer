@@ -11,20 +11,40 @@ export type FilePropsType = {
   folder: string,
   path: string,
   relpath: string,
+  hash: string,
   size: number,
   modified: Date,
   changed: Date,
   created: Date
 };
 
+export class FilePropsDb {
+  constructor(dbFile: FilePropsType) {
+    this._id = dbFile._id;
+    this.name = dbFile.name;
+    this.ext = dbFile.ext;
+    this.folder = dbFile.folder;
+    this.path = dbFile.path;
+    this.relpath = dbFile.relpath;
+    this.hash = dbFile.hash;
+    this.size = dbFile.size;
+    this.modified = dbFile.modified;
+    this.changed = dbFile.changed;
+    this.created = dbFile.created;
+  }
+  get id() {
+    return this._id;
+  }
+}
 export class FileProps {
-  constructor(id, file, stats, rootPath) {
-    this._id = id;
+  constructor(hash, file, stats, rootPath) {
+    this._id = hash;
     this.name = path.basename(file);
     this.ext = path.extname(file);
     this.folder = path.dirname(file); // Useless ??
     this.path = file; // Useless ??
     this.relpath = path.relative(rootPath, file); // Relative to the database... More usefull
+    this.hash = hash;
     this.size = stats.size;
     this.modified = stats.mtime;
     this.changed = stats.ctime;

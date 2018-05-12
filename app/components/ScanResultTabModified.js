@@ -2,19 +2,19 @@
 import React, { Component } from 'react';
 import { Tab, Table, Button } from 'semantic-ui-react';
 
-import { FileProps, FilePropsType } from '../api/filesystem';
+import { FileProps, FilePropsDb } from '../api/filesystem';
 
 import styles from './ScanResult.css';
 import { printValue } from '../utils/format';
 
 type Props = {
   openFolderFor: FileProps => void,
-  openDbFolderFor: FilePropsType => void,
+  openDbFolderFor: FilePropsDb => void,
   id: string,
   files: Array<{
     file: FileProps,
     diff: Map<string, Array<string | number | Date>>,
-    dbFile: FilePropsType
+    dbFile: FilePropsDb
   }>
 };
 

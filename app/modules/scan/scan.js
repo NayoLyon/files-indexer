@@ -10,7 +10,7 @@ import {
 } from './scanAction';
 import { SELECT_TOSCAN_FOLDER } from '../folders/foldersAction';
 import type { Action } from '../actionType';
-import { FileProps } from '../../api/filesystem';
+import { FileProps, FilePropsDb } from '../../api/filesystem';
 
 export type scanStateType = {
   +indexing: boolean,
@@ -22,9 +22,9 @@ export type scanStateType = {
   +modified: Array<{
     file: FileProps,
     diff: Map<string, Array<string | number | Date>>,
-    dbFile: FilePropsType
+    dbFile: FilePropsDb
   }>,
-  +duplicates: Array<{ file: FileProps, matches: Arrays<FileProps> }>
+  +duplicates: Array<{ file: FileProps, matches: Arrays<FilePropsDb> }>
 };
 
 const defaultValue: scanStateType = {

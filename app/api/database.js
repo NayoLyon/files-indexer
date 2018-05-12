@@ -1,5 +1,7 @@
 import { setSync } from 'winattr';
 
+import { FilePropsDb } from './filesystem';
+
 const Datastore = require('nedb-promise');
 
 const path = require('path');
@@ -46,9 +48,19 @@ export async function getDatabaseSize(folder: string): number {
   }
 }
 
-export function findDb(folder: string, what) {
+export async function findDb(folder: string, what): Array<FilePropsDb> {
   const db = getDb(folder);
-  return db.find(what);
+  try {
+    const occurences = await db.find(what);
+    const res = [];
+    occurences.forEach(elt => {
+      res.push(new FilePropsDb(elt));
+    });
+    return res;
+  } catch (err) {
+    console.error('Error in DB find', err);
+    throw err;
+  }
 }
 
 export function insertDb(folder: string, obj) {

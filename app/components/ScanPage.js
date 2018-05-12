@@ -2,10 +2,12 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import Scan from './Scan';
+
 import * as ScanActions from '../modules/scan/scanAction';
-import { scan, FileProps } from '../api/filesystem';
+import { scan, FileProps, FilePropsDb } from '../api/filesystem';
 import { findDb } from '../api/database';
+
+import Scan from './Scan';
 
 type Props = {
   scanProgress: (string, number) => void,
@@ -13,8 +15,8 @@ type Props = {
   endScan: () => void,
   scanExists: FileProps => void,
   scanNew: FileProps => void,
-  scanModified: (FileProps, Map<string, Array<string | number | Date>>, FilePropsType) => void,
-  scanDuplicate: (FileProps, Arrays<FileProps>) => void,
+  scanModified: (FileProps, Map<string, Array<string | number | Date>>, FilePropsDb) => void,
+  scanDuplicate: (FileProps, Arrays<FilePropsDb>) => void,
   masterFolder: string,
   toScanFolder: string
 };

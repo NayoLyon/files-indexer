@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { shell } from 'electron';
 import path from 'path';
 
-import { FileProps, FilePropsType } from '../api/filesystem';
+import { FileProps, FilePropsDb } from '../api/filesystem';
 
 import ScanResult from './ScanResult';
 import * as ScanActions from '../modules/scan/scanAction';
@@ -28,7 +28,7 @@ class ScanResultPage extends Component<Props> {
     this.openFolderFor = this.openFolderFor.bind(this);
   }
 
-  openDbFolderFor(file: FilePropsType) {
+  openDbFolderFor(file: FilePropsDb) {
     ScanResultPage.openFolder(path.resolve(this.props.masterFolder, file.relpath));
   }
   openFolderFor(file: FileProps) {
@@ -36,12 +36,7 @@ class ScanResultPage extends Component<Props> {
   }
 
   render() {
-    return (
-      <ScanResult
-        openDbFolderFor={this.openDbFolderFor}
-        openFolderFor={this.openFolderFor}
-      />
-    );
+    return <ScanResult openDbFolderFor={this.openDbFolderFor} openFolderFor={this.openFolderFor} />;
   }
 }
 

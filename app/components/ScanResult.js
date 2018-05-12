@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Tab } from 'semantic-ui-react';
 
-import { FileProps, FilePropsType } from '../api/filesystem';
+import { FileProps, FilePropsDb } from '../api/filesystem';
 
 import ScanResultTab from './ScanResultTab';
 import ScanResultTabModified from './ScanResultTabModified';
@@ -11,15 +11,15 @@ import ScanResultTabDuplicate from './ScanResultTabDuplicate';
 
 type Props = {
   openFolderFor: FileProps => void,
-  openDbFolderFor: FilePropsType => void,
+  openDbFolderFor: FilePropsDb => void,
   identicals: Array<FileProps>,
   newFiles: Array<FileProps>,
   modified: Array<{
     file: FileProps,
     diff: Map<string, Array<string | number | Date>>,
-    dbFile: FilePropsType
+    dbFile: FilePropsDb
   }>,
-  duplicates: Array<{ file: FileProps, matches: Arrays<FileProps> }>
+  duplicates: Array<{ file: FileProps, matches: Arrays<FilePropsDb> }>
 };
 
 class ScanResult extends Component<Props> {
