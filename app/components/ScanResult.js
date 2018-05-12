@@ -10,6 +10,8 @@ import ScanResultTabModified from './ScanResultTabModified';
 import ScanResultTabDuplicate from './ScanResultTabDuplicate';
 
 type Props = {
+  openFolderFor: FileProps => void,
+  openDbFolderFor: FilePropsType => void,
   identicals: Array<FileProps>,
   newFiles: Array<FileProps>,
   modified: Array<{
@@ -41,7 +43,12 @@ class ScanResult extends Component<Props> {
       panes.push({
         menuItem: 'Modified files',
         render: () => (
-          <ScanResultTabModified id="scan_result_modified" files={this.props.modified} />
+          <ScanResultTabModified
+            id="scan_result_modified"
+            files={this.props.modified}
+            openDbFolderFor={this.props.openDbFolderFor}
+            openFolderFor={this.props.openFolderFor}
+          />
         )
       });
     }

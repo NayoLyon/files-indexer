@@ -1,11 +1,15 @@
 // @flow
 import React, { Component } from 'react';
-import { Tab, Table } from 'semantic-ui-react';
+import { Tab, Table, Button } from 'semantic-ui-react';
+
 import { FileProps, FilePropsType } from '../api/filesystem';
+
 import styles from './ScanResult.css';
 import { printValue } from '../utils/format';
 
 type Props = {
+  openFolderFor: FileProps => void,
+  openDbFolderFor: FilePropsType => void,
   id: string,
   files: Array<{
     file: FileProps,
@@ -40,13 +44,39 @@ export default class ScanResultTabModified extends Component<Props> {
       const fileDiff = columnsName.reduce((prevVal, elt) => {
         const curDiff = file.diff.get(elt);
         if (curDiff || elt === 'relpath') {
+          const actionsDb =
+            elt === 'relpath' ? (
+              <Button
+                icon="external"
+                onClick={() => {
+                  this.props.openDbFolderFor(file.dbFile);
+                }}
+              />
+            ) : null;
+          let actionsFolder = null;
+          if (elt === 'relpath') {
+            actionsFolder = (
+              <Button
+                icon="external"
+                onClick={() => {
+                  this.props.openFolderFor(file.file);
+                }}
+              />
+            );
+          }
           prevVal.push(
-            <Table.Cell key={`${this.props.id}_file_${i}_${elt}db`} textAlign="left">
+            <Table.Cell
+              key={`${this.props.id}_file_${i}_${elt}db`}
+              textAlign="left"
+              verticalAlign="middle"
+            >
+              {actionsDb}
               {printValue(file.dbFile[elt])}
             </Table.Cell>
           );
           prevVal.push(
             <Table.Cell key={`${this.props.id}_file_${i}_${elt}dir`} textAlign="left">
+              {actionsFolder}
               {printValue(file.file[elt])}
             </Table.Cell>
           );

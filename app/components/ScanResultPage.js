@@ -3,25 +3,52 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { shell } from 'electron';
+import path from 'path';
+
+import { FileProps, FilePropsType } from '../api/filesystem';
 
 import ScanResult from './ScanResult';
 import * as ScanActions from '../modules/scan/scanAction';
 
 type Props = {
+  masterFolder: string,
+  toScanFolder: string
 };
 
 class ScanResultPage extends Component<Props> {
   props: Props;
+  static openFolder(folder) {
+    shell.showItemInFolder(folder);
+  }
+
+  constructor(props) {
+    super(props);
+    this.openDbFolderFor = this.openDbFolderFor.bind(this);
+    this.openFolderFor = this.openFolderFor.bind(this);
+  }
+
+  openDbFolderFor(file: FilePropsType) {
+    ScanResultPage.openFolder(path.resolve(this.props.masterFolder, file.relpath));
+  }
+  openFolderFor(file: FileProps) {
+    ScanResultPage.openFolder(path.resolve(this.props.toScanFolder, file.relpath));
+  }
 
   render() {
     return (
-      <ScanResult />
+      <ScanResult
+        openDbFolderFor={this.openDbFolderFor}
+        openFolderFor={this.openFolderFor}
+      />
     );
   }
 }
 
 function mapStateToProps(state) {
   return {
+    masterFolder: state.folders.masterPath,
+    toScanFolder: state.folders.toScanPath
   };
 }
 
