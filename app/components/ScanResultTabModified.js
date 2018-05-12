@@ -22,7 +22,7 @@ export default class ScanResultTabModified extends Component<Props> {
   }
 
   renderFiles() {
-    const columnsName = [];
+    const columnsName = ['relpath'];
     const rows = [];
     // To have a pretty table, I need to parse the files twice:
     // one to compute the columns, and the other to actually create the rows.
@@ -39,7 +39,7 @@ export default class ScanResultTabModified extends Component<Props> {
 
       const fileDiff = columnsName.reduce((prevVal, elt) => {
         const curDiff = file.diff.get(elt);
-        if (curDiff) {
+        if (curDiff || elt === 'relpath') {
           prevVal.push(
             <Table.Cell key={`${this.props.id}_file_${i}_${elt}db`} textAlign="left">
               {printValue(file.dbFile[elt])}
