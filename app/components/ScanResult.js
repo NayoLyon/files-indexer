@@ -39,7 +39,9 @@ class ScanResult extends Component<Props> {
       });
       if (duplicatefileRefs.length > 0) {
         panes.push({
-          menuItem: 'Caution: several files refers to the same db file!!',
+          menuItem: `Caution: several files refers to the same db file!! (${
+            duplicatefileRefs.length
+          })`,
           render: () => (
             <ScanResultTabReferences id="scan_result_references" files={duplicatefileRefs} />
           )
@@ -48,19 +50,19 @@ class ScanResult extends Component<Props> {
     }
     if (this.props.identicals.length > 0) {
       panes.push({
-        menuItem: 'Identical files',
+        menuItem: `Identical files (${this.props.identicals.length})`,
         render: () => <ScanResultTab id="scan_result_identical" files={this.props.identicals} />
       });
     }
     if (this.props.newFiles.length > 0) {
       panes.push({
-        menuItem: 'New files',
+        menuItem: `New files (${this.props.newFiles.length})`,
         render: () => <ScanResultTab id="scan_result_new" files={this.props.newFiles} />
       });
     }
     if (this.props.modified.length > 0) {
       panes.push({
-        menuItem: 'Modified files',
+        menuItem: `Modified files (${this.props.modified.length})`,
         render: () => (
           <ScanResultTabModified
             id="scan_result_modified"
@@ -73,7 +75,7 @@ class ScanResult extends Component<Props> {
     }
     if (this.props.duplicates.length > 0) {
       panes.push({
-        menuItem: 'Possible duplicates',
+        menuItem: `Possible duplicates (${this.props.duplicates.length})`,
         render: () => (
           <ScanResultTabDuplicate id="scan_result_duplicates" files={this.props.duplicates} />
         )
