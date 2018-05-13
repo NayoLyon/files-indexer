@@ -54,7 +54,7 @@ export async function findDb(folder: string, what): Array<FilePropsDb> {
     const occurences = await db.find(what);
     const res = [];
     occurences.forEach(elt => {
-      res.push(new FilePropsDb(elt));
+      res.push(FilePropsDb.fromFile(elt));
     });
     return res;
   } catch (err) {

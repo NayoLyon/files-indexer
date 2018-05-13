@@ -19,23 +19,30 @@ export type FilePropsType = {
 };
 
 export class FilePropsDb {
-  constructor(dbFile: FilePropsType) {
-    this._id = dbFile._id;
-    this.name = dbFile.name;
-    this.ext = dbFile.ext;
-    this.folder = dbFile.folder;
-    this.path = dbFile.path;
-    this.relpath = dbFile.relpath;
-    this.hash = dbFile.hash;
-    this.size = dbFile.size;
-    this.modified = dbFile.modified;
-    this.changed = dbFile.changed;
-    this.created = dbFile.created;
+  constructor(file: FilePropsType) {
+    this._id = file._id;
+    this.name = file.name;
+    this.ext = file.ext;
+    this.folder = file.folder;
+    this.path = file.path;
+    this.relpath = file.relpath;
+    this.hash = file.hash;
+    this.size = file.size;
+    this.modified = file.modified;
+    this.changed = file.changed;
+    this.created = file.created;
   }
   get id() {
     return this._id;
   }
+  static fromFile(file: FilePropsType): FilePropsDb {
+    return new FilePropsDb(file);
+  }
+  clone(): FilePropsDb {
+    return new FilePropsDb(this);
+  }
 }
+
 export class FileProps {
   constructor(hash, file, stats, rootPath) {
     this._id = hash;
