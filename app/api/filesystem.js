@@ -53,7 +53,7 @@ export class FileProps {
   get id() {
     return this._id;
   }
-  compareSameHash(dbFile) {
+  compareSameHash(dbFile: FilePropsDb) {
     const result: Map<string, Array<string | number | Date>> = new Map();
     if (dbFile.name !== this.name) {
       result.set('name', [this.name, dbFile.name]);
@@ -76,7 +76,7 @@ export class FileProps {
   }
 }
 
-export async function scan(
+export async function doScan(
   folder: string,
   fileCallback: (fileProps: FileProps) => void,
   progressCallback: (step: string, progress: number) => void

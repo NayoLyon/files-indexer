@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Indexation from './Indexation';
 import * as IndexationActions from '../modules/indexation/indexationAction';
-import { scan, FileProps } from '../api/filesystem';
+import { doScan, FileProps } from '../api/filesystem';
 import { findDb, insertDb } from '../api/database';
 
 type Props = {
@@ -39,7 +39,7 @@ class IndexationPage extends Component<Props> {
 
   async index() {
     this.props.startIndexation();
-    await scan(this.props.masterFolder, this.processFile, this.props.indexProgress);
+    await doScan(this.props.masterFolder, this.processFile, this.props.indexProgress);
 
     this.props.loadDatabase(this.props.masterFolder);
 

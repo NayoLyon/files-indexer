@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import * as ScanActions from '../modules/scan/scanAction';
-import { scan, FileProps, FilePropsDb } from '../api/filesystem';
+import { doScan, FileProps, FilePropsDb } from '../api/filesystem';
 import { findDb } from '../api/database';
 
 import Scan from './Scan';
@@ -64,7 +64,7 @@ class ScanPage extends Component<Props> {
   async scan() {
     this.props.startScan();
 
-    await scan(this.props.toScanFolder, this.processFile, this.props.scanProgress);
+    await doScan(this.props.toScanFolder, this.processFile, this.props.scanProgress);
 
     this.props.endScan();
   }
