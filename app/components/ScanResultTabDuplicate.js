@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { Tab, Table, Visibility } from 'semantic-ui-react';
+import { Tab, Table } from 'semantic-ui-react';
 import { FileProps, FilePropsDb } from '../api/filesystem';
 import { printValue } from '../utils/format';
 
@@ -63,15 +63,15 @@ export default class ScanResultTabDuplicate extends Component<Props> {
               <Table.HeaderCell>Relative path</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
-          <Visibility
+          {/* <Visibility
             as={Table.Body}
             continuous={false}
             once={false}
             onBottomVisible={() => console.log('This will call API')}
           >
             {this.renderFiles()}
-          </Visibility>
-          {/* <Table.Body>{this.renderFiles()}</Table.Body> */}
+          </Visibility> */}
+          <Table.Body>{this.renderFiles()}</Table.Body>
         </Table>
       </Tab.Pane>
     );
