@@ -79,6 +79,7 @@ class ScanResultPage extends Component<Props> {
     // Retrieve all files connected to this dbref and remove all scan references to these files
     let counter = 0;
     const dbRefInstance = this.props.dbFilesRef.get(dbFile.id);
+    const oldDbMap = new Map();
     if (dbRefInstance) {
       nbFilesToRescan += dbRefInstance.files.size;
       const promises = [];
@@ -88,13 +89,16 @@ class ScanResultPage extends Component<Props> {
         switch (val) {
           case ScanActions.CONST_SCAN_TYPE_DUPLICATE:
             // Do nothing, will be managed in the next step...
+            oldDbMap.set(key, dbFile);
             break;
           case ScanActions.CONST_SCAN_TYPE_EXISTS:
             filesToRescan.push(key);
+            oldDbMap.set(key, dbFile);
             promises.push(this.props.scanExistsRemove(key));
             break;
           case ScanActions.CONST_SCAN_TYPE_MODIFIED:
             filesToRescan.push(key);
+            oldDbMap.set(key, dbFile);
             promises.push(this.props.scanModifiedRemove(key));
             break;
           default:
@@ -128,25 +132,31 @@ class ScanResultPage extends Component<Props> {
     }
     // Retrieve all files duplicated and new (not connected to dbFile by hash)
     //  and remove all scan references to these files
-    await Promise.all(this.props.newFiles.map(async elt => {
-      this.props.scanProgress('LISTING', counter / nbFilesToRescan);
-      counter += 1;
-      filesToRescan.push(elt);
-      await this.props.scanNewRemove(elt);
-    }));
-    await Promise.all(this.props.duplicates.map(async elt => {
-      this.props.scanProgress('LISTING', counter / nbFilesToRescan);
-      counter += 1;
-      filesToRescan.push(elt.file);
-      await this.props.scanDuplicateRemove(elt.file);
-    }));
+    await Promise.all(
+      this.props.newFiles.map(async elt => {
+        this.props.scanProgress('LISTING', counter / nbFilesToRescan);
+        counter += 1;
+        filesToRescan.push(elt);
+        await this.props.scanNewRemove(elt);
+      })
+    );
+    await Promise.all(
+      this.props.duplicates.map(async elt => {
+        this.props.scanProgress('LISTING', counter / nbFilesToRescan);
+        counter += 1;
+        filesToRescan.push(elt.file);
+        await this.props.scanDuplicateRemove(elt.file);
+      })
+    );
 
     // Rescan them all
     counter = 0;
-    await Promise.all(filesToRescan.map(async elt => {
-      this.props.scanProgress('INDEXING', counter / filesToRescan.length);
-      await this.props.scanProcessFile(elt, dbFile);
-    }));
+    await Promise.all(
+      filesToRescan.map(async elt => {
+        this.props.scanProgress('INDEXING', counter / filesToRescan.length);
+        await this.props.scanProcessFile(elt, oldDbMap.get(elt));
+      })
+    );
 
     this.props.endScan();
   }
