@@ -108,41 +108,45 @@ export default function scan(state: scanStateType = defaultValue, action: Action
     }
     case SCAN_DBREF_UPDATE: {
       const nextDbRef = new Map(state.dbFilesRef);
-      const prevOldScanDbRef = nextDbRef.get(action.oldDbFile.id);
-      if (prevOldScanDbRef) {
-        if (prevOldScanDbRef.files.size === 1 && prevOldScanDbRef.files.get(action.file)) {
-          // We have only the file, and we remove it, so remove the entire dbRef...
-          nextDbRef.delete(action.oldDbFile.id);
-        } else {
-          // We should not have only 1 entry here...
-          if (prevOldScanDbRef.files.size <= 1) {
-            console.error('Corrupted scanDbRef map!!', action.file, prevOldScanDbRef);
+      if (action.oldDbFile) {
+        const prevOldScanDbRef = nextDbRef.get(action.oldDbFile.id);
+        if (prevOldScanDbRef) {
+          if (prevOldScanDbRef.files.size === 1 && prevOldScanDbRef.files.get(action.file)) {
+            // We have only the file, and we remove it, so remove the entire dbRef...
+            nextDbRef.delete(action.oldDbFile.id);
+          } else {
+            // We should not have only 1 entry here...
+            if (prevOldScanDbRef.files.size <= 1) {
+              console.error('Corrupted scanDbRef map!!', action.file, prevOldScanDbRef);
+            }
+            const nextOldScanDbRef = {
+              dbFile: prevOldScanDbRef.dbFile,
+              files: new Map(prevOldScanDbRef.files)
+            };
+            nextOldScanDbRef.files.delete(action.file);
+            nextDbRef.set(action.oldDbFile.id, nextOldScanDbRef);
           }
-          const nextOldScanDbRef = {
-            dbFile: prevOldScanDbRef.dbFile,
-            files: new Map(prevOldScanDbRef.files)
-          };
-          nextOldScanDbRef.files.delete(action.file);
-          nextDbRef.set(action.oldDbFile.id, nextOldScanDbRef);
         }
       }
-      const prevNewScanDbRef = nextDbRef.get(action.newDbFile.id);
-      let nextNewScanDbRef;
-      if (prevNewScanDbRef) {
-        // Copy the previous one, to append this new ref
-        nextNewScanDbRef = {
-          dbFile: prevNewScanDbRef.dbFile,
-          files: new Map(prevNewScanDbRef.files)
-        };
-      } else {
-        // Entirely new, create from scratch...
-        nextNewScanDbRef = {
-          dbFile: action.newDbFile,
-          files: new Map()
-        };
+      if (action.newDbFile) {
+        const prevNewScanDbRef = nextDbRef.get(action.newDbFile.id);
+        let nextNewScanDbRef;
+        if (prevNewScanDbRef) {
+          // Copy the previous one, to append this new ref
+          nextNewScanDbRef = {
+            dbFile: prevNewScanDbRef.dbFile,
+            files: new Map(prevNewScanDbRef.files)
+          };
+        } else {
+          // Entirely new, create from scratch...
+          nextNewScanDbRef = {
+            dbFile: action.newDbFile,
+            files: new Map()
+          };
+        }
+        nextNewScanDbRef.files.set(action.file, action.scanType);
+        nextDbRef.set(action.newDbFile.id, nextNewScanDbRef);
       }
-      nextNewScanDbRef.files.set(action.file, action.scanType);
-      nextDbRef.set(action.dbFile.id, nextNewScanDbRef);
       return Object.assign({}, state, { dbFilesRef: nextDbRef });
     }
     default:
