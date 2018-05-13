@@ -121,8 +121,8 @@ export function scanRefAdd(file: FileProps, dbFile: FilePropsDb, scanType: strin
 
 export function scanRefUpdate(
   file: FileProps,
-  oldDbFile: FilePropsDb,
-  newDbFile: FilePropsDb,
+  oldDbFile: FilePropsDb | undefined,
+  newDbFile: FilePropsDb | undefined,
   scanType: string
 ) {
   return {
