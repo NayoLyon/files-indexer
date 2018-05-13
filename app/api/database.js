@@ -67,3 +67,10 @@ export function insertDb(folder: string, obj) {
   const db = getDb(folder);
   return db.insert(obj);
 }
+
+/* eslint-disable no-underscore-dangle */
+export function updateDb(folder: string, obj) {
+  const db = getDb(folder);
+  return db.update({ _id: obj._id }, obj, { returnUpdatedDocs: true });
+}
+/* eslint-enable no-underscore-dangle */

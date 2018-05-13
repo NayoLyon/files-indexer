@@ -10,6 +10,7 @@ import { printValue } from '../utils/format';
 type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
+  copyModifiedAttribute: (FileProps, FilePropsDb) => void,
   id: string,
   files: Array<{
     file: FileProps,
@@ -60,6 +61,16 @@ export default class ScanResultTabModified extends Component<Props> {
                 icon="external"
                 onClick={() => {
                   this.props.openFolderFor(file.file);
+                }}
+              />
+            );
+          } else if (elt === 'modified') {
+            actionsFolder = (
+              <Button
+                icon="triangle left"
+                color="green"
+                onClick={() => {
+                  this.props.copyModifiedAttribute(file.file, file.dbFile);
                 }}
               />
             );

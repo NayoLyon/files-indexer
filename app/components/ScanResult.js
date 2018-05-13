@@ -14,6 +14,7 @@ import ScanResultTabReferences from './ScanResultTabReferences';
 type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
+  copyModifiedAttribute: (FileProps, FilePropsDb) => void,
   identicals: Array<FileProps>,
   newFiles: Array<FileProps>,
   modified: Array<{
@@ -67,6 +68,7 @@ class ScanResult extends Component<Props> {
           <ScanResultTabModified
             id="scan_result_modified"
             files={this.props.modified}
+            copyModifiedAttribute={this.props.copyModifiedAttribute}
             openDbFolderFor={this.props.openDbFolderFor}
             openFolderFor={this.props.openFolderFor}
           />
