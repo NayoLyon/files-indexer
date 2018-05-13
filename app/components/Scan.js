@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Grid, Icon, Header, Button } from 'semantic-ui-react';
+
 import ScanResultPage from './ScanResultPage';
 
 type Props = {
