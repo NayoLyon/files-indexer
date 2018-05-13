@@ -8,7 +8,7 @@ type Props = {
   files: Array<FileProps>
 };
 
-export default class ScanResultTab extends Component<Props> {
+export default class ScanResultTabNew extends Component<Props> {
   props: Props;
   constructor(props) {
     super(props);

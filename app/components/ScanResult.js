@@ -6,7 +6,7 @@ import { Tab } from 'semantic-ui-react';
 import { FileProps, FilePropsDb } from '../api/filesystem';
 import { scanDbRef } from '../modules/scan/scan';
 
-import ScanResultTab from './ScanResultTab';
+import ScanResultTabNew from './ScanResultTabNew';
 import ScanResultTabModified from './ScanResultTabModified';
 import ScanResultTabDuplicate from './ScanResultTabDuplicate';
 import ScanResultTabReferences from './ScanResultTabReferences';
@@ -63,7 +63,7 @@ class ScanResult extends Component<Props> {
     if (this.props.newFiles.length > 0) {
       panes.push({
         menuItem: `New files (${this.props.newFiles.length})`,
-        render: () => <ScanResultTab id="scan_result_new" files={this.props.newFiles} />
+        render: () => <ScanResultTabNew id="scan_result_new" files={this.props.newFiles} />
       });
     }
     if (this.props.modified.length > 0) {
