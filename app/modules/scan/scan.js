@@ -4,9 +4,13 @@ import {
   SCAN_END,
   SCAN_PROGRESS,
   SCAN_EXISTS_ADD,
+  SCAN_EXISTS_REMOVE,
   SCAN_NEW_ADD,
+  SCAN_NEW_REMOVE,
   SCAN_MODIFIED_ADD,
+  SCAN_MODIFIED_REMOVE,
   SCAN_DUPLICATE_ADD,
+  SCAN_DUPLICATE_REMOVE,
   SCAN_DBREF_ADD,
   SCAN_DBREF_UPDATE
 } from './scanAction';
@@ -59,8 +63,16 @@ export default function scan(state: scanStateType = defaultValue, action: Action
       return Object.assign({}, state, { step: action.step, progress: action.progress });
     case SCAN_EXISTS_ADD:
       return Object.assign({}, state, { identicals: [...state.identicals, action.file] });
+    case SCAN_EXISTS_REMOVE: {
+      const newIdenticals = state.identicals.filter(elt => elt !== action.file);
+      return Object.assign({}, state, { identicals: newIdenticals });
+    }
     case SCAN_NEW_ADD:
       return Object.assign({}, state, { newFiles: [...state.newFiles, action.file] });
+    case SCAN_NEW_REMOVE: {
+      const newNewFiles = state.newFiles.filter(elt => elt !== action.file);
+      return Object.assign({}, state, { newFiles: newNewFiles });
+    }
     case SCAN_MODIFIED_ADD:
       return Object.assign({}, state, {
         modified: [
@@ -68,10 +80,18 @@ export default function scan(state: scanStateType = defaultValue, action: Action
           { file: action.file, diff: action.diff, dbFile: action.dbFile }
         ]
       });
+    case SCAN_MODIFIED_REMOVE: {
+      const newModified = state.modified.filter(elt => elt.file !== action.file);
+      return Object.assign({}, state, { modified: newModified });
+    }
     case SCAN_DUPLICATE_ADD:
       return Object.assign({}, state, {
         duplicates: [...state.duplicates, { file: action.file, matches: action.matches }]
       });
+    case SCAN_DUPLICATE_REMOVE: {
+      const newDuplicates = state.duplicates.filter(elt => elt.file !== action.file);
+      return Object.assign({}, state, { duplicates: newDuplicates });
+    }
     case SCAN_DBREF_ADD: {
       const nextDbRef = new Map(state.dbFilesRef);
       const prevScanDbRef = nextDbRef.get(action.dbFile.id);
