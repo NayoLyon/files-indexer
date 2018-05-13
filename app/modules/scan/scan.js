@@ -27,7 +27,7 @@ export type scanStateType = {
   +isScanned: boolean,
   +step: string,
   +progress: number,
-  +identicals: Array<FileProps>,
+  +identicals: Array<{ file: FileProps, dbFile: FilePropsDb }>,
   +newFiles: Array<FileProps>,
   +modified: Array<{
     file: FileProps,
@@ -62,9 +62,11 @@ export default function scan(state: scanStateType = defaultValue, action: Action
     case SCAN_PROGRESS:
       return Object.assign({}, state, { step: action.step, progress: action.progress });
     case SCAN_EXISTS_ADD:
-      return Object.assign({}, state, { identicals: [...state.identicals, action.file] });
+      return Object.assign({}, state, {
+        identicals: [...state.identicals, { file: action.file, dbFile: action.dbFile }]
+      });
     case SCAN_EXISTS_REMOVE: {
-      const newIdenticals = state.identicals.filter(elt => elt !== action.file);
+      const newIdenticals = state.identicals.filter(elt => elt.file !== action.file);
       return Object.assign({}, state, { identicals: newIdenticals });
     }
     case SCAN_NEW_ADD:

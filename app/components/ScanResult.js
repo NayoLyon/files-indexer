@@ -10,6 +10,7 @@ import ScanResultTab from './ScanResultTab';
 import ScanResultTabModified from './ScanResultTabModified';
 import ScanResultTabDuplicate from './ScanResultTabDuplicate';
 import ScanResultTabReferences from './ScanResultTabReferences';
+import ScanResultTabIdentical from './ScanResultTabIdentical';
 
 type Props = {
   openFolderFor: FileProps => void,
@@ -17,7 +18,7 @@ type Props = {
   copyModifiedAttribute: (FileProps, FilePropsDb) => void,
   removeFile: (FileProps, FilePropsDb) => void,
   copyNameAttribute: (FileProps, FilePropsDb) => void,
-  identicals: Array<FileProps>,
+  identicals: Array<{ file: FileProps, dbFile: FilePropsDb }>,
   newFiles: Array<FileProps>,
   modified: Array<{
     file: FileProps,
@@ -54,7 +55,9 @@ class ScanResult extends Component<Props> {
     if (this.props.identicals.length > 0) {
       panes.push({
         menuItem: `Identical files (${this.props.identicals.length})`,
-        render: () => <ScanResultTab id="scan_result_identical" files={this.props.identicals} />
+        render: () => (
+          <ScanResultTabIdentical id="scan_result_identical" files={this.props.identicals} />
+        )
       });
     }
     if (this.props.newFiles.length > 0) {

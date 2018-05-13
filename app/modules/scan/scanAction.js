@@ -53,10 +53,11 @@ export function scanProgress(step: string, progress: number) {
   };
 }
 
-export function scanExistsAdd(file: FileProps) {
+export function scanExistsAdd(file: FileProps, dbFile: FilePropsDb) {
   return {
     type: SCAN_EXISTS_ADD,
-    file
+    file,
+    dbFile
   };
 }
 export function scanExistsRemove(file: FileProps) {
@@ -167,7 +168,7 @@ export function scanProcessFile(fileProps: FileProps, oldDbFile: FilePropsDb | u
         await dispatch(scanModifiedAdd(fileProps, compared, inDb));
         await dispatch(scanRefUpdate(fileProps, oldDbFile, inDb, CONST_SCAN_TYPE_MODIFIED));
       } else {
-        await dispatch(scanExistsAdd(fileProps));
+        await dispatch(scanExistsAdd(fileProps, inDb));
         await dispatch(scanRefUpdate(fileProps, oldDbFile, inDb, CONST_SCAN_TYPE_EXISTS));
       }
     }
