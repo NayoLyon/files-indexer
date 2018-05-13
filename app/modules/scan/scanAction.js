@@ -147,17 +147,14 @@ export function scanProcessFile(fileProps: FileProps, oldDbFile: FilePropsDb | u
         name: fileProps.name
       });
       if (occurences.length === 0) {
-        dispatch(scanNewAdd(fileProps));
+        await dispatch(scanNewAdd(fileProps));
       } else {
-        dispatch(scanDuplicateAdd(fileProps, occurences));
-        occurences.forEach(elt => {
-          dispatch(scanRefUpdate(
-            fileProps,
-            oldDbFile,
-            elt,
-            CONST_SCAN_TYPE_DUPLICATE
-          ));
-        });
+        await dispatch(scanDuplicateAdd(fileProps, occurences));
+        await Promise.all(
+          occurences.map(async elt => {
+            await dispatch(scanRefUpdate(fileProps, oldDbFile, elt, CONST_SCAN_TYPE_DUPLICATE));
+          })
+        );
       }
     } else {
       if (occurences.length > 1) {
@@ -167,11 +164,11 @@ export function scanProcessFile(fileProps: FileProps, oldDbFile: FilePropsDb | u
       const inDb = occurences[0];
       const compared: Map<string, Array<string | number | Date>> = fileProps.compareSameHash(inDb);
       if (compared.size > 0) {
-        dispatch(scanModifiedAdd(fileProps, compared, inDb));
-        dispatch(scanRefUpdate(fileProps, oldDbFile, inDb, CONST_SCAN_TYPE_MODIFIED));
+        await dispatch(scanModifiedAdd(fileProps, compared, inDb));
+        await dispatch(scanRefUpdate(fileProps, oldDbFile, inDb, CONST_SCAN_TYPE_MODIFIED));
       } else {
-        dispatch(scanExistsAdd(fileProps));
-        dispatch(scanRefUpdate(fileProps, oldDbFile, inDb, CONST_SCAN_TYPE_EXISTS));
+        await dispatch(scanExistsAdd(fileProps));
+        await dispatch(scanRefUpdate(fileProps, oldDbFile, inDb, CONST_SCAN_TYPE_EXISTS));
       }
     }
   };
