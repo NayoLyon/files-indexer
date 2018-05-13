@@ -24,7 +24,7 @@ class Scan extends Component<Props> {
     } else if (this.props.indexing) {
       content = (
         <Header as="h2">
-          {this.props.step} at {this.props.progress}%
+          {this.props.step} at {Math.round(this.props.progress * 100)}%
         </Header>
       );
     } else if (this.props.isScanned) {

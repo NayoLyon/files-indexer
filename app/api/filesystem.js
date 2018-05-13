@@ -82,12 +82,11 @@ export async function doScan(
   progressCallback: (step: string, progress: number) => void
 ) {
   progressCallback('LISTING', 0);
-  const files = await walkDir(folder, 0, 100, progressCallback);
+  const files = await walkDir(folder, 0, 1, progressCallback);
 
   // Now scanning files to store in DB
   for (let i = 0; i < files.length; i += 1) {
-    const i100 = i * 100;
-    progressCallback('INDEXING', Math.round(i100 / files.length));
+    progressCallback('INDEXING', i / files.length);
     const file = files[i];
 
     const hash = await computeHash(file);
@@ -120,7 +119,7 @@ async function walkDir(
   const [fileList, subFolders] = await readDir(folder);
 
   const progressStep = (progressEnd - progressStart) / (subFolders.length + 1);
-  progressCallback('LISTING', Math.round(progressStart + progressStep));
+  progressCallback('LISTING', progressStart + progressStep);
 
   for (let i = 0; i < subFolders.length; i += 1) {
     const subFolder = subFolders[i];
