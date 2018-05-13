@@ -4,10 +4,10 @@ import { FileProps, FilePropsDb } from '../../api/filesystem';
 export const SCAN_START = 'SCAN_START';
 export const SCAN_END = 'SCAN_END';
 export const SCAN_PROGRESS = 'SCAN_PROGRESS';
-export const SCAN_EXISTS = 'SCAN_EXISTS';
-export const SCAN_NEW = 'SCAN_NEW';
-export const SCAN_MODIFIED = 'SCAN_MODIFIED';
-export const SCAN_DUPLICATE = 'SCAN_DUPLICATE';
+export const SCAN_EXISTS_ADD = 'SCAN_EXISTS_ADD';
+export const SCAN_NEW_ADD = 'SCAN_NEW_ADD';
+export const SCAN_MODIFIED_ADD = 'SCAN_MODIFIED_ADD';
+export const SCAN_DUPLICATE_ADD = 'SCAN_DUPLICATE_ADD';
 export const SCAN_DBREF_ADD = 'SCAN_DBREF_ADD';
 export const SCAN_DBREF_UPDATE = 'SCAN_DBREF_UPDATE';
 export const CONST_SCAN_TYPE_DUPLICATE = 'duplicate';
@@ -47,36 +47,36 @@ export function scanProgress(step: string, progress: number) {
   };
 }
 
-export function scanExists(file: FileProps) {
+export function scanExistsAdd(file: FileProps) {
   return {
-    type: SCAN_EXISTS,
+    type: SCAN_EXISTS_ADD,
     file
   };
 }
 
-export function scanNew(file: FileProps) {
+export function scanNewAdd(file: FileProps) {
   return {
-    type: SCAN_NEW,
+    type: SCAN_NEW_ADD,
     file
   };
 }
 
-export function scanModified(
+export function scanModifiedAdd(
   file: FileProps,
   diff: Map<string, Array<string | number | Date>>,
   dbFile: FilePropsDb
 ) {
   return {
-    type: SCAN_MODIFIED,
+    type: SCAN_MODIFIED_ADD,
     file,
     diff,
     dbFile
   };
 }
 
-export function scanDuplicate(file: FileProps, matches: Arrays<FilePropsDb>) {
+export function scanDuplicateAdd(file: FileProps, matches: Arrays<FilePropsDb>) {
   return {
-    type: SCAN_DUPLICATE,
+    type: SCAN_DUPLICATE_ADD,
     file,
     matches
   };

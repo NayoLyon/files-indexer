@@ -3,10 +3,10 @@ import {
   SCAN_START,
   SCAN_END,
   SCAN_PROGRESS,
-  SCAN_EXISTS,
-  SCAN_NEW,
-  SCAN_MODIFIED,
-  SCAN_DUPLICATE,
+  SCAN_EXISTS_ADD,
+  SCAN_NEW_ADD,
+  SCAN_MODIFIED_ADD,
+  SCAN_DUPLICATE_ADD,
   SCAN_DBREF_ADD,
   SCAN_DBREF_UPDATE
 } from './scanAction';
@@ -57,18 +57,18 @@ export default function scan(state: scanStateType = defaultValue, action: Action
       return Object.assign({}, state, { indexing: false, isScanned: true });
     case SCAN_PROGRESS:
       return Object.assign({}, state, { step: action.step, progress: action.progress });
-    case SCAN_EXISTS:
+    case SCAN_EXISTS_ADD:
       return Object.assign({}, state, { identicals: [...state.identicals, action.file] });
-    case SCAN_NEW:
+    case SCAN_NEW_ADD:
       return Object.assign({}, state, { newFiles: [...state.newFiles, action.file] });
-    case SCAN_MODIFIED:
+    case SCAN_MODIFIED_ADD:
       return Object.assign({}, state, {
         modified: [
           ...state.modified,
           { file: action.file, diff: action.diff, dbFile: action.dbFile }
         ]
       });
-    case SCAN_DUPLICATE:
+    case SCAN_DUPLICATE_ADD:
       return Object.assign({}, state, {
         duplicates: [...state.duplicates, { file: action.file, matches: action.matches }]
       });
