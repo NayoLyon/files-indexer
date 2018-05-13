@@ -93,7 +93,7 @@ export async function doScan(
     const stats = fs.statSync(file);
 
     const fileProps = new FileProps(hash, file, stats, folder);
-    fileCallback(fileProps);
+    await fileCallback(fileProps);
   }
 }
 function computeHash(fn) {
