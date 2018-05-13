@@ -32,25 +32,24 @@ export default class ScanResultTabModified extends Component<Props> {
     // To have a pretty table, I need to parse the files twice:
     // one to compute the columns, and the other to actually create the rows.
     for (let i = 0; i < this.props.files.length; i += 1) {
-      const file = this.props.files[i];
-      file.diff.forEach((val, key) => {
+      this.props.files[i].diff.forEach((val, key) => {
         if (!columnsName.includes(key)) {
           columnsName.push(key);
         }
       });
     }
     for (let i = 0; i < this.props.files.length; i += 1) {
-      const file = this.props.files[i];
+      const { file, diff, dbFile } = this.props.files[i];
 
       const fileDiff = columnsName.reduce((prevVal, elt) => {
-        const curDiff = file.diff.get(elt);
+        const curDiff = diff.get(elt);
         if (curDiff || elt === 'relpath') {
           const actionsDb =
             elt === 'relpath' ? (
               <Button
                 icon="external"
                 onClick={() => {
-                  this.props.openDbFolderFor(file.dbFile);
+                  this.props.openDbFolderFor(dbFile);
                 }}
               />
             ) : null;
@@ -60,7 +59,7 @@ export default class ScanResultTabModified extends Component<Props> {
               <Button
                 icon="external"
                 onClick={() => {
-                  this.props.openFolderFor(file.file);
+                  this.props.openFolderFor(file);
                 }}
               />
             );
@@ -70,7 +69,7 @@ export default class ScanResultTabModified extends Component<Props> {
                 icon="triangle left"
                 color="green"
                 onClick={() => {
-                  this.props.copyModifiedAttribute(file.file, file.dbFile);
+                  this.props.copyModifiedAttribute(file, dbFile);
                 }}
               />
             );
@@ -82,13 +81,13 @@ export default class ScanResultTabModified extends Component<Props> {
               verticalAlign="middle"
             >
               {actionsDb}
-              {printValue(file.dbFile[elt])}
+              {printValue(dbFile[elt])}
             </Table.Cell>
           );
           prevVal.push(
             <Table.Cell key={`${this.props.id}_file_${i}_${elt}dir`} textAlign="left">
               {actionsFolder}
-              {printValue(file.file[elt])}
+              {printValue(file[elt])}
             </Table.Cell>
           );
         } else {
@@ -102,7 +101,7 @@ export default class ScanResultTabModified extends Component<Props> {
       rows.push(
         <Table.Row key={`${this.props.id}_file_${i}`}>
           <Table.Cell key={`${this.props.id}_file_${i}_name`} textAlign="center">
-            {file.file.name}
+            {file.name}
           </Table.Cell>
           {fileDiff}
         </Table.Row>
