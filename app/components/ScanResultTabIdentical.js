@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { Tab, List, Button } from 'semantic-ui-react';
-import { FileProps } from '../api/filesystem';
+import { FileProps, FilePropsDb } from '../api/filesystem';
 
 type Props = {
   removeFile: (FileProps, FilePropsDb) => void,
