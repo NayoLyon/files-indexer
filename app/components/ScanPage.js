@@ -17,7 +17,7 @@ type Props = {
   scanNew: FileProps => void,
   scanModified: (FileProps, Map<string, Array<string | number | Date>>, FilePropsDb) => void,
   scanDuplicate: (FileProps, Arrays<FilePropsDb>) => void,
-  scanAddRef: (file: FileProps, dbFile: FilePropsDb, scanType: string) => void,
+  scanRefAdd: (file: FileProps, dbFile: FilePropsDb, scanType: string) => void,
   masterFolder: string,
   toScanFolder: string
 };
@@ -41,7 +41,7 @@ class ScanPage extends Component<Props> {
       } else {
         this.props.scanDuplicate(fileProps, occurences);
         occurences.forEach(elt => {
-          this.props.scanAddRef(fileProps, elt, ScanActions.CONST_SCAN_TYPE_DUPLICATE);
+          this.props.scanRefAdd(fileProps, elt, ScanActions.CONST_SCAN_TYPE_DUPLICATE);
         });
       }
     } else {
@@ -53,10 +53,10 @@ class ScanPage extends Component<Props> {
       const compared: Map<string, Array<string | number | Date>> = fileProps.compareSameHash(inDb);
       if (compared.size > 0) {
         this.props.scanModified(fileProps, compared, inDb);
-        this.props.scanAddRef(fileProps, inDb, ScanActions.CONST_SCAN_TYPE_MODIFIED);
+        this.props.scanRefAdd(fileProps, inDb, ScanActions.CONST_SCAN_TYPE_MODIFIED);
       } else {
         this.props.scanExists(fileProps);
-        this.props.scanAddRef(fileProps, inDb, ScanActions.CONST_SCAN_TYPE_EXISTS);
+        this.props.scanRefAdd(fileProps, inDb, ScanActions.CONST_SCAN_TYPE_EXISTS);
       }
     }
   }

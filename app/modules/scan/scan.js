@@ -7,7 +7,8 @@ import {
   SCAN_NEW,
   SCAN_MODIFIED,
   SCAN_DUPLICATE,
-  SCAN_ADD_DBREF
+  SCAN_DBREF_ADD,
+  SCAN_DBREF_UPDATE
 } from './scanAction';
 import { SELECT_TOSCAN_FOLDER } from '../folders/foldersAction';
 import type { Action } from '../actionType';
@@ -71,19 +72,58 @@ export default function scan(state: scanStateType = defaultValue, action: Action
       return Object.assign({}, state, {
         duplicates: [...state.duplicates, { file: action.file, matches: action.matches }]
       });
-    case SCAN_ADD_DBREF: {
-      const newDbRef = new Map(state.dbFilesRef);
-      const oldDbRef = state.dbFilesRef.get(action.dbFile.id);
+    case SCAN_DBREF_ADD: {
+      const nextDbRef = new Map(state.dbFilesRef);
+      const prevScanDbRef = nextDbRef.get(action.dbFile.id);
       let newFileMap = new Map();
-      if (oldDbRef) {
-        newFileMap = new Map(oldDbRef.files);
+      if (prevScanDbRef) {
+        newFileMap = new Map(prevScanDbRef.files);
       }
       newFileMap.set(action.file, action.scanType);
-      newDbRef.set(action.dbFile.id, {
+      nextDbRef.set(action.dbFile.id, {
         dbFile: action.dbFile,
         files: newFileMap
       });
-      return Object.assign({}, state, { dbFilesRef: newDbRef });
+      return Object.assign({}, state, { dbFilesRef: nextDbRef });
+    }
+    case SCAN_DBREF_UPDATE: {
+      const nextDbRef = new Map(state.dbFilesRef);
+      const prevOldScanDbRef = nextDbRef.get(action.oldDbFile.id);
+      if (prevOldScanDbRef) {
+        if (prevOldScanDbRef.files.size === 1 && prevOldScanDbRef.files.get(action.file)) {
+          // We have only the file, and we remove it, so remove the entire dbRef...
+          nextDbRef.delete(action.oldDbFile.id);
+        } else {
+          // We should not have only 1 entry here...
+          if (prevOldScanDbRef.files.size <= 1) {
+            console.error('Corrupted scanDbRef map!!', action.file, prevOldScanDbRef);
+          }
+          const nextOldScanDbRef = {
+            dbFile: prevOldScanDbRef.dbFile,
+            files: new Map(prevOldScanDbRef.files)
+          };
+          nextOldScanDbRef.files.delete(action.file);
+          nextDbRef.set(action.oldDbFile.id, nextOldScanDbRef);
+        }
+      }
+      const prevNewScanDbRef = nextDbRef.get(action.newDbFile.id);
+      let nextNewScanDbRef;
+      if (prevNewScanDbRef) {
+        // Copy the previous one, to append this new ref
+        nextNewScanDbRef = {
+          dbFile: prevNewScanDbRef.dbFile,
+          files: new Map(prevNewScanDbRef.files)
+        };
+      } else {
+        // Entirely new, create from scratch...
+        nextNewScanDbRef = {
+          dbFile: action.newDbFile,
+          files: new Map()
+        };
+      }
+      nextNewScanDbRef.files.set(action.file, action.scanType);
+      nextDbRef.set(action.dbFile.id, nextNewScanDbRef);
+      return Object.assign({}, state, { dbFilesRef: nextDbRef });
     }
     default:
       return state;
