@@ -41,6 +41,13 @@ export class FilePropsDb {
   clone(): FilePropsDb {
     return new FilePropsDb(this);
   }
+  setNewName(name: string): void {
+    const rootPath = getRootPath(this.path, this.relpath);
+    this.name = name;
+    this.ext = path.extname(name);
+    this.path = path.resolve(path.dirname(this.path), name);
+    this.relpath = path.relative(rootPath, this.path);
+  }
 }
 
 export class FileProps {
@@ -161,4 +168,17 @@ function readDir(folder) {
     }
     resolve([fileList, subFolders]);
   });
+}
+
+function getRootPath(fullPath: string, relPath: string): string | null {
+  let res = fullPath;
+  let prevRes = null;
+  while (fullPath !== path.resolve(res, relPath) && res !== prevRes) {
+    prevRes = res;
+    res = path.dirname(res);
+  }
+  if (fullPath === path.resolve(res, relPath)) {
+    return res;
+  }
+  return null;
 }

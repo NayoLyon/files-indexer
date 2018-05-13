@@ -15,6 +15,8 @@ type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
   copyModifiedAttribute: (FileProps, FilePropsDb) => void,
+  removeFile: (FileProps, FilePropsDb) => void,
+  copyNameAttribute: (FileProps, FilePropsDb) => void,
   identicals: Array<FileProps>,
   newFiles: Array<FileProps>,
   modified: Array<{
@@ -71,6 +73,8 @@ class ScanResult extends Component<Props> {
             copyModifiedAttribute={this.props.copyModifiedAttribute}
             openDbFolderFor={this.props.openDbFolderFor}
             openFolderFor={this.props.openFolderFor}
+            removeFile={this.props.removeFile}
+            copyNameAttribute={this.props.copyNameAttribute}
           />
         )
       });

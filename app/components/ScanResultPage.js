@@ -23,6 +23,7 @@ type Props = {
   scanModifiedRemove: (file: FileProps) => void,
   scanDuplicateRemove: (file: FileProps) => void,
   scanProcessFile: (fileProps: FileProps, oldDbFile: FilePropsDb | undefined) => void,
+  scanRefUpdate: (FileProps, FilePropsDb | undefined, FilePropsDb | undefined, string) => void,
   masterFolder: string,
   toScanFolder: string,
   dbFilesRef: Map<string, scanDbRef>,
@@ -42,6 +43,8 @@ class ScanResultPage extends Component<Props> {
     this.openDbFolderFor = this.openDbFolderFor.bind(this);
     this.openFolderFor = this.openFolderFor.bind(this);
     this.dbFilePropUpdated = this.dbFilePropUpdated.bind(this);
+    this.removeFile = this.removeFile.bind(this);
+    this.copyNameAttribute = this.copyNameAttribute.bind(this);
   }
 
   openDbFolderFor(file: FilePropsDb) {
@@ -50,11 +53,36 @@ class ScanResultPage extends Component<Props> {
   openFolderFor(file: FileProps) {
     ScanResultPage.openFolder(path.resolve(this.props.toScanFolder, file.relpath));
   }
+  async removeFile(file: FileProps, oldDbFile: FilePropsDb) {
+    shell.moveItemToTrash(path.resolve(this.props.toScanFolder, file.relpath));
+    this.props.scanModifiedRemove(file);
+    this.props.scanRefUpdate(file, oldDbFile, undefined, 'whatever'); // TODO change 'whatever' to undefined ??
+  }
   async copyModifiedAttribute(file: FileProps, dbFile: FilePropsDb) {
     const dbFilePath = path.resolve(this.props.masterFolder, dbFile.relpath);
     const newDbFile = dbFile.clone();
     newDbFile.modified = new Date(file.modified);
     fs.utimesSync(dbFilePath, fs.statSync(dbFilePath).atime, newDbFile.modified);
+    try {
+      const updatedDoc = await updateDb(this.props.masterFolder, newDbFile);
+      if (updatedDoc[0] !== 1) {
+        console.error(updatedDoc, newDbFile);
+        throw Error(`Document ${newDbFile.relpath} not updated!!`);
+      } else if (updatedDoc[1]._id !== newDbFile._id) {
+        console.error(updatedDoc, newDbFile);
+        throw Error(`Wrong document ${newDbFile.relpath} not updated!!`);
+      }
+      this.dbFilePropUpdated(dbFile);
+    } catch (err) {
+      console.warn('Error while updating doc', err);
+      // TODO propagate an error...
+    }
+  }
+  async copyNameAttribute(file: FileProps, dbFile: FilePropsDb) {
+    const dbFilePath = path.resolve(this.props.masterFolder, dbFile.relpath);
+    const newDbFile = dbFile.clone();
+    newDbFile.setNewName(file.name);
+    fs.renameSync(dbFilePath, path.resolve(path.dirname(dbFilePath), file.name));
     try {
       const updatedDoc = await updateDb(this.props.masterFolder, newDbFile);
       if (updatedDoc[0] !== 1) {
@@ -167,6 +195,8 @@ class ScanResultPage extends Component<Props> {
         openDbFolderFor={this.openDbFolderFor}
         openFolderFor={this.openFolderFor}
         copyModifiedAttribute={this.copyModifiedAttribute}
+        removeFile={this.removeFile}
+        copyNameAttribute={this.copyNameAttribute}
       />
     );
   }

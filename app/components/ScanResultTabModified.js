@@ -11,6 +11,8 @@ type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
   copyModifiedAttribute: (FileProps, FilePropsDb) => void,
+  removeFile: (FileProps, FilePropsDb) => void,
+  copyNameAttribute: (FileProps, FilePropsDb) => void,
   id: string,
   files: Array<{
     file: FileProps,
@@ -56,12 +58,20 @@ export default class ScanResultTabModified extends Component<Props> {
           let actionsFolder = null;
           if (elt === 'relpath') {
             actionsFolder = (
-              <Button
-                icon="external"
-                onClick={() => {
-                  this.props.openFolderFor(file);
-                }}
-              />
+              <Button.Group>
+                <Button
+                  icon="external"
+                  onClick={() => {
+                    this.props.openFolderFor(file);
+                  }}
+                />
+                <Button
+                  icon="trash"
+                  onClick={() => {
+                    this.props.removeFile(file, dbFile);
+                  }}
+                />
+              </Button.Group>
             );
           } else if (elt === 'modified') {
             actionsFolder = (
@@ -70,6 +80,16 @@ export default class ScanResultTabModified extends Component<Props> {
                 color="green"
                 onClick={() => {
                   this.props.copyModifiedAttribute(file, dbFile);
+                }}
+              />
+            );
+          } else if (elt === 'name') {
+            actionsFolder = (
+              <Button
+                icon="triangle left"
+                color="green"
+                onClick={() => {
+                  this.props.copyNameAttribute(file, dbFile);
                 }}
               />
             );
