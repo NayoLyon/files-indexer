@@ -77,8 +77,8 @@ export default class ScanResultTabIdentical extends Component<Props> {
           close={this.close}
           openDbFolderFor={this.props.openDbFolderFor}
           openFolderFor={this.props.openFolderFor}
-          files={[this.state.file]}
-          dbFile={this.state.dbFile}
+          file={this.state.file}
+          dbFiles={[this.state.dbFile]}
         />
         <List selection verticalAlign="middle">
           {this.renderFiles()}

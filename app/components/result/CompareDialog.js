@@ -11,14 +11,14 @@ type Props = {
   openDbFolderFor: FilePropsDb => void,
   close: () => void,
   open: boolean,
-  files: Array<FileProps | null>,
-  dbFile: FilePropsDb | null
+  file: FileProps | null,
+  dbFiles: Array<FilePropsDb> | null
 };
 
 export default class CompareDialog extends Component<Props> {
   props: Props;
 
-  static renderFiles(files: Array<FileProps>, openFolderFunc: FileProps => void) {
+  static renderFiles(files: Array<FilePropsDb>, openFolderFunc: FilePropsDb => void) {
     const res = [];
     files.forEach(file => {
       res.push(<FileDetails key={file.relpath} file={file} openFolderFor={openFolderFunc} />);
@@ -41,15 +41,15 @@ export default class CompareDialog extends Component<Props> {
         paddingTop: '1rem'
       }
     };
-    if (!this.props.dbFile) {
+    if (!this.props.file) {
       return null;
     }
     return (
       <Modal open={this.props.open} onClose={this.props.close} style={inlineStyle.modal}>
         {/* <Modal.Header>Select a Photo</Modal.Header> */}
         <Modal.Content image style={inlineStyle.content}>
-          <FileDetails file={this.props.dbFile} openFolderFor={this.props.openDbFolderFor} />
-          {CompareDialog.renderFiles(this.props.files, this.props.openFolderFor)}
+          <FileDetails file={this.props.file} openFolderFor={this.props.openFolderFor} />
+          {CompareDialog.renderFiles(this.props.dbFiles, this.props.openDbFolderFor)}
         </Modal.Content>
         <Modal.Actions>
           <Button icon="close" onClick={this.props.close} />
