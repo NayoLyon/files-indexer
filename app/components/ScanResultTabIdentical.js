@@ -3,13 +3,14 @@ import React, { Component } from 'react';
 import { Tab, List, Button } from 'semantic-ui-react';
 
 import { FileProps, FilePropsDb } from '../api/filesystem';
+import { CONST_SCAN_TYPE_IDENTICAL, ConstScanType } from '../modules/scan/scanAction';
 
 import CompareDialog from './result/CompareDialog';
 
 type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
-  removeFile: (FileProps, FilePropsDb) => void,
+  removeFile: (FileProps, FilePropsDb, ConstScanType) => void,
   id: string,
   files: Array<{ file: FileProps, dbFile: FilePropsDb }>
 };
@@ -55,7 +56,7 @@ export default class ScanResultTabIdentical extends Component<Props> {
               <Button
                 icon="trash"
                 onClick={() => {
-                  this.props.removeFile(file, dbFile);
+                  this.props.removeFile(file, dbFile, CONST_SCAN_TYPE_IDENTICAL);
                 }}
               />
               <Button icon="search" onClick={this.show(file, dbFile)} />

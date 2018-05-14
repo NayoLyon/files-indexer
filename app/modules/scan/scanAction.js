@@ -19,6 +19,13 @@ export const SCAN_DBREF_UPDATE = 'SCAN_DBREF_UPDATE';
 export const CONST_SCAN_TYPE_DUPLICATE = 'duplicate';
 export const CONST_SCAN_TYPE_MODIFIED = 'modified';
 export const CONST_SCAN_TYPE_EXISTS = 'exists';
+export const CONST_SCAN_TYPE_IDENTICAL = 'identical';
+
+export type ConstScanType =
+  | CONST_SCAN_TYPE_DUPLICATE
+  | CONST_SCAN_TYPE_MODIFIED
+  | CONST_SCAN_TYPE_EXISTS
+  | CONST_SCAN_TYPE_IDENTICAL;
 
 export type scanActionType = {
   +type: string,

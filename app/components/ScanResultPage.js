@@ -53,9 +53,24 @@ class ScanResultPage extends Component<Props> {
   openFolderFor(file: FileProps) {
     ScanResultPage.openFolder(path.resolve(this.props.toScanFolder, file.relpath));
   }
-  async removeFile(file: FileProps, oldDbFile: FilePropsDb) {
+  async removeFile(file: FileProps, oldDbFile: FilePropsDb, scanType: ScanActions.ConstScanType) {
     shell.moveItemToTrash(path.resolve(this.props.toScanFolder, file.relpath));
-    this.props.scanModifiedRemove(file);
+    switch (scanType) {
+      case ScanActions.CONST_SCAN_TYPE_MODIFIED:
+        this.props.scanModifiedRemove(file);
+        break;
+      case ScanActions.CONST_SCAN_TYPE_IDENTICAL:
+        this.props.scanExistsRemove(file);
+        break;
+      case ScanActions.CONST_SCAN_TYPE_DUPLICATE:
+        this.props.scanDuplicateRemove(file);
+        break;
+      case ScanActions.CONST_SCAN_TYPE_EXISTS:
+        this.props.scanExistsRemove(file);
+        break;
+      default:
+        console.error(`Unexpected removeFile of ${scanType}!!`);
+    }
     this.props.scanRefUpdate(file, oldDbFile, undefined, 'whatever'); // TODO change 'whatever' to undefined ??
   }
   async copyModifiedAttribute(file: FileProps, dbFile: FilePropsDb) {

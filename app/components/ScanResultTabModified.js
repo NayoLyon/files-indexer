@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Tab, Table, Button } from 'semantic-ui-react';
 
 import { FileProps, FilePropsDb } from '../api/filesystem';
+import { CONST_SCAN_TYPE_MODIFIED, ConstScanType } from '../modules/scan/scanAction';
 
 import styles from './ScanResult.css';
 import { printValue } from '../utils/format';
@@ -11,7 +12,7 @@ type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
   copyModifiedAttribute: (FileProps, FilePropsDb) => void,
-  removeFile: (FileProps, FilePropsDb) => void,
+  removeFile: (FileProps, FilePropsDb, ConstScanType) => void,
   copyNameAttribute: (FileProps, FilePropsDb) => void,
   id: string,
   files: Array<{
@@ -68,7 +69,7 @@ export default class ScanResultTabModified extends Component<Props> {
                 <Button
                   icon="trash"
                   onClick={() => {
-                    this.props.removeFile(file, dbFile);
+                    this.props.removeFile(file, dbFile, CONST_SCAN_TYPE_MODIFIED);
                   }}
                 />
               </Button.Group>
