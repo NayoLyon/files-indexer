@@ -60,6 +60,8 @@ class ScanResult extends Component<Props> {
             id="scan_result_identical"
             files={this.props.identicals}
             removeFile={this.props.removeFile}
+            openDbFolderFor={this.props.openDbFolderFor}
+            openFolderFor={this.props.openFolderFor}
           />
         )
       });
