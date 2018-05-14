@@ -25,10 +25,10 @@ export default class ScanResultTabReferences extends Component<Props> {
       rows.push(
         <Table.Row key={`${this.props.id}_file_${i}_${counter}`}>
           <Table.Cell textAlign="center">Possible match {counter}</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(key.size)}</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(key.modified)}</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(key.relpath)}</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(val)}</Table.Cell>
+          <Table.Cell textAlign="center">{printValue(key, 'size')}</Table.Cell>
+          <Table.Cell textAlign="center">{printValue(key, 'modified')}</Table.Cell>
+          <Table.Cell textAlign="center">{printValue(key, 'relpath')}</Table.Cell>
+          <Table.Cell textAlign="center">{val}</Table.Cell>
         </Table.Row>
       );
     };
@@ -41,9 +41,9 @@ export default class ScanResultTabReferences extends Component<Props> {
             {dbFile.name}
           </Table.Cell>
           <Table.Cell textAlign="center">In DB</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(dbFile.size)}</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(dbFile.modified)}</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(dbFile.relpath)}</Table.Cell>
+          <Table.Cell textAlign="center">{printValue(dbFile, 'size')}</Table.Cell>
+          <Table.Cell textAlign="center">{printValue(dbFile, 'modified')}</Table.Cell>
+          <Table.Cell textAlign="center">{printValue(dbFile, 'relpath')}</Table.Cell>
           <Table.Cell textAlign="center" />
         </Table.Row>
       );

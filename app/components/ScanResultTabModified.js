@@ -101,13 +101,13 @@ export default class ScanResultTabModified extends Component<Props> {
               verticalAlign="middle"
             >
               {actionsDb}
-              {printValue(dbFile[elt])}
+              {printValue(dbFile, elt)}
             </Table.Cell>
           );
           prevVal.push(
             <Table.Cell key={`${this.props.id}_file_${i}_${elt}dir`} textAlign="left">
               {actionsFolder}
-              {printValue(file[elt])}
+              {printValue(file, elt)}
             </Table.Cell>
           );
         } else {

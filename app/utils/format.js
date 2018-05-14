@@ -1,7 +1,14 @@
+import filesize from 'filesize';
+
+const size = filesize.partial({ standard: 'iec', separator: ',' });
+
 // For date formatting: https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/DateTimeFormat
-export function printValue(val) {
+export function printValue(obj, prop) {
+  const val = obj[prop];
   if (val instanceof Date) {
     return val.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
+  } else if (prop === 'size') {
+    return size(val);
   }
   return `${val}`;
 }

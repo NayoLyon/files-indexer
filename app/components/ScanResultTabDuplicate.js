@@ -28,9 +28,9 @@ export default class ScanResultTabDuplicate extends Component<Props> {
             {file.file.name}
           </Table.Cell>
           <Table.Cell textAlign="center">In folder</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(file.file.size)}</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(file.file.modified)}</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(file.file.relpath)}</Table.Cell>
+          <Table.Cell textAlign="center">{printValue(file.file, 'size')}</Table.Cell>
+          <Table.Cell textAlign="center">{printValue(file.file, 'modified')}</Table.Cell>
+          <Table.Cell textAlign="center">{printValue(file.file, 'relpath')}</Table.Cell>
         </Table.Row>
       );
 
@@ -38,9 +38,9 @@ export default class ScanResultTabDuplicate extends Component<Props> {
         rows.push(
           <Table.Row key={`${this.props.id}_file_${i}_${m}`}>
             <Table.Cell textAlign="center">Possible match {m + 1}</Table.Cell>
-            <Table.Cell textAlign="center">{printValue(matches[m].size)}</Table.Cell>
-            <Table.Cell textAlign="center">{printValue(matches[m].modified)}</Table.Cell>
-            <Table.Cell textAlign="center">{printValue(matches[m].relpath)}</Table.Cell>
+            <Table.Cell textAlign="center">{printValue(matches[m], 'size')}</Table.Cell>
+            <Table.Cell textAlign="center">{printValue(matches[m], 'modified')}</Table.Cell>
+            <Table.Cell textAlign="center">{printValue(matches[m], 'relpath')}</Table.Cell>
           </Table.Row>
         );
       }
