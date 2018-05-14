@@ -93,7 +93,13 @@ class ScanResult extends Component<Props> {
       panes.push({
         menuItem: `Possible duplicates (${this.props.duplicates.length})`,
         render: () => (
-          <ScanResultTabDuplicate id="scan_result_duplicates" files={this.props.duplicates} />
+          <ScanResultTabDuplicate
+            id="scan_result_duplicates"
+            files={this.props.duplicates}
+            removeFile={this.props.removeFile}
+            openDbFolderFor={this.props.openDbFolderFor}
+            openFolderFor={this.props.openFolderFor}
+          />
         )
       });
     }

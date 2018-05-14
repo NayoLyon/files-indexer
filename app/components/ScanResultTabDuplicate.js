@@ -1,11 +1,17 @@
 // @flow
 import React, { Component } from 'react';
-import { Tab, Table } from 'semantic-ui-react';
+import { Tab, Table, Button } from 'semantic-ui-react';
 
 import { FileProps, FilePropsDb } from '../api/filesystem';
+import { CONST_SCAN_TYPE_DUPLICATE, ConstScanType } from '../modules/scan/scanAction';
 import { printValue } from '../utils/format';
 
+import CompareDialog from './result/CompareDialog';
+
 type Props = {
+  openFolderFor: FileProps => void,
+  openDbFolderFor: FilePropsDb => void,
+  removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb, ConstScanType) => void,
   id: string,
   files: Array<{ file: FileProps, matches: Array<FilePropsDb> }>
 };
@@ -15,6 +21,16 @@ export default class ScanResultTabDuplicate extends Component<Props> {
   constructor(props) {
     super(props);
     this.renderFiles = this.renderFiles.bind(this);
+    this.close = this.close.bind(this);
+    this.show = this.show.bind(this);
+    this.state = { open: false, file: null, dbFiles: null };
+  }
+
+  close() {
+    this.setState({ open: false });
+  }
+  show(file, dbFiles) {
+    return () => this.setState({ file, dbFiles, open: true });
   }
 
   renderFiles() {
@@ -26,12 +42,29 @@ export default class ScanResultTabDuplicate extends Component<Props> {
       rows.push(
         <Table.Row key={`${this.props.id}_file_${i}_dir`}>
           <Table.Cell textAlign="center" rowSpan={matches.length + 1}>
+            <Button icon="search" onClick={this.show(file.file, matches)} />
             {file.file.name}
           </Table.Cell>
           <Table.Cell textAlign="center">In folder</Table.Cell>
           <Table.Cell textAlign="center">{printValue(file.file, 'size')}</Table.Cell>
           <Table.Cell textAlign="center">{printValue(file.file, 'modified')}</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(file.file, 'relpath')}</Table.Cell>
+          <Table.Cell textAlign="center">
+            {printValue(file.file, 'relpath')}
+            <Button.Group>
+              <Button
+                icon="external"
+                onClick={() => {
+                  this.props.openFolderFor(file.file);
+                }}
+              />
+              <Button
+                icon="trash"
+                onClick={() => {
+                  this.props.removeFile(file.file, matches, CONST_SCAN_TYPE_DUPLICATE);
+                }}
+              />
+            </Button.Group>
+          </Table.Cell>
         </Table.Row>
       );
 
@@ -41,7 +74,15 @@ export default class ScanResultTabDuplicate extends Component<Props> {
             <Table.Cell textAlign="center">Possible match {m + 1}</Table.Cell>
             <Table.Cell textAlign="center">{printValue(matches[m], 'size')}</Table.Cell>
             <Table.Cell textAlign="center">{printValue(matches[m], 'modified')}</Table.Cell>
-            <Table.Cell textAlign="center">{printValue(matches[m], 'relpath')}</Table.Cell>
+            <Table.Cell textAlign="center">
+              {printValue(matches[m], 'relpath')}
+              <Button
+                icon="external"
+                onClick={() => {
+                  this.props.openDbFolderFor(matches[m]);
+                }}
+              />
+            </Table.Cell>
           </Table.Row>
         );
       }
@@ -51,6 +92,14 @@ export default class ScanResultTabDuplicate extends Component<Props> {
   render() {
     return (
       <Tab.Pane key={this.props.id} style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}>
+        <CompareDialog
+          open={this.state.open}
+          close={this.close}
+          openDbFolderFor={this.props.openDbFolderFor}
+          openFolderFor={this.props.openFolderFor}
+          file={this.state.file}
+          dbFiles={this.state.dbFiles}
+        />
         <Table celled structured>
           <Table.Header>
             <Table.Row>
