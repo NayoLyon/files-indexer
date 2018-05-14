@@ -37,13 +37,13 @@ export default class FileDetails extends Component<Props> {
       return <Image size="huge" src={this.getProp('path')} />;
     }
     return (
-      <Card.Header style={FileDetails.inlineStyle.genericHeaderStyles}>{mimeType}</Card.Header>
+      <Card.Header style={FileDetails.inlineStyles.genericHeaderStyles}>{mimeType}</Card.Header>
     );
   }
 
   render() {
     return (
-      <Card style={FileDetails.inlineStyle.card}>
+      <Card style={FileDetails.inlineStyles.card}>
         {this.computePreview()}
         <Card.Content>
           <Card.Header>{this.getProp('name')}</Card.Header>
