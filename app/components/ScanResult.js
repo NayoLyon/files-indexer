@@ -56,7 +56,11 @@ class ScanResult extends Component<Props> {
       panes.push({
         menuItem: `Identical files (${this.props.identicals.length})`,
         render: () => (
-          <ScanResultTabIdentical id="scan_result_identical" files={this.props.identicals} />
+          <ScanResultTabIdentical
+            id="scan_result_identical"
+            files={this.props.identicals}
+            removeFile={this.props.removeFile}
+          />
         )
       });
     }
