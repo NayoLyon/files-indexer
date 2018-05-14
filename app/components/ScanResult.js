@@ -5,6 +5,7 @@ import { Tab } from 'semantic-ui-react';
 
 import { FileProps, FilePropsDb } from '../api/filesystem';
 import { scanDbRef } from '../modules/scan/scan';
+import { ConstScanType } from '../modules/scan/scanAction';
 
 import ScanResultTabNew from './ScanResultTabNew';
 import ScanResultTabModified from './ScanResultTabModified';
@@ -16,7 +17,7 @@ type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
   copyModifiedAttribute: (FileProps, FilePropsDb) => void,
-  removeFile: (FileProps, FilePropsDb) => void,
+  removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb, ConstScanType) => void,
   copyNameAttribute: (FileProps, FilePropsDb) => void,
   identicals: Array<{ file: FileProps, dbFile: FilePropsDb }>,
   newFiles: Array<FileProps>,
@@ -25,7 +26,7 @@ type Props = {
     diff: Map<string, Array<string | number | Date>>,
     dbFile: FilePropsDb
   }>,
-  duplicates: Array<{ file: FileProps, matches: Arrays<FilePropsDb> }>,
+  duplicates: Array<{ file: FileProps, matches: Array<FilePropsDb> }>,
   dbFilesRef: Map<string, scanDbRef>
 };
 

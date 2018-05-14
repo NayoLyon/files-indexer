@@ -22,13 +22,18 @@ type Props = {
   scanNewRemove: (file: FileProps) => void,
   scanModifiedRemove: (file: FileProps) => void,
   scanDuplicateRemove: (file: FileProps) => void,
-  scanProcessFile: (fileProps: FileProps, oldDbFile: FilePropsDb | undefined) => void,
-  scanRefUpdate: (FileProps, FilePropsDb | undefined, FilePropsDb | undefined, string) => void,
+  scanProcessFile: (fileProps: FileProps, oldDbFile: FilePropsDb | void) => void,
+  scanRefUpdate: (
+    FileProps,
+    Array<FilePropsDb> | FilePropsDb | void,
+    FilePropsDb | void,
+    ScanActions.ConstScanType
+  ) => void,
   masterFolder: string,
   toScanFolder: string,
   dbFilesRef: Map<string, scanDbRef>,
   newFiles: Array<FileProps>,
-  duplicates: Array<{ file: FileProps, matches: Arrays<FilePropsDb> }>
+  duplicates: Array<{ file: FileProps, matches: Array<FilePropsDb> }>
 };
 
 class ScanResultPage extends Component<Props> {
@@ -53,7 +58,7 @@ class ScanResultPage extends Component<Props> {
   openFolderFor(file: FileProps) {
     ScanResultPage.openFolder(path.resolve(this.props.toScanFolder, file.relpath));
   }
-  async removeFile(file: FileProps, oldDbFile: FilePropsDb, scanType: ScanActions.ConstScanType) {
+  async removeFile(file: FileProps, oldDbFile: Array<FilePropsDb> | FilePropsDb, scanType: ScanActions.ConstScanType) {
     shell.moveItemToTrash(path.resolve(this.props.toScanFolder, file.relpath));
     switch (scanType) {
       case ScanActions.CONST_SCAN_TYPE_MODIFIED:

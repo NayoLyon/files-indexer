@@ -1,12 +1,13 @@
 // @flow
 import React, { Component } from 'react';
 import { Tab, Table } from 'semantic-ui-react';
+
 import { FileProps, FilePropsDb } from '../api/filesystem';
 import { printValue } from '../utils/format';
 
 type Props = {
   id: string,
-  files: Array<{ file: FileProps, matches: Arrays<FilePropsDb> }>
+  files: Array<{ file: FileProps, matches: Array<FilePropsDb> }>
 };
 
 export default class ScanResultTabDuplicate extends Component<Props> {

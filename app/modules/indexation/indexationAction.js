@@ -1,5 +1,6 @@
 // @flow
 import { getDatabaseSize } from '../../api/database';
+import { Action } from '../actionType';
 
 export const INDEXATION_LOAD_DATABASE = 'INDEXATION_LOAD_DATABASE';
 export const INDEXATION_START = 'INDEXATION_START';

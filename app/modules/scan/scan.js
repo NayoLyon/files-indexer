@@ -12,7 +12,8 @@ import {
   SCAN_DUPLICATE_ADD,
   SCAN_DUPLICATE_REMOVE,
   SCAN_DBREF_ADD,
-  SCAN_DBREF_UPDATE
+  SCAN_DBREF_UPDATE,
+  ConstScanType
 } from './scanAction';
 import { SELECT_TOSCAN_FOLDER } from '../folders/foldersAction';
 import type { Action } from '../actionType';
@@ -20,7 +21,7 @@ import { FileProps, FilePropsDb } from '../../api/filesystem';
 
 export type scanDbRef = {
   dbFile: FilePropsDb,
-  files: Map<FileProps, string>
+  files: Map<FileProps, ConstScanType>
 };
 export type scanStateType = {
   +indexing: boolean,
@@ -34,7 +35,7 @@ export type scanStateType = {
     diff: Map<string, Array<string | number | Date>>,
     dbFile: FilePropsDb
   }>,
-  +duplicates: Array<{ file: FileProps, matches: Arrays<FilePropsDb> }>,
+  +duplicates: Array<{ file: FileProps, matches: Array<FilePropsDb> }>,
   +dbFilesRef: Map<string, scanDbRef>
 };
 
@@ -111,23 +112,12 @@ export default function scan(state: scanStateType = defaultValue, action: Action
     case SCAN_DBREF_UPDATE: {
       const nextDbRef = new Map(state.dbFilesRef);
       if (action.oldDbFile) {
-        const prevOldScanDbRef = nextDbRef.get(action.oldDbFile.id);
-        if (prevOldScanDbRef) {
-          if (prevOldScanDbRef.files.size === 1 && prevOldScanDbRef.files.get(action.file)) {
-            // We have only the file, and we remove it, so remove the entire dbRef...
-            nextDbRef.delete(action.oldDbFile.id);
-          } else {
-            // We should not have only 1 entry here...
-            if (prevOldScanDbRef.files.size <= 1) {
-              console.error('Corrupted scanDbRef map!!', action.file, prevOldScanDbRef);
-            }
-            const nextOldScanDbRef = {
-              dbFile: prevOldScanDbRef.dbFile,
-              files: new Map(prevOldScanDbRef.files)
-            };
-            nextOldScanDbRef.files.delete(action.file);
-            nextDbRef.set(action.oldDbFile.id, nextOldScanDbRef);
-          }
+        if (action.oldDbFile instanceof Array) {
+          action.oldDbFile.forEach(dbFile => {
+            removeOldDbFile(action.file, dbFile, nextDbRef);
+          });
+        } else {
+          removeOldDbFile(action.file, action.oldDbFile, nextDbRef);
         }
       }
       if (action.newDbFile) {
@@ -155,3 +145,24 @@ export default function scan(state: scanStateType = defaultValue, action: Action
       return state;
   }
 }
+
+function removeOldDbFile(file: FileProps, dbFile: FilePropsDb, mapDbRef: Map<string, scanDbRef>) {
+  const prevOldScanDbRef = mapDbRef.get(dbFile.id);
+  if (prevOldScanDbRef) {
+    if (prevOldScanDbRef.files.size === 1 && prevOldScanDbRef.files.get(file)) {
+      // We have only the file, and we remove it, so remove the entire dbRef...
+      mapDbRef.delete(dbFile.id);
+    } else {
+      // We should not have only 1 entry here...
+      if (prevOldScanDbRef.files.size <= 1) {
+        console.error('Corrupted scanDbRef map!!', file, prevOldScanDbRef);
+      }
+      const nextOldScanDbRef = {
+        dbFile: prevOldScanDbRef.dbFile,
+        files: new Map(prevOldScanDbRef.files)
+      };
+      nextOldScanDbRef.files.delete(file);
+      mapDbRef.set(dbFile.id, nextOldScanDbRef);
+    }
+  }
+};

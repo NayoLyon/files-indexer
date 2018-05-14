@@ -35,8 +35,8 @@ export type scanActionType = {
   +diff: ?Map<string, Array<string | number | Date>>,
   +matches: ?Array<FilePropsDb>,
   +dbFile: ?FilePropsDb,
-  +scanType: ?string,
-  +oldDbFile: ?FilePropsDb,
+  +scanType: ?ConstScanType,
+  +oldDbFile: ?(Array<FilePropsDb> | FilePropsDb),
   +newDbFile: ?FilePropsDb
 };
 
@@ -106,7 +106,7 @@ export function scanModifiedRemove(file: FileProps) {
   };
 }
 
-export function scanDuplicateAdd(file: FileProps, matches: Arrays<FilePropsDb>) {
+export function scanDuplicateAdd(file: FileProps, matches: Array<FilePropsDb>) {
   return {
     type: SCAN_DUPLICATE_ADD,
     file,
@@ -131,9 +131,9 @@ export function scanRefAdd(file: FileProps, dbFile: FilePropsDb, scanType: strin
 
 export function scanRefUpdate(
   file: FileProps,
-  oldDbFile: FilePropsDb | undefined,
-  newDbFile: FilePropsDb | undefined,
-  scanType: string
+  oldDbFile: Array<FilePropsDb> | FilePropsDb | void,
+  newDbFile: FilePropsDb | void,
+  scanType: ConstScanType
 ) {
   return {
     type: SCAN_DBREF_UPDATE,
@@ -144,7 +144,7 @@ export function scanRefUpdate(
   };
 }
 
-export function scanProcessFile(fileProps: FileProps, oldDbFile: FilePropsDb | undefined) {
+export function scanProcessFile(fileProps: FileProps, oldDbFile: FilePropsDb | void) {
   return async (dispatch: (action: Action) => void, getState) => {
     const { masterPath } = getState().folders;
 

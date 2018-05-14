@@ -12,7 +12,7 @@ type Props = {
   scanProgress: (string, number) => void,
   startScan: () => void,
   endScan: () => void,
-  scanProcessFile: (fileProps: FileProps, oldDbFile: FilePropsDb | undefined) => void,
+  scanProcessFile: (fileProps: FileProps, oldDbFile: FilePropsDb | void) => void,
   toScanFolder: string
 };
 
