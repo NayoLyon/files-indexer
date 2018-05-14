@@ -46,7 +46,7 @@ export default class CompareDialog extends Component<Props> {
     }
     return (
       <Modal open={this.props.open} onClose={this.props.close} style={inlineStyle.modal}>
-        <Modal.Header>Select a Photo</Modal.Header>
+        {/* <Modal.Header>Select a Photo</Modal.Header> */}
         <Modal.Content image style={inlineStyle.content}>
           <FileDetails file={this.props.dbFile} openFolderFor={this.props.openDbFolderFor} />
           {CompareDialog.renderFiles(this.props.files, this.props.openFolderFor)}
