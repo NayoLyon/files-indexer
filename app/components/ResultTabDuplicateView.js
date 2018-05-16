@@ -6,7 +6,7 @@ import { FileProps, FilePropsDb } from '../api/filesystem';
 import { CONST_SCAN_TYPE_DUPLICATE, ConstScanType } from '../modules/scan/scanAction';
 import { printValue } from '../utils/format';
 
-import CompareDialog from './result/CompareDialog';
+import CompareDialogView from './result/CompareDialogView';
 
 type Props = {
   openFolderFor: FileProps => void,
@@ -92,7 +92,7 @@ export default class ResultTabDuplicateView extends Component<Props> {
   render() {
     return (
       <Tab.Pane key={this.props.id} style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}>
-        <CompareDialog
+        <CompareDialogView
           open={this.state.open}
           close={this.close}
           openDbFolderFor={this.props.openDbFolderFor}

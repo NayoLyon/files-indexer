@@ -4,7 +4,7 @@ import { Modal, Button, Label } from 'semantic-ui-react';
 
 import { FileProps, FilePropsDb, FilePropsType } from '../../api/filesystem';
 
-import FileDetails from './FileDetails';
+import FileDetailsView from './FileDetailsView';
 
 type Props = {
   openFolderFor: FileProps => void,
@@ -16,7 +16,7 @@ type Props = {
   dbFiles: Array<FilePropsDb | null> | null
 };
 
-export default class CompareDialog extends Component<Props> {
+export default class CompareDialogView extends Component<Props> {
   props: Props;
 
   static renderFiles(
@@ -25,16 +25,16 @@ export default class CompareDialog extends Component<Props> {
   ) {
     const res = [];
     if (files instanceof Array) {
-      const type = CompareDialog.getType(files[0]);
+      const type = CompareDialogView.getType(files[0]);
       files.forEach(file => {
         res.push(
-          <FileDetails key={`${type}_${file.relpath}`} file={file} openFolderFor={openFolderFunc} />
+          <FileDetailsView key={`${type}_${file.relpath}`} file={file} openFolderFor={openFolderFunc} />
         );
       });
     } else {
-      const type = CompareDialog.getType(files);
+      const type = CompareDialogView.getType(files);
       res.push(
-        <FileDetails key={`${type}_${files.relpath}`} file={files} openFolderFor={openFolderFunc} />
+        <FileDetailsView key={`${type}_${files.relpath}`} file={files} openFolderFor={openFolderFunc} />
       );
     }
     return res;
@@ -109,16 +109,16 @@ export default class CompareDialog extends Component<Props> {
 
     // Display the files in the given order
     if (this.props.dbFilesFirst) {
-      filesDetails = CompareDialog.renderFiles(this.props.dbFiles, this.props.openDbFolderFor);
-      filesDetails.push(CompareDialog.getDivider('Db', 'Scan'));
+      filesDetails = CompareDialogView.renderFiles(this.props.dbFiles, this.props.openDbFolderFor);
+      filesDetails.push(CompareDialogView.getDivider('Db', 'Scan'));
       filesDetails = filesDetails.concat(
-        CompareDialog.renderFiles(this.props.files, this.props.openFolderFor)
+        CompareDialogView.renderFiles(this.props.files, this.props.openFolderFor)
       );
     } else {
-      filesDetails = CompareDialog.renderFiles(this.props.files, this.props.openFolderFor);
-      filesDetails.push(CompareDialog.getDivider('Scan', 'Db'));
+      filesDetails = CompareDialogView.renderFiles(this.props.files, this.props.openFolderFor);
+      filesDetails.push(CompareDialogView.getDivider('Scan', 'Db'));
       filesDetails = filesDetails.concat(
-        CompareDialog.renderFiles(this.props.dbFiles, this.props.openDbFolderFor)
+        CompareDialogView.renderFiles(this.props.dbFiles, this.props.openDbFolderFor)
       );
     }
     return (

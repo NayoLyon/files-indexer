@@ -10,7 +10,7 @@ type Props = {
   file: FilePropsType
 };
 
-export default class FileDetails extends Component<Props> {
+export default class FileDetailsView extends Component<Props> {
   props: Props;
   static inlineStyles = {
     card: {
@@ -37,13 +37,13 @@ export default class FileDetails extends Component<Props> {
       return <Image size="huge" src={this.getProp('path')} />;
     }
     return (
-      <Card.Header style={FileDetails.inlineStyles.genericHeaderStyles}>{mimeType}</Card.Header>
+      <Card.Header style={FileDetailsView.inlineStyles.genericHeaderStyles}>{mimeType}</Card.Header>
     );
   }
 
   render() {
     return (
-      <Card style={FileDetails.inlineStyles.card}>
+      <Card style={FileDetailsView.inlineStyles.card}>
         {this.computePreview()}
         <Card.Content>
           <Card.Header>{this.getProp('name')}</Card.Header>

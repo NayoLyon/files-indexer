@@ -5,7 +5,7 @@ import { Tab, List, Button } from 'semantic-ui-react';
 import { FileProps, FilePropsDb } from '../api/filesystem';
 import { CONST_SCAN_TYPE_IDENTICAL, ConstScanType } from '../modules/scan/scanAction';
 
-import CompareDialog from './result/CompareDialog';
+import CompareDialogView from './result/CompareDialogView';
 
 type Props = {
   openFolderFor: FileProps => void,
@@ -72,7 +72,7 @@ export default class ResultTabIdenticalView extends Component<Props> {
     const { tabPaneStyle } = ResultTabIdenticalView.getStyles();
     return (
       <Tab.Pane key={this.props.id} style={tabPaneStyle}>
-        <CompareDialog
+        <CompareDialogView
           open={this.state.open}
           close={this.close}
           openDbFolderFor={this.props.openDbFolderFor}
