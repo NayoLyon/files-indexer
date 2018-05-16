@@ -5,6 +5,7 @@ import { Tab, Table, Button } from 'semantic-ui-react';
 import { FileProps, FilePropsDb } from '../../api/filesystem';
 import { CONST_SCAN_TYPE_MODIFIED, ConstScanType } from '../../modules/scan/scanAction';
 
+import CompareDialogView from './CompareDialogView';
 import styles from './Scrollables.css';
 import { printValue } from '../../utils/format';
 
@@ -27,6 +28,16 @@ export default class ResultTabModifiedView extends Component<Props> {
   constructor(props) {
     super(props);
     this.renderFiles = this.renderFiles.bind(this);
+    this.close = this.close.bind(this);
+    this.show = this.show.bind(this);
+    this.state = { open: false, file: null, dbFile: null };
+  }
+
+  close() {
+    this.setState({ open: false });
+  }
+  show(file, dbFile) {
+    return () => this.setState({ file, dbFile, open: true });
   }
 
   renderFiles() {
@@ -122,6 +133,7 @@ export default class ResultTabModifiedView extends Component<Props> {
       rows.push(
         <Table.Row key={`${this.props.id}_file_${i}`}>
           <Table.Cell key={`${this.props.id}_file_${i}_name`} textAlign="center">
+            <Button icon="search" onClick={this.show(file, dbFile)} />
             {file.name}
           </Table.Cell>
           {fileDiff}
@@ -149,6 +161,15 @@ export default class ResultTabModifiedView extends Component<Props> {
     const { columns, detailColumns, rows } = this.renderFiles();
     return (
       <Tab.Pane key={this.props.id} style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}>
+        <CompareDialogView
+          open={this.state.open}
+          close={this.close}
+          openDbFolderFor={this.props.openDbFolderFor}
+          openFolderFor={this.props.openFolderFor}
+          files={this.state.file}
+          dbFiles={this.state.dbFile}
+          dbFilesFirst
+        />
         <Table className={styles.scrollableTable} celled structured>
           <Table.Header>
             <Table.Row>
