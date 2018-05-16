@@ -1,8 +1,8 @@
 // @flow
 import React, { Component } from 'react';
-import { Modal, Button } from 'semantic-ui-react';
+import { Modal, Button, Label } from 'semantic-ui-react';
 
-import { FileProps, FilePropsDb } from '../../api/filesystem';
+import { FileProps, FilePropsDb, FilePropsType } from '../../api/filesystem';
 
 import FileDetails from './FileDetails';
 
@@ -11,19 +11,79 @@ type Props = {
   openDbFolderFor: FilePropsDb => void,
   close: () => void,
   open: boolean,
-  file: FileProps | null,
-  dbFiles: Array<FilePropsDb> | null
+  dbFilesFirst: boolean,
+  files: Array<FileProps | null> | null,
+  dbFiles: Array<FilePropsDb | null> | null
 };
 
 export default class CompareDialog extends Component<Props> {
   props: Props;
 
-  static renderFiles(files: Array<FilePropsDb>, openFolderFunc: FilePropsDb => void) {
+  static renderFiles(
+    files: FilePropsType | Array<FilePropsType>,
+    openFolderFunc: FilePropsType => void
+  ) {
     const res = [];
-    files.forEach(file => {
-      res.push(<FileDetails key={file.relpath} file={file} openFolderFor={openFolderFunc} />);
-    });
+    if (files instanceof Array) {
+      const type = CompareDialog.getType(files[0]);
+      files.forEach(file => {
+        res.push(
+          <FileDetails key={`${type}_${file.relpath}`} file={file} openFolderFor={openFolderFunc} />
+        );
+      });
+    } else {
+      const type = CompareDialog.getType(files);
+      res.push(
+        <FileDetails key={`${type}_${files.relpath}`} file={files} openFolderFor={openFolderFunc} />
+      );
+    }
     return res;
+  }
+  static getType(file: FilePropsType) {
+    if (file instanceof FileProps) {
+      return 'scan';
+    } else if (file instanceof FilePropsDb) {
+      return 'db';
+    }
+    return 'unknown';
+  }
+  static getDivider(topLabel: string, bottomLabel: string) {
+    const inlineStyle = {
+      divider: {
+        flex: '0 1',
+        margin: '1rem auto',
+        textAlign: 'center'
+      },
+      dividerLine: {
+        borderLeft: '1px solid rgba(34, 36, 38, 0.15)',
+        borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+        height: 'calc(50% - 2.5em)',
+        width: 0,
+        display: 'inline-block'
+      },
+      dividerLabel: {
+        display: 'block',
+        margin: '0.4em'
+      }
+    };
+
+    return (
+      <div key="divider" style={{ ...inlineStyle.divider, color: 'black' }}>
+        <div style={inlineStyle.dividerLine} />
+        <Label
+          basic
+          color="grey"
+          pointing="left"
+          style={{ ...inlineStyle.dividerLabel, marginTop: 0 }}
+        >
+          {topLabel}
+        </Label>
+        <Label basic color="grey" pointing="right" style={inlineStyle.dividerLabel}>
+          {bottomLabel}
+        </Label>
+        <div style={inlineStyle.dividerLine} />
+      </div>
+    );
   }
 
   render() {
@@ -41,15 +101,31 @@ export default class CompareDialog extends Component<Props> {
         paddingTop: '1rem'
       }
     };
-    if (!this.props.file) {
+    if (!this.props.files || !this.props.dbFiles) {
       return null;
+    }
+
+    let filesDetails;
+
+    // Display the files in the given order
+    if (this.props.dbFilesFirst) {
+      filesDetails = CompareDialog.renderFiles(this.props.dbFiles, this.props.openDbFolderFor);
+      filesDetails.push(CompareDialog.getDivider('Db', 'Scan'));
+      filesDetails = filesDetails.concat(
+        CompareDialog.renderFiles(this.props.files, this.props.openFolderFor)
+      );
+    } else {
+      filesDetails = CompareDialog.renderFiles(this.props.files, this.props.openFolderFor);
+      filesDetails.push(CompareDialog.getDivider('Scan', 'Db'));
+      filesDetails = filesDetails.concat(
+        CompareDialog.renderFiles(this.props.dbFiles, this.props.openDbFolderFor)
+      );
     }
     return (
       <Modal open={this.props.open} onClose={this.props.close} style={inlineStyle.modal}>
         {/* <Modal.Header>Select a Photo</Modal.Header> */}
         <Modal.Content image style={inlineStyle.content}>
-          <FileDetails file={this.props.file} openFolderFor={this.props.openFolderFor} />
-          {CompareDialog.renderFiles(this.props.dbFiles, this.props.openDbFolderFor)}
+          {filesDetails}
         </Modal.Content>
         <Modal.Actions>
           <Button icon="close" onClick={this.props.close} />

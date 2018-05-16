@@ -97,7 +97,7 @@ export default class ScanResultTabDuplicate extends Component<Props> {
           close={this.close}
           openDbFolderFor={this.props.openDbFolderFor}
           openFolderFor={this.props.openFolderFor}
-          file={this.state.file}
+          files={this.state.file}
           dbFiles={this.state.dbFiles}
         />
         <Table celled structured>
