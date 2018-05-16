@@ -3,14 +3,14 @@ import React from 'react';
 import { Switch, Route } from 'react-router';
 import App from './components/App';
 import HomeContainer from './components/HomeContainer';
-import IndexationPage from './components/IndexationPage';
-import ScanPage from './components/ScanPage';
+import IndexationContainer from './components/IndexationContainer';
+import ScanContainer from './components/ScanContainer';
 
 export default () => (
   <App>
     <Switch>
-      <Route exact path="/scan" component={ScanPage} />
-      <Route exact path="/index" component={IndexationPage} />
+      <Route exact path="/scan" component={ScanContainer} />
+      <Route exact path="/index" component={IndexationContainer} />
       <Route path="/" component={HomeContainer} />
     </Switch>
   </App>

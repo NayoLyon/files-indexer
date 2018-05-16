@@ -4,43 +4,51 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Grid, Icon, Header, Button } from 'semantic-ui-react';
 
-import ScanResultPage from './ScanResultPage';
-
 type Props = {
-  scan: () => void,
-  toScanFolder: string,
+  index: () => void,
+  masterFolder: string,
+  dbSize: number,
   indexing: boolean,
-  isScanned: boolean,
+  isIndexed: boolean,
   step: string,
   progress: number
 };
 
-class Scan extends Component<Props> {
+class IndexationView extends Component<Props> {
   props: Props;
 
   render() {
     let content = null;
-    if (!this.props.isScanned && !this.props.indexing) {
-      content = <Button onClick={this.props.scan}>Start Scan</Button>;
+    if (!this.props.isIndexed && !this.props.indexing) {
+      content = <Button onClick={this.props.index}>Start Indexation</Button>;
     } else if (this.props.indexing) {
       content = (
         <Header as="h2">
           {this.props.step} at {Math.round(this.props.progress * 100)}%
         </Header>
       );
-    } else if (this.props.isScanned) {
-      content = <ScanResultPage />;
+    } else if (this.props.isIndexed) {
+      // TODO displaying database content...
+      content = (
+        <div>
+          <Header as="h2">Folder indexed...</Header>
+          <p>{this.props.dbSize} elements indexed.</p>
+          <Link to="/scan">
+            <Button>Now scan folder</Button>
+          </Link>
+        </div>
+      );
     }
     return (
       <Grid padded style={{ height: '100vh' }}>
         <Grid.Column stretched>
           <Grid.Row style={{ flex: '0 0 4rem' }}>
-            <Link to="/index">
+            <Link to="/">
               <Icon name="arrow left" size="huge" />
             </Link>
           </Grid.Row>
           <Grid.Row style={{ flex: '0 0 2rem' }}>
-            <Header>Scan folder {this.props.toScanFolder}</Header>
+            <Header>Indexation of folder {this.props.masterFolder}</Header>
           </Grid.Row>
           <Grid.Row style={{ flex: '1 1 10%', height: '10%' }}>{content}</Grid.Row>
         </Grid.Column>
@@ -51,12 +59,13 @@ class Scan extends Component<Props> {
 
 function mapStateToProps(state) {
   return {
-    toScanFolder: state.folders.toScanPath,
-    indexing: state.scan.indexing,
-    isScanned: state.scan.isScanned,
-    step: state.scan.step,
-    progress: state.scan.progress
+    masterFolder: state.folders.masterPath,
+    dbSize: state.indexation.dbSize,
+    indexing: state.indexation.indexing,
+    isIndexed: state.indexation.isIndexed,
+    step: state.indexation.step,
+    progress: state.indexation.progress
   };
 }
 
-export default connect(mapStateToProps)(Scan);
+export default connect(mapStateToProps)(IndexationView);

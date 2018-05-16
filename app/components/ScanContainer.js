@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import * as ScanActions from '../modules/scan/scanAction';
 import { doScan, FileProps, FilePropsDb } from '../api/filesystem';
 
-import Scan from './Scan';
+import ScanView from './ScanView';
 
 type Props = {
   scanProgress: (string, number) => void,
@@ -16,7 +16,7 @@ type Props = {
   toScanFolder: string
 };
 
-class ScanPage extends Component<Props> {
+class ScanContainer extends Component<Props> {
   props: Props;
 
   async scan() {
@@ -28,7 +28,7 @@ class ScanPage extends Component<Props> {
   }
 
   render() {
-    return <Scan scan={this.scan.bind(this)} />;
+    return <ScanView scan={this.scan.bind(this)} />;
   }
 }
 
@@ -42,4 +42,4 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(ScanActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ScanPage);
+export default connect(mapStateToProps, mapDispatchToProps)(ScanContainer);

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import Loader from 'react-loader';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import Indexation from './Indexation';
+import IndexationView from './IndexationView';
 import * as IndexationActions from '../modules/indexation/indexationAction';
 import { doScan, FileProps } from '../api/filesystem';
 import { findDb, insertDb } from '../api/database';
@@ -18,7 +18,7 @@ type Props = {
   dbSize: number
 };
 
-class IndexationPage extends Component<Props> {
+class IndexationContainer extends Component<Props> {
   props: Props;
 
   constructor(props) {
@@ -49,7 +49,7 @@ class IndexationPage extends Component<Props> {
   render() {
     return (
       <Loader loaded={this.props.dbLoaded}>
-        <Indexation index={this.index.bind(this)} dbSize={this.props.dbSize} />
+        <IndexationView index={this.index.bind(this)} dbSize={this.props.dbSize} />
       </Loader>
     );
   }
@@ -67,4 +67,4 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(IndexationActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(IndexationPage);
+export default connect(mapStateToProps, mapDispatchToProps)(IndexationContainer);
