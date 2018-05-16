@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { Tab, Table } from 'semantic-ui-react';
-import { scanDbRef } from '../../modules/scan/scan';
+import { scanDbRef } from '../../modules/scan/scanReducer';
 import { printValue } from '../../utils/format';
 
 type Props = {

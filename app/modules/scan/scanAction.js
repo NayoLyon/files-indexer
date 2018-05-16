@@ -146,7 +146,7 @@ export function scanRefUpdate(
 
 export function scanProcessFile(fileProps: FileProps, oldDbFile: FilePropsDb | void) {
   return async (dispatch: (action: Action) => void, getState) => {
-    const { masterPath } = getState().folders;
+    const { masterPath } = getState().foldersState;
 
     let occurences = await findDb(masterPath, { _id: fileProps.id });
     if (occurences.length === 0) {

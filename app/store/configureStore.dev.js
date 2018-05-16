@@ -3,7 +3,7 @@ import thunk from 'redux-thunk';
 import { createHashHistory } from 'history';
 import { routerMiddleware, routerActions } from 'react-router-redux';
 import { createLogger } from 'redux-logger';
-import rootReducer, { fullStateType } from '../modules/index';
+import rootReducer, { fullStateType } from '../modules/reducers';
 import * as foldersActions from '../modules/folders/foldersAction';
 import * as indexationActions from '../modules/indexation/indexationAction';
 import * as scanActions from '../modules/scan/scanAction';
@@ -58,7 +58,7 @@ const configureStore = (initialState?: fullStateType) => {
   const store = createStore(rootReducer, initialState, enhancer);
 
   if (module.hot) {
-    module.hot.accept('../modules', () => store.replaceReducer(require('../modules'))); // eslint-disable-line global-require
+    module.hot.accept('../modules/reducers', () => store.replaceReducer(require('../modules/reducers'))); // eslint-disable-line global-require
   }
 
   return store;

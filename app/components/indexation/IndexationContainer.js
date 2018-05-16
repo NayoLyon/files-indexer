@@ -57,9 +57,9 @@ class IndexationContainer extends Component<Props> {
 
 function mapStateToProps(state) {
   return {
-    masterFolder: state.folders.masterPath,
-    dbLoaded: state.indexation.dbLoaded,
-    dbSize: state.indexation.dbSize
+    masterFolder: state.foldersState.masterPath,
+    dbLoaded: state.indexationState.dbLoaded,
+    dbSize: state.indexationState.dbSize
   };
 }
 

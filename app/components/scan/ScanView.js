@@ -51,11 +51,11 @@ class ScanView extends Component<Props> {
 
 function mapStateToProps(state) {
   return {
-    toScanFolder: state.folders.toScanPath,
-    indexing: state.scan.indexing,
-    isScanned: state.scan.isScanned,
-    step: state.scan.step,
-    progress: state.scan.progress
+    toScanFolder: state.foldersState.toScanPath,
+    indexing: state.scanState.indexing,
+    isScanned: state.scanState.isScanned,
+    step: state.scanState.step,
+    progress: state.scanState.progress
   };
 }
 

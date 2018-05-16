@@ -74,8 +74,8 @@ class HomeContainer extends Component<Props> {
 
 function mapStateToProps(state) {
   return {
-    masterFolder: state.folders.masterPath,
-    toScanFolder: state.folders.toScanPath
+    masterFolder: state.foldersState.masterPath,
+    toScanFolder: state.foldersState.toScanPath
   };
 }
 

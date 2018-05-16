@@ -59,12 +59,12 @@ class IndexationView extends Component<Props> {
 
 function mapStateToProps(state) {
   return {
-    masterFolder: state.folders.masterPath,
-    dbSize: state.indexation.dbSize,
-    indexing: state.indexation.indexing,
-    isIndexed: state.indexation.isIndexed,
-    step: state.indexation.step,
-    progress: state.indexation.progress
+    masterFolder: state.foldersState.masterPath,
+    dbSize: state.indexationState.dbSize,
+    indexing: state.indexationState.indexing,
+    isIndexed: state.indexationState.isIndexed,
+    step: state.indexationState.step,
+    progress: state.indexationState.progress
   };
 }
 

@@ -34,7 +34,7 @@ class ScanContainer extends Component<Props> {
 
 function mapStateToProps(state) {
   return {
-    toScanFolder: state.folders.toScanPath
+    toScanFolder: state.foldersState.toScanPath
   };
 }
 

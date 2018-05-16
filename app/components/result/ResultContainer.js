@@ -10,7 +10,7 @@ import path from 'path';
 import { FileProps, FilePropsDb } from '../../api/filesystem';
 
 import ResultView from './ResultView';
-import { scanDbRef } from '../../modules/scan/scan';
+import { scanDbRef } from '../../modules/scan/scanReducer';
 import { updateDb } from '../../api/database';
 import * as ScanActions from '../../modules/scan/scanAction';
 
@@ -224,11 +224,11 @@ class ResultContainer extends Component<Props> {
 
 function mapStateToProps(state) {
   return {
-    masterFolder: state.folders.masterPath,
-    toScanFolder: state.folders.toScanPath,
-    dbFilesRef: state.scan.dbFilesRef,
-    newFiles: state.scan.newFiles,
-    duplicates: state.scan.duplicates
+    masterFolder: state.foldersState.masterPath,
+    toScanFolder: state.foldersState.toScanPath,
+    dbFilesRef: state.scanState.dbFilesRef,
+    newFiles: state.scanState.newFiles,
+    duplicates: state.scanState.duplicates
   };
 }
 

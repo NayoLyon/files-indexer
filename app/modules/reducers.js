@@ -6,16 +6,16 @@ import indexationReducer, { indexationStateType } from './indexation/indexationR
 import scanReducer, { scanStateType } from './scan/scanReducer';
 
 export type fullStateType = {
-  +scan: scanStateType,
-  +indexation: indexationStateType,
-  +folders: foldersStateType,
+  +scanState: scanStateType,
+  +indexationState: indexationStateType,
+  +foldersState: foldersStateType,
   +router: object
 };
 
 const rootReducer = combineReducers({
-  scan: scanReducer,
-  indexation: indexationReducer,
-  folders: foldersReducer,
+  scanState: scanReducer,
+  indexationState: indexationReducer,
+  foldersState: foldersReducer,
   routing: router
 });
 

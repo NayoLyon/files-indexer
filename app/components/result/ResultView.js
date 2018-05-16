@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Tab } from 'semantic-ui-react';
 
 import { FileProps, FilePropsDb } from '../../api/filesystem';
-import { scanDbRef } from '../../modules/scan/scan';
+import { scanDbRef } from '../../modules/scan/scanReducer';
 import { ConstScanType } from '../../modules/scan/scanAction';
 
 import ResultTabNewView from './ResultTabNewView';
@@ -109,11 +109,11 @@ class ResultView extends Component<Props> {
 
 function mapStateToProps(state) {
   return {
-    identicals: state.scan.identicals,
-    newFiles: state.scan.newFiles,
-    modified: state.scan.modified,
-    duplicates: state.scan.duplicates,
-    dbFilesRef: state.scan.dbFilesRef
+    identicals: state.scanState.identicals,
+    newFiles: state.scanState.newFiles,
+    modified: state.scanState.modified,
+    duplicates: state.scanState.duplicates,
+    dbFilesRef: state.scanState.dbFilesRef
   };
 }
 
