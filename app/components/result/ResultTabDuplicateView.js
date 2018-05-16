@@ -36,31 +36,30 @@ export default class ResultTabDuplicateView extends Component<Props> {
   renderFiles() {
     const rows = [];
     for (let i = 0; i < this.props.files.length; i += 1) {
-      const file = this.props.files[i];
-      const { matches } = file;
+      const { file, matches } = this.props.files[i];
 
       rows.push(
         <Table.Row key={`${this.props.id}_file_${i}_dir`}>
           <Table.Cell textAlign="center" rowSpan={matches.length + 1}>
-            <Button icon="search" onClick={this.show(file.file, matches)} />
-            {file.file.name}
+            <Button icon="search" onClick={this.show(file, matches)} />
+            {file.name}
           </Table.Cell>
           <Table.Cell textAlign="center">In folder</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(file.file, 'size')}</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(file.file, 'modified')}</Table.Cell>
+          <Table.Cell textAlign="center">{printValue(file, 'size')}</Table.Cell>
+          <Table.Cell textAlign="center">{printValue(file, 'modified')}</Table.Cell>
           <Table.Cell textAlign="center">
-            {printValue(file.file, 'relpath')}
+            {printValue(file, 'relpath')}
             <Button.Group>
               <Button
                 icon="external"
                 onClick={() => {
-                  this.props.openFolderFor(file.file);
+                  this.props.openFolderFor(file);
                 }}
               />
               <Button
                 icon="trash"
                 onClick={() => {
-                  this.props.removeFile(file.file, matches, CONST_SCAN_TYPE_DUPLICATE);
+                  this.props.removeFile(file, matches, CONST_SCAN_TYPE_DUPLICATE);
                 }}
               />
             </Button.Group>
