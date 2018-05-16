@@ -10,7 +10,7 @@ type Props = {
   toScanFolder: string
 };
 
-export default class Home extends Component<Props> {
+export default class HomeView extends Component<Props> {
   props: Props;
 
   render() {

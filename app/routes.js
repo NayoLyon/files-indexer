@@ -2,7 +2,7 @@
 import React from 'react';
 import { Switch, Route } from 'react-router';
 import App from './components/App';
-import HomePage from './components/HomePage';
+import HomeContainer from './components/HomeContainer';
 import IndexationPage from './components/IndexationPage';
 import ScanPage from './components/ScanPage';
 
@@ -11,7 +11,7 @@ export default () => (
     <Switch>
       <Route exact path="/scan" component={ScanPage} />
       <Route exact path="/index" component={IndexationPage} />
-      <Route path="/" component={HomePage} />
+      <Route path="/" component={HomeContainer} />
     </Switch>
   </App>
 );

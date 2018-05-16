@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { remote } from 'electron';
 import Store from 'electron-store';
-import Home from './Home';
+import HomeView from './HomeView';
 import * as FoldersActions from '../modules/folders/foldersAction';
 
 const { dialog } = remote;
@@ -22,7 +22,7 @@ See http://reactdesktop.js.org/docs/windows/window/
 Or https://xel-toolkit.org/ for an alternative to React desktop
 Or https://www.material-ui.com/#/get-started/required-knowledge ???
 */
-class HomePage extends Component<Props> {
+class HomeContainer extends Component<Props> {
   props: Props;
 
   selectFolder(isMaster: boolean) {
@@ -62,7 +62,7 @@ class HomePage extends Component<Props> {
 
   render() {
     return (
-      <Home
+      <HomeView
         selectFolder={this.selectFolder.bind(this)}
         isScanPossible={this.isScanPossible.bind(this)}
         masterFolder={this.props.masterFolder}
@@ -83,4 +83,4 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(FoldersActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
+export default connect(mapStateToProps, mapDispatchToProps)(HomeContainer);
