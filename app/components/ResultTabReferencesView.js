@@ -9,7 +9,7 @@ type Props = {
   files: Array<scanDbRef>
 };
 
-export default class ScanResultTabReferences extends Component<Props> {
+export default class ResultTabReferencesView extends Component<Props> {
   props: Props;
   constructor(props) {
     super(props);

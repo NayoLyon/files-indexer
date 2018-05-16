@@ -9,7 +9,7 @@ import path from 'path';
 
 import { FileProps, FilePropsDb } from '../api/filesystem';
 
-import ScanResult from './ScanResult';
+import ResultView from './ResultView';
 import { scanDbRef } from '../modules/scan/scan';
 import { updateDb } from '../api/database';
 import * as ScanActions from '../modules/scan/scanAction';
@@ -36,7 +36,7 @@ type Props = {
   duplicates: Array<{ file: FileProps, matches: Array<FilePropsDb> }>
 };
 
-class ScanResultPage extends Component<Props> {
+class ResultContainer extends Component<Props> {
   props: Props;
   static openFolder(folder) {
     shell.showItemInFolder(folder);
@@ -53,10 +53,10 @@ class ScanResultPage extends Component<Props> {
   }
 
   openDbFolderFor(file: FilePropsDb) {
-    ScanResultPage.openFolder(path.resolve(this.props.masterFolder, file.relpath));
+    ResultContainer.openFolder(path.resolve(this.props.masterFolder, file.relpath));
   }
   openFolderFor(file: FileProps) {
-    ScanResultPage.openFolder(path.resolve(this.props.toScanFolder, file.relpath));
+    ResultContainer.openFolder(path.resolve(this.props.toScanFolder, file.relpath));
   }
   async removeFile(file: FileProps, oldDbFile: Array<FilePropsDb> | FilePropsDb, scanType: ScanActions.ConstScanType) {
     shell.moveItemToTrash(path.resolve(this.props.toScanFolder, file.relpath));
@@ -211,7 +211,7 @@ class ScanResultPage extends Component<Props> {
 
   render() {
     return (
-      <ScanResult
+      <ResultView
         openDbFolderFor={this.openDbFolderFor}
         openFolderFor={this.openFolderFor}
         copyModifiedAttribute={this.copyModifiedAttribute}
@@ -236,4 +236,4 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(ScanActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ScanResultPage);
+export default connect(mapStateToProps, mapDispatchToProps)(ResultContainer);

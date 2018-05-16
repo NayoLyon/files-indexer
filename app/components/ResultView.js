@@ -7,11 +7,11 @@ import { FileProps, FilePropsDb } from '../api/filesystem';
 import { scanDbRef } from '../modules/scan/scan';
 import { ConstScanType } from '../modules/scan/scanAction';
 
-import ScanResultTabNew from './ScanResultTabNew';
-import ScanResultTabModified from './ScanResultTabModified';
-import ScanResultTabDuplicate from './ScanResultTabDuplicate';
-import ScanResultTabReferences from './ScanResultTabReferences';
-import ScanResultTabIdentical from './ScanResultTabIdentical';
+import ResultTabNewView from './ResultTabNewView';
+import ResultTabModifiedView from './ResultTabModifiedView';
+import ResultTabDuplicateView from './ResultTabDuplicateView';
+import ResultTabReferencesView from './ResultTabReferencesView';
+import ResultTabIdenticalView from './ResultTabIdenticalView';
 
 type Props = {
   openFolderFor: FileProps => void,
@@ -30,7 +30,7 @@ type Props = {
   dbFilesRef: Map<string, scanDbRef>
 };
 
-class ScanResult extends Component<Props> {
+class ResultView extends Component<Props> {
   props: Props;
 
   render() {
@@ -48,7 +48,7 @@ class ScanResult extends Component<Props> {
             duplicatefileRefs.length
           })`,
           render: () => (
-            <ScanResultTabReferences id="scan_result_references" files={duplicatefileRefs} />
+            <ResultTabReferencesView id="scan_result_references" files={duplicatefileRefs} />
           )
         });
       }
@@ -57,7 +57,7 @@ class ScanResult extends Component<Props> {
       panes.push({
         menuItem: `Identical files (${this.props.identicals.length})`,
         render: () => (
-          <ScanResultTabIdentical
+          <ResultTabIdenticalView
             id="scan_result_identical"
             files={this.props.identicals}
             removeFile={this.props.removeFile}
@@ -70,14 +70,14 @@ class ScanResult extends Component<Props> {
     if (this.props.newFiles.length > 0) {
       panes.push({
         menuItem: `New files (${this.props.newFiles.length})`,
-        render: () => <ScanResultTabNew id="scan_result_new" files={this.props.newFiles} />
+        render: () => <ResultTabNewView id="scan_result_new" files={this.props.newFiles} />
       });
     }
     if (this.props.modified.length > 0) {
       panes.push({
         menuItem: `Modified files (${this.props.modified.length})`,
         render: () => (
-          <ScanResultTabModified
+          <ResultTabModifiedView
             id="scan_result_modified"
             files={this.props.modified}
             copyModifiedAttribute={this.props.copyModifiedAttribute}
@@ -93,7 +93,7 @@ class ScanResult extends Component<Props> {
       panes.push({
         menuItem: `Possible duplicates (${this.props.duplicates.length})`,
         render: () => (
-          <ScanResultTabDuplicate
+          <ResultTabDuplicateView
             id="scan_result_duplicates"
             files={this.props.duplicates}
             removeFile={this.props.removeFile}
@@ -117,4 +117,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps)(ScanResult);
+export default connect(mapStateToProps)(ResultView);

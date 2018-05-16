@@ -5,7 +5,7 @@ import { Tab, Table, Button } from 'semantic-ui-react';
 import { FileProps, FilePropsDb } from '../api/filesystem';
 import { CONST_SCAN_TYPE_MODIFIED, ConstScanType } from '../modules/scan/scanAction';
 
-import styles from './ScanResult.css';
+import styles from './Scrollables.css';
 import { printValue } from '../utils/format';
 
 type Props = {
@@ -22,7 +22,7 @@ type Props = {
   }>
 };
 
-export default class ScanResultTabModified extends Component<Props> {
+export default class ResultTabModifiedView extends Component<Props> {
   props: Props;
   constructor(props) {
     super(props);

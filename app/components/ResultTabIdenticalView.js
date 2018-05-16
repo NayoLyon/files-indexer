@@ -15,7 +15,7 @@ type Props = {
   files: Array<{ file: FileProps, dbFile: FilePropsDb }>
 };
 
-export default class ScanResultTabIdentical extends Component<Props> {
+export default class ResultTabIdenticalView extends Component<Props> {
   props: Props;
   static getStyles() {
     return {
@@ -45,7 +45,7 @@ export default class ScanResultTabIdentical extends Component<Props> {
   }
 
   renderFiles() {
-    const { buttonGroupStyle } = ScanResultTabIdentical.getStyles();
+    const { buttonGroupStyle } = ResultTabIdenticalView.getStyles();
     const res = [];
     for (let i = 0; i < this.props.files.length; i += 1) {
       const { file, dbFile } = this.props.files[i];
@@ -69,7 +69,7 @@ export default class ScanResultTabIdentical extends Component<Props> {
     return res;
   }
   render() {
-    const { tabPaneStyle } = ScanResultTabIdentical.getStyles();
+    const { tabPaneStyle } = ResultTabIdenticalView.getStyles();
     return (
       <Tab.Pane key={this.props.id} style={tabPaneStyle}>
         <CompareDialog

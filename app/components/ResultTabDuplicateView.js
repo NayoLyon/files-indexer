@@ -16,7 +16,7 @@ type Props = {
   files: Array<{ file: FileProps, matches: Array<FilePropsDb> }>
 };
 
-export default class ScanResultTabDuplicate extends Component<Props> {
+export default class ResultTabDuplicateView extends Component<Props> {
   props: Props;
   constructor(props) {
     super(props);
