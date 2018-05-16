@@ -51,7 +51,7 @@ const defaultValue: scanStateType = {
   dbFilesRef: new Map()
 };
 
-export default function scan(state: scanStateType = defaultValue, action: Action) {
+export default function scanReducer(state: scanStateType = defaultValue, action: Action) {
   switch (action.type) {
     case SELECT_TOSCAN_FOLDER:
       // When we change the folder, we re-initialize scan state...

@@ -12,9 +12,9 @@ const defaultValue: foldersStateType = {
   toScanPath: ''
 };
 
-// export default function folders(state: foldersStateType = { masterPath: '', toScanPath: '' },
+// export default function foldersReducer(state: foldersStateType = { masterPath: '', toScanPath: '' },
 // action: actionType) {
-export default function folders(state: foldersStateType = defaultValue, action: Action) {
+export default function foldersReducer(state: foldersStateType = defaultValue, action: Action) {
   switch (action.type) {
     case SELECT_MASTER_FOLDER:
       return Object.assign({}, state, { masterPath: action.path });

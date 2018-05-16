@@ -25,7 +25,7 @@ const defaultValue: indexationStateType = {
   progress: 0
 };
 
-export default function indexation(state: indexationStateType = defaultValue, action: Action) {
+export default function indexationReducer(state: indexationStateType = defaultValue, action: Action) {
   switch (action.type) {
     case INDEXATION_LOAD_DATABASE:
       return Object.assign({}, state, {

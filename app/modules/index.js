@@ -1,9 +1,9 @@
 // @flow
 import { combineReducers } from 'redux';
 import { routerReducer as router } from 'react-router-redux';
-import folders, { foldersStateType } from './folders/folders';
-import indexation, { indexationStateType } from './indexation/indexation';
-import scan, { scanStateType } from './scan/scan';
+import foldersReducer, { foldersStateType } from './folders/foldersReducer';
+import indexationReducer, { indexationStateType } from './indexation/indexationReducer';
+import scanReducer, { scanStateType } from './scan/scanReducer';
 
 export type fullStateType = {
   +scan: scanStateType,
@@ -13,9 +13,9 @@ export type fullStateType = {
 };
 
 const rootReducer = combineReducers({
-  scan,
-  indexation,
-  folders,
+  scan: scanReducer,
+  indexation: indexationReducer,
+  folders: foldersReducer,
   routing: router
 });
 
