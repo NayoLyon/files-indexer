@@ -31,6 +31,7 @@ type Props = {
   ) => void,
   masterFolder: string,
   toScanFolder: string,
+  identicals: Array<{ file: FileProps, dbFile: FilePropsDb }>,
   dbFilesRef: Map<string, scanDbRef>,
   newFiles: Array<FileProps>,
   duplicates: Array<{ file: FileProps, matches: Array<FilePropsDb> }>
@@ -50,6 +51,7 @@ class ResultContainer extends Component<Props> {
     this.dbFilePropUpdated = this.dbFilePropUpdated.bind(this);
     this.removeFile = this.removeFile.bind(this);
     this.copyNameAttribute = this.copyNameAttribute.bind(this);
+    this.removeAllFiles = this.removeAllFiles.bind(this);
   }
 
   openDbFolderFor(file: FilePropsDb) {
@@ -58,7 +60,11 @@ class ResultContainer extends Component<Props> {
   openFolderFor(file: FileProps) {
     ResultContainer.openFolder(path.resolve(this.props.toScanFolder, file.relpath));
   }
-  async removeFile(file: FileProps, oldDbFile: Array<FilePropsDb> | FilePropsDb, scanType: ScanActions.ConstScanType) {
+  async removeFile(
+    file: FileProps,
+    oldDbFile: Array<FilePropsDb> | FilePropsDb,
+    scanType: ScanActions.ConstScanType
+  ) {
     shell.moveItemToTrash(path.resolve(this.props.toScanFolder, file.relpath));
     switch (scanType) {
       case ScanActions.CONST_SCAN_TYPE_MODIFIED:
@@ -77,6 +83,15 @@ class ResultContainer extends Component<Props> {
         console.error(`Unexpected removeFile of ${scanType}!!`);
     }
     this.props.scanRefUpdate(file, oldDbFile, undefined, 'whatever'); // TODO change 'whatever' to undefined ??
+  }
+  async removeAllFiles(scanType: ScanActions.ConstScanType) {
+    if (scanType === ScanActions.CONST_SCAN_TYPE_IDENTICAL) {
+      this.props.identicals.forEach(ident => {
+        this.removeFile(ident.file, ident.dbFile, scanType);
+      });
+    } else {
+      console.error(`Unexpected scanType '${scanType}' for removeAllFiles. Skip action...`);
+    }
   }
   async copyModifiedAttribute(file: FileProps, dbFile: FilePropsDb) {
     const dbFilePath = path.resolve(this.props.masterFolder, dbFile.relpath);
@@ -216,6 +231,7 @@ class ResultContainer extends Component<Props> {
         openFolderFor={this.openFolderFor}
         copyModifiedAttribute={this.copyModifiedAttribute}
         removeFile={this.removeFile}
+        removeAllFiles={this.removeAllFiles}
         copyNameAttribute={this.copyNameAttribute}
       />
     );
@@ -226,6 +242,7 @@ function mapStateToProps(state) {
   return {
     masterFolder: state.foldersState.masterPath,
     toScanFolder: state.foldersState.toScanPath,
+    identicals: state.scanState.identicals,
     dbFilesRef: state.scanState.dbFilesRef,
     newFiles: state.scanState.newFiles,
     duplicates: state.scanState.duplicates

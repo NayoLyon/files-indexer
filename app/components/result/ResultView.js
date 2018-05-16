@@ -1,11 +1,11 @@
 // @flow
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Tab } from 'semantic-ui-react';
+import { Tab, Menu, Button } from 'semantic-ui-react';
 
 import { FileProps, FilePropsDb } from '../../api/filesystem';
 import { scanDbRef } from '../../modules/scan/scanReducer';
-import { ConstScanType } from '../../modules/scan/scanAction';
+import { CONST_SCAN_TYPE_IDENTICAL, ConstScanType } from '../../modules/scan/scanAction';
 
 import ResultTabNewView from './ResultTabNewView';
 import ResultTabModifiedView from './ResultTabModifiedView';
@@ -18,6 +18,7 @@ type Props = {
   openDbFolderFor: FilePropsDb => void,
   copyModifiedAttribute: (FileProps, FilePropsDb) => void,
   removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb, ConstScanType) => void,
+  removeAllFiles: ConstScanType => void,
   copyNameAttribute: (FileProps, FilePropsDb) => void,
   identicals: Array<{ file: FileProps, dbFile: FilePropsDb }>,
   newFiles: Array<FileProps>,
@@ -34,6 +35,9 @@ class ResultView extends Component<Props> {
   props: Props;
 
   render() {
+    const inlineStyles = {
+      trashButtonStyle: { fontSize: '0.7rem', marginRight: '-0.8rem', marginLeft: '0.4rem' }
+    };
     const panes = [];
     if (this.props.dbFilesRef.size > 0) {
       const duplicatefileRefs = [];
@@ -55,7 +59,17 @@ class ResultView extends Component<Props> {
     }
     if (this.props.identicals.length > 0) {
       panes.push({
-        menuItem: `Identical files (${this.props.identicals.length})`,
+        menuItem: (
+          <Menu.Item key="messages">
+            Identical files ({this.props.identicals.length})<Button
+              icon="trash"
+              style={inlineStyles.trashButtonStyle}
+              onClick={() => {
+                this.props.removeAllFiles(CONST_SCAN_TYPE_IDENTICAL);
+              }}
+            />
+          </Menu.Item>
+        ),
         render: () => (
           <ResultTabIdenticalView
             id="scan_result_identical"
