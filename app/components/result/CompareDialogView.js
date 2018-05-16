@@ -110,13 +110,13 @@ export default class CompareDialogView extends Component<Props> {
     // Display the files in the given order
     if (this.props.dbFilesFirst) {
       filesDetails = CompareDialogView.renderFiles(this.props.dbFiles, this.props.openDbFolderFor);
-      filesDetails.push(CompareDialogView.getDivider('Db', 'Scan'));
+      filesDetails.push(CompareDialogView.getDivider('Db', 'Folder'));
       filesDetails = filesDetails.concat(
         CompareDialogView.renderFiles(this.props.files, this.props.openFolderFor)
       );
     } else {
       filesDetails = CompareDialogView.renderFiles(this.props.files, this.props.openFolderFor);
-      filesDetails.push(CompareDialogView.getDivider('Scan', 'Db'));
+      filesDetails.push(CompareDialogView.getDivider('Folder', 'Db'));
       filesDetails = filesDetails.concat(
         CompareDialogView.renderFiles(this.props.dbFiles, this.props.openDbFolderFor)
       );
