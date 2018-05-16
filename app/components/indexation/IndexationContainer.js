@@ -4,9 +4,9 @@ import Loader from 'react-loader';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import IndexationView from './IndexationView';
-import * as IndexationActions from '../modules/indexation/indexationAction';
-import { doScan, FileProps } from '../api/filesystem';
-import { findDb, insertDb } from '../api/database';
+import * as IndexationActions from '../../modules/indexation/indexationAction';
+import { doScan, FileProps } from '../../api/filesystem';
+import { findDb, insertDb } from '../../api/database';
 
 type Props = {
   loadDatabase: string => void,

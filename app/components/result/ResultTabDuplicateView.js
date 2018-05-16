@@ -2,11 +2,11 @@
 import React, { Component } from 'react';
 import { Tab, Table, Button } from 'semantic-ui-react';
 
-import { FileProps, FilePropsDb } from '../api/filesystem';
-import { CONST_SCAN_TYPE_DUPLICATE, ConstScanType } from '../modules/scan/scanAction';
-import { printValue } from '../utils/format';
+import { FileProps, FilePropsDb } from '../../api/filesystem';
+import { CONST_SCAN_TYPE_DUPLICATE, ConstScanType } from '../../modules/scan/scanAction';
+import { printValue } from '../../utils/format';
 
-import CompareDialogView from './result/CompareDialogView';
+import CompareDialogView from './CompareDialogView';
 
 type Props = {
   openFolderFor: FileProps => void,

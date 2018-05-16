@@ -2,11 +2,11 @@
 import React, { Component } from 'react';
 import { Tab, Table, Button } from 'semantic-ui-react';
 
-import { FileProps, FilePropsDb } from '../api/filesystem';
-import { CONST_SCAN_TYPE_MODIFIED, ConstScanType } from '../modules/scan/scanAction';
+import { FileProps, FilePropsDb } from '../../api/filesystem';
+import { CONST_SCAN_TYPE_MODIFIED, ConstScanType } from '../../modules/scan/scanAction';
 
 import styles from './Scrollables.css';
-import { printValue } from '../utils/format';
+import { printValue } from '../../utils/format';
 
 type Props = {
   openFolderFor: FileProps => void,

@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { Tab, List } from 'semantic-ui-react';
-import { FileProps } from '../api/filesystem';
+import { FileProps } from '../../api/filesystem';
 
 type Props = {
   id: string,

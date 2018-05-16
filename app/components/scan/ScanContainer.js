@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import * as ScanActions from '../modules/scan/scanAction';
-import { doScan, FileProps, FilePropsDb } from '../api/filesystem';
+import * as ScanActions from '../../modules/scan/scanAction';
+import { doScan, FileProps, FilePropsDb } from '../../api/filesystem';
 
 import ScanView from './ScanView';
 

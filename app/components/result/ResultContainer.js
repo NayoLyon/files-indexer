@@ -7,12 +7,12 @@ import { shell } from 'electron';
 import fs from 'fs';
 import path from 'path';
 
-import { FileProps, FilePropsDb } from '../api/filesystem';
+import { FileProps, FilePropsDb } from '../../api/filesystem';
 
 import ResultView from './ResultView';
-import { scanDbRef } from '../modules/scan/scan';
-import { updateDb } from '../api/database';
-import * as ScanActions from '../modules/scan/scanAction';
+import { scanDbRef } from '../../modules/scan/scan';
+import { updateDb } from '../../api/database';
+import * as ScanActions from '../../modules/scan/scanAction';
 
 type Props = {
   scanProgress: (string, number) => void,

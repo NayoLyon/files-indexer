@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Tab } from 'semantic-ui-react';
 
-import { FileProps, FilePropsDb } from '../api/filesystem';
-import { scanDbRef } from '../modules/scan/scan';
-import { ConstScanType } from '../modules/scan/scanAction';
+import { FileProps, FilePropsDb } from '../../api/filesystem';
+import { scanDbRef } from '../../modules/scan/scan';
+import { ConstScanType } from '../../modules/scan/scanAction';
 
 import ResultTabNewView from './ResultTabNewView';
 import ResultTabModifiedView from './ResultTabModifiedView';

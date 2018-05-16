@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { remote } from 'electron';
 import Store from 'electron-store';
 import HomeView from './HomeView';
-import * as FoldersActions from '../modules/folders/foldersAction';
+import * as FoldersActions from '../../modules/folders/foldersAction';
 
 const { dialog } = remote;
 

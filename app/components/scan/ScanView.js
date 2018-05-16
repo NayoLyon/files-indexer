@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Grid, Icon, Header, Button } from 'semantic-ui-react';
 
-import ResultContainer from './ResultContainer';
+import ResultContainer from '../result/ResultContainer';
 
 type Props = {
   scan: () => void,

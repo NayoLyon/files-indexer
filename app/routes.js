@@ -2,9 +2,9 @@
 import React from 'react';
 import { Switch, Route } from 'react-router';
 import App from './components/App';
-import HomeContainer from './components/HomeContainer';
-import IndexationContainer from './components/IndexationContainer';
-import ScanContainer from './components/ScanContainer';
+import HomeContainer from './components/home/HomeContainer';
+import IndexationContainer from './components/indexation/IndexationContainer';
+import ScanContainer from './components/scan/ScanContainer';
 
 export default () => (
   <App>
