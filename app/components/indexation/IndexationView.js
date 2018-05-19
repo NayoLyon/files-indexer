@@ -8,7 +8,7 @@ import IndexationAnomaliesView from './IndexationAnomaliesView';
 
 type Props = {
   index: () => void,
-  indexDiff: () => void,
+  quickIndex: () => void,
   masterFolder: string,
   dbSize: number,
   indexing: boolean,
@@ -39,7 +39,7 @@ class IndexationView extends Component<Props> {
           <Link to="/scan">
             <Button>Now scan folder</Button>
           </Link>
-          <Button onClick={this.props.indexDiff}>Re-index</Button>
+          <Button onClick={this.props.quickIndex}>Re-index</Button>
           <Button onClick={this.props.index}>Full re-indexation</Button>
           <IndexationAnomaliesView />
         </div>
