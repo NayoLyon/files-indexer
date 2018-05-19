@@ -40,6 +40,8 @@ export async function getDatabaseSize(folder: string): number {
     } catch (err) {
       db = new Datastore({ filename: getDbFile(folder), autoload: true });
       dbStore.set(folder, db);
+      await db.ensureIndex({ fieldName: 'relpath' });
+      await db.ensureIndex({ fieldName: 'hash' });
     }
     return await db.count({});
   } catch (error) {
