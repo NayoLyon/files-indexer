@@ -148,7 +148,7 @@ export function scanProcessFile(fileProps: FileProps, oldDbFile: FilePropsDb | v
   return async (dispatch: (action: Action) => void, getState) => {
     const { masterPath } = getState().foldersState;
 
-    let occurences = await findDb(masterPath, { _id: fileProps.id });
+    let occurences = await findDb(masterPath, { hash: fileProps.hash });
     if (occurences.length === 0) {
       // File not found in db... Search for files with similar properties
       occurences = await findDb(masterPath, {
@@ -167,7 +167,7 @@ export function scanProcessFile(fileProps: FileProps, oldDbFile: FilePropsDb | v
     } else {
       if (occurences.length > 1) {
         console.error(occurences);
-        throw Error(`Multiple occurences from hash ${fileProps.id}!!`);
+        throw Error(`Multiple occurences from hash ${fileProps.hash}!!`);
       }
       const inDb = occurences[0];
       const compared: Map<string, Array<string | number | Date>> = fileProps.compareSameHash(inDb);

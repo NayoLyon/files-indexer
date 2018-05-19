@@ -29,7 +29,7 @@ class IndexationContainer extends Component<Props> {
   }
 
   async processFile(fileProps: FileProps) {
-    const occurences = await findDb(this.props.masterFolder, { _id: fileProps.id });
+    const occurences = await findDb(this.props.masterFolder, { hash: fileProps.hash });
     if (occurences === null || occurences.length === 0) {
       await insertDb(this.props.masterFolder, fileProps);
     } else {

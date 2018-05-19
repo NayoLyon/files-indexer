@@ -103,7 +103,7 @@ class ResultContainer extends Component<Props> {
       if (updatedDoc[0] !== 1) {
         console.error(updatedDoc, newDbFile);
         throw Error(`Document ${newDbFile.relpath} not updated!!`);
-      } else if (updatedDoc[1]._id !== newDbFile._id) {
+      } else if (updatedDoc[1].hash !== newDbFile.hash) {
         console.error(updatedDoc, newDbFile);
         throw Error(`Wrong document ${newDbFile.relpath} not updated!!`);
       }
@@ -123,7 +123,7 @@ class ResultContainer extends Component<Props> {
       if (updatedDoc[0] !== 1) {
         console.error(updatedDoc, newDbFile);
         throw Error(`Document ${newDbFile.relpath} not updated!!`);
-      } else if (updatedDoc[1]._id !== newDbFile._id) {
+      } else if (updatedDoc[1].hash !== newDbFile.hash) {
         console.error(updatedDoc, newDbFile);
         throw Error(`Wrong document ${newDbFile.relpath} not updated!!`);
       }
