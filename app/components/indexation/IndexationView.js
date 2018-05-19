@@ -2,10 +2,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Grid, Icon, Header, Button, Table } from 'semantic-ui-react';
+import { Grid, Icon, Header, Button } from 'semantic-ui-react';
 
-import { printValue } from '../../utils/format';
-import { FilePropsDb, FileProps } from '../../api/filesystem';
+import IndexationAnomaliesView from './IndexationAnomaliesView';
 
 type Props = {
   index: () => void,
@@ -15,75 +14,12 @@ type Props = {
   indexing: boolean,
   isIndexed: boolean,
   step: string,
-  progress: number,
-  duplicates: Map<string, { dbFile: FilePropsDb, file: FileProps, diff: Set<string> }>
+  progress: number
 };
 
 class IndexationView extends Component<Props> {
   props: Props;
-  constructor(props) {
-    super(props);
-    this.renderAnomalies = this.renderAnomalies.bind(this);
-  }
 
-  renderAnomalies() {
-    if (this.props.duplicates.size === 0) {
-      return null;
-    }
-
-    const listItems = [];
-    this.props.duplicates.forEach((dupFile, relpath) => {
-      const { dbFile, file, diff } = dupFile;
-      let isFirst = true;
-      diff.forEach(prop => {
-        let mainCell = null;
-        if (isFirst) {
-          mainCell = (
-            <Table.Cell key="relpath" textAlign="center" rowSpan={diff.size}>
-              {relpath}
-            </Table.Cell>
-          );
-        }
-        let rowContent;
-        if (prop === 'new') {
-          rowContent = [
-            <Table.Cell key="prop" textAlign="center">
-              {prop}
-            </Table.Cell>,
-            <Table.Cell key="filevalue" textAlign="center" />,
-            <Table.Cell key="dbvalue" />
-          ];
-        } else {
-          rowContent = [
-            <Table.Cell key="prop" textAlign="center">
-              {prop}
-            </Table.Cell>,
-            <Table.Cell key="filevalue" textAlign="center">
-              {printValue(file, prop)}
-            </Table.Cell>,
-            <Table.Cell key="dbvalue" textAlign="center">
-              {printValue(dbFile, prop)}
-            </Table.Cell>
-          ];
-        }
-        /* eslint-disable react/no-array-index-key */
-        listItems.push(
-          <Table.Row key={`${relpath}_${prop}`}>
-            {mainCell}
-            {rowContent}
-          </Table.Row>
-        );
-        /* eslint-enable react/no-array-index-key */
-        isFirst = false;
-      });
-    });
-
-    return (
-      <Table>
-        <Table.Body>{listItems}</Table.Body>
-      </Table>
-    );
-  }
   render() {
     let content = null;
     if (!this.props.isIndexed && !this.props.indexing) {
@@ -96,7 +32,6 @@ class IndexationView extends Component<Props> {
       );
     } else if (this.props.isIndexed) {
       // TODO displaying database content...
-      const indexAnomalies = this.renderAnomalies();
       content = (
         <div>
           <Header as="h2">Folder indexed...</Header>
@@ -106,7 +41,7 @@ class IndexationView extends Component<Props> {
           </Link>
           <Button onClick={this.props.indexDiff}>Re-index</Button>
           <Button onClick={this.props.index}>Full re-indexation</Button>
-          {indexAnomalies}
+          <IndexationAnomaliesView />
         </div>
       );
     }
@@ -135,8 +70,7 @@ function mapStateToProps(state) {
     indexing: state.indexationState.indexing,
     isIndexed: state.indexationState.isIndexed,
     step: state.indexationState.step,
-    progress: state.indexationState.progress,
-    duplicates: state.indexationState.duplicates
+    progress: state.indexationState.progress
   };
 }
 
