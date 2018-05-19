@@ -27,17 +27,18 @@ export default class CompareDialogView extends Component<Props> {
     if (files instanceof Array) {
       const type = CompareDialogView.getType(files[0]);
       files.forEach(file => {
-        res.push(
-          <FileDetailsView key={`${type}_${file.relpath}`} file={file} openFolderFor={openFolderFunc} />
-        );
+        res.push(CompareDialogView.renderFile(file, type, openFolderFunc));
       });
     } else {
       const type = CompareDialogView.getType(files);
-      res.push(
-        <FileDetailsView key={`${type}_${files.relpath}`} file={files} openFolderFor={openFolderFunc} />
-      );
+      res.push(CompareDialogView.renderFile(files, type, openFolderFunc));
     }
     return res;
+  }
+  static renderFile(file: FilePropsType, type: string, openFolderFunc: FilePropsType => void) {
+    return (
+      <FileDetailsView key={`${type}_${file.relpath}`} file={file} openFolderFor={openFolderFunc} />
+    );
   }
   static getType(file: FilePropsType) {
     if (file instanceof FileProps) {
