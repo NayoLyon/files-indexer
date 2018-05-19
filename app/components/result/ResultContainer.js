@@ -1,5 +1,4 @@
 // @flow
-/* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';

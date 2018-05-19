@@ -68,9 +68,7 @@ export function insertDb(folder: string, obj) {
   return db.insert(obj);
 }
 
-/* eslint-disable no-underscore-dangle */
-export function updateDb(folder: string, obj) {
+export function updateDb(folder: string, obj: FilePropsDb) {
   const db = getDb(folder);
-  return db.update({ _id: obj._id }, obj, { returnUpdatedDocs: true });
+  return db.update({ _id: obj.id }, obj, { returnUpdatedDocs: true });
 }
-/* eslint-enable no-underscore-dangle */
