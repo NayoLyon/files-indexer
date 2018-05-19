@@ -52,7 +52,13 @@ class ResultView extends Component<Props> {
             duplicatefileRefs.length
           })`,
           render: () => (
-            <ResultTabReferencesView id="scan_result_references" files={duplicatefileRefs} />
+            <ResultTabReferencesView
+              id="scan_result_references"
+              files={duplicatefileRefs}
+              removeFile={this.props.removeFile}
+              openDbFolderFor={this.props.openDbFolderFor}
+              openFolderFor={this.props.openFolderFor}
+            />
           )
         });
       }
