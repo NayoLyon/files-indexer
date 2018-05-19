@@ -61,7 +61,7 @@ export default class ResultTabIdenticalView extends Component<Props> {
               />
               <Button icon="search" onClick={this.show(file, dbFile)} />
             </Button.Group>
-            {file.name}
+            {file.relpath}
           </List.Content>
         </List.Item>
       );
