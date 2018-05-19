@@ -117,7 +117,13 @@ class ResultContainer extends Component<Props> {
     const dbFilePath = path.resolve(this.props.masterFolder, dbFile.relpath);
     const newDbFile = dbFile.clone();
     newDbFile.setNewName(file.name);
-    fs.renameSync(dbFilePath, path.resolve(path.dirname(dbFilePath), file.name));
+    const dbFileNewPath = path.resolve(this.props.masterFolder, newDbFile.relpath);
+    if (fs.existsSync(dbFileNewPath)) {
+      const err = new Error(`File '${newDbFile.relpath}' already exists!`);
+      console.log(err);
+      throw err;
+    }
+    fs.renameSync(dbFilePath, dbFileNewPath);
     try {
       const updatedDoc = await updateDb(this.props.masterFolder, newDbFile);
       if (updatedDoc[0] !== 1) {
