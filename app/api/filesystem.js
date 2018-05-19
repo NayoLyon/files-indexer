@@ -42,11 +42,12 @@ export class FilePropsDb {
     return new FilePropsDb(this);
   }
   setNewName(name: string): void {
-    const rootPath = getRootPath(this.path, this.relpath);
+    // const rootPath = getRootPath(this.path, this.relpath);
     this.name = name;
     this.ext = path.extname(name);
     this.path = path.resolve(path.dirname(this.path), name);
-    this.relpath = path.relative(rootPath, this.path);
+    this.relpath = path.join(path.dirname(this.relpath), name);
+    // this.relpath = path.relative(rootPath, this.path);
   }
 }
 
@@ -170,15 +171,15 @@ function readDir(folder) {
   });
 }
 
-function getRootPath(fullPath: string, relPath: string): string | null {
-  let res = fullPath;
-  let prevRes = null;
-  while (fullPath !== path.resolve(res, relPath) && res !== prevRes) {
-    prevRes = res;
-    res = path.dirname(res);
-  }
-  if (fullPath === path.resolve(res, relPath)) {
-    return res;
-  }
-  return null;
-}
+// function getRootPath(fullPath: string, relPath: string): string | null {
+//   let res = fullPath;
+//   let prevRes = null;
+//   while (fullPath !== path.resolve(res, relPath) && res !== prevRes) {
+//     prevRes = res;
+//     res = path.dirname(res);
+//   }
+//   if (fullPath === path.resolve(res, relPath)) {
+//     return res;
+//   }
+//   return null;
+// }
