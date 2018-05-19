@@ -5,9 +5,11 @@ import { connect } from 'react-redux';
 import { Grid, Icon, Header, Button, Table } from 'semantic-ui-react';
 
 import { printValue } from '../../utils/format';
+import { FilePropsDb, FileProps } from '../../api/filesystem';
 
 type Props = {
   index: () => void,
+  indexDiff: () => void,
   masterFolder: string,
   dbSize: number,
   indexing: boolean,
@@ -31,28 +33,47 @@ class IndexationView extends Component<Props> {
 
     const listItems = [];
     this.props.duplicates.forEach((dupFile, relpath) => {
-      const {dbFile, file, diff } = dupFile;
+      const { dbFile, file, diff } = dupFile;
       let isFirst = true;
-      diff.forEach((prop) => {
+      diff.forEach(prop => {
         let mainCell = null;
         if (isFirst) {
           mainCell = (
-            <Table.Cell textAlign="center" rowSpan={diff.size}>
+            <Table.Cell key="relpath" textAlign="center" rowSpan={diff.size}>
               {relpath}
             </Table.Cell>
           );
         }
+        let rowContent;
+        if (prop === 'new') {
+          rowContent = [
+            <Table.Cell key="prop" textAlign="center">
+              {prop}
+            </Table.Cell>,
+            <Table.Cell key="filevalue" textAlign="center" />,
+            <Table.Cell key="dbvalue" />
+          ];
+        } else {
+          rowContent = [
+            <Table.Cell key="prop" textAlign="center">
+              {prop}
+            </Table.Cell>,
+            <Table.Cell key="filevalue" textAlign="center">
+              {printValue(file, prop)}
+            </Table.Cell>,
+            <Table.Cell key="dbvalue" textAlign="center">
+              {printValue(dbFile, prop)}
+            </Table.Cell>
+          ];
+        }
         /* eslint-disable react/no-array-index-key */
-        const row = (
+        listItems.push(
           <Table.Row key={`${relpath}_${prop}`}>
             {mainCell}
-            <Table.Cell textAlign="center">{prop}</Table.Cell>
-            <Table.Cell textAlign="center">{printValue(dbFile, prop)}</Table.Cell>
-            <Table.Cell textAlign="center">{printValue(file, prop)}</Table.Cell>
+            {rowContent}
           </Table.Row>
         );
         /* eslint-enable react/no-array-index-key */
-        listItems.push(row);
         isFirst = false;
       });
     });
@@ -83,6 +104,7 @@ class IndexationView extends Component<Props> {
           <Link to="/scan">
             <Button>Now scan folder</Button>
           </Link>
+          <Button onClick={this.props.indexDiff}>Re-index</Button>
           <Button onClick={this.props.index}>Full re-indexation</Button>
           {indexAnomalies}
         </div>

@@ -48,7 +48,7 @@ export function indexProgress(step: string, progress: number) {
   };
 }
 
-export function indexDuplicate(dbFile: FilePropsDb, newFile: FileProps, diff: Set<string>) {
+export function indexDuplicate(dbFile: FilePropsDb | void, newFile: FileProps, diff: Set<string>) {
   return {
     type: INDEXATION_DUPLICATE,
     dbFile,

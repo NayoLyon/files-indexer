@@ -16,7 +16,7 @@ export type indexationStateType = {
   +dbSize: number,
   +step: string,
   +progress: number,
-  +duplicates: Map<string, { dbFile: FilePropsDb, file: FileProps, diff: Set<string> }>
+  +duplicates: Map<string, { dbFile: FilePropsDb | void, file: FileProps, diff: Set<string> }>
 };
 
 const defaultValue: indexationStateType = {
@@ -35,21 +35,26 @@ export default function indexationReducer(
 ) {
   switch (action.type) {
     case INDEXATION_LOAD_DATABASE:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         dbSize: action.dbSize,
         dbLoaded: true,
         isIndexed: action.isIndexed
-      });
+      };
     // return { ...state, { isIndexed: true } };
     case INDEXATION_START:
-      return Object.assign({}, state, { indexing: true });
+      return {
+        ...state,
+        indexing: true,
+        duplicates: new Map()
+      };
     case INDEXATION_END:
       return Object.assign({}, state, { indexing: false, isIndexed: true });
     case INDEXATION_PROGRESS:
       return Object.assign({}, state, { step: action.step, progress: action.progress });
     case INDEXATION_DUPLICATE: {
       const duplicates = new Map(state.duplicates);
-      duplicates.set(action.dbFile.relpath, {
+      duplicates.set(action.newFile.relpath, {
         dbFile: action.dbFile,
         file: action.newFile,
         diff: action.diff

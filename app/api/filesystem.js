@@ -59,14 +59,13 @@ export class FilePropsDb {
 }
 
 export class FileProps {
-  constructor(hash, file, stats, rootPath) {
+  constructor(file, stats, rootPath) {
     this._id = undefined;
     this.name = path.basename(file);
     this.ext = path.extname(file);
     this.folder = path.dirname(file); // Useless ??
     this.path = file; // Useless ??
     this.relpath = path.relative(rootPath, file); // Relative to the database... More usefull
-    this.hash = hash;
     this.size = stats.size;
     this.modified = stats.mtime;
     this.changed = stats.ctime;
@@ -74,6 +73,9 @@ export class FileProps {
   }
   get id() {
     return this._id;
+  }
+  async computeHash() {
+    this.hash = await computeHashForFile(this.path);
   }
   compareSameHash(dbFile: FilePropsDb) {
     const result: Map<string, Array<string | number | Date>> = new Map();
@@ -107,14 +109,15 @@ export class FileProps {
         result.add(prop);
       }
     });
-    return result.size ? result : null;
+    return result;
   }
 }
 
 export async function doScan(
   folder: string,
   fileCallback: (fileProps: FileProps) => void,
-  progressCallback: (step: string, progress: number) => void
+  progressCallback: (step: string, progress: number) => void,
+  hashRequired: boolean = true
 ) {
   progressCallback('LISTING', 0);
   const files = await walkDir(folder, 0, 1, progressCallback);
@@ -124,14 +127,16 @@ export async function doScan(
     progressCallback('INDEXING', i / files.length);
     const file = files[i];
 
-    const hash = await computeHash(file);
     const stats = fs.statSync(file);
 
-    const fileProps = new FileProps(hash, file, stats, folder);
+    const fileProps = new FileProps(file, stats, folder);
+    if (hashRequired) {
+      await fileProps.computeHash();
+    }
     await fileCallback(fileProps);
   }
 }
-function computeHash(fn) {
+function computeHashForFile(fn) {
   return new Promise((resolve, reject) => {
     const hash = crypto.createHash('md5');
     const fh = fs.createReadStream(fn);
