@@ -13,7 +13,6 @@ type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
   removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb, ConstScanType) => void,
-  id: string,
   files: Array<scanDbRef>
 };
 
@@ -42,7 +41,7 @@ export default class ResultTabReferencesView extends Component<Props> {
       counter += 1;
       const label = scanType === CONST_SCAN_TYPE_DUPLICATE ? "Possible match" : "Match";
       rows.push(
-        <Table.Row key={`${this.props.id}_file_${i}_${counter}`}>
+        <Table.Row key={`file_${dbFile.relpath}_${file.relpath}`}>
           <Table.Cell textAlign="center">
             <Button
               icon="external"
@@ -76,7 +75,7 @@ export default class ResultTabReferencesView extends Component<Props> {
       });
 
       rows.push(
-        <Table.Row key={`${this.props.id}_file_${i}_dir`}>
+        <Table.Row key={`db_${dbFile.relpath}`}>
           <Table.Cell textAlign="center" rowSpan={files.size + 1}>
             <Button icon="search" onClick={this.show(filesView, dbFile)} />
             {dbFile.name}
@@ -104,7 +103,7 @@ export default class ResultTabReferencesView extends Component<Props> {
   }
   render() {
     return (
-      <Tab.Pane key={this.props.id} style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}>
+      <Tab.Pane key="scan_result_references" style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}>
         <CompareDialogView
           open={this.state.open}
           close={this.close}

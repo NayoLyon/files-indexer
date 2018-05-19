@@ -4,7 +4,6 @@ import { Tab, List } from 'semantic-ui-react';
 import { FileProps } from '../../api/filesystem';
 
 type Props = {
-  id: string,
   files: Array<FileProps>
 };
 
@@ -20,7 +19,7 @@ export default class ResultTabNewView extends Component<Props> {
     for (let i = 0; i < this.props.files.length; i += 1) {
       const file = this.props.files[i];
       res.push(
-        <List.Item key={`${this.props.id}_file_${i}`}>
+        <List.Item key={file.relpath}>
           <List.Content>
             <List.Header>{file.name}</List.Header>
           </List.Content>
@@ -31,7 +30,7 @@ export default class ResultTabNewView extends Component<Props> {
   }
   render() {
     return (
-      <Tab.Pane key={this.props.id} style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}>
+      <Tab.Pane key="scan_result_new" style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}>
         <List selection verticalAlign="middle">
           {this.renderFiles()}
         </List>

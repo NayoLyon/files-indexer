@@ -15,7 +15,6 @@ type Props = {
   copyModifiedAttribute: (FileProps, FilePropsDb) => void,
   removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb, ConstScanType) => void,
   copyNameAttribute: (FileProps, FilePropsDb) => void,
-  id: string,
   files: Array<{
     file: FileProps,
     diff: Map<string, Array<string | number | Date>>,
@@ -108,7 +107,7 @@ export default class ResultTabModifiedView extends Component<Props> {
           }
           prevVal.push(
             <Table.Cell
-              key={`${this.props.id}_file_${i}_${elt}db`}
+              key={`db_${elt}`}
               textAlign="left"
               verticalAlign="middle"
             >
@@ -117,22 +116,22 @@ export default class ResultTabModifiedView extends Component<Props> {
             </Table.Cell>
           );
           prevVal.push(
-            <Table.Cell key={`${this.props.id}_file_${i}_${elt}dir`} textAlign="left">
+            <Table.Cell key={`folder_${elt}`} textAlign="left">
               {actionsFolder}
               {printValue(file, elt)}
             </Table.Cell>
           );
         } else {
           prevVal.push(
-            <Table.Cell key={`${this.props.id}_file_${i}_${elt}`} colSpan="2" textAlign="left" />
+            <Table.Cell key={`both_${elt}`} colSpan="2" textAlign="left" />
           );
         }
         return prevVal;
       }, []);
 
       rows.push(
-        <Table.Row key={`${this.props.id}_file_${i}`}>
-          <Table.Cell key={`${this.props.id}_file_${i}_name`} textAlign="center">
+        <Table.Row key={file.relpath}>
+          <Table.Cell key="main" textAlign="center">
             <Button icon="search" onClick={this.show(file, dbFile)} />
             {file.name}
           </Table.Cell>
@@ -142,16 +141,16 @@ export default class ResultTabModifiedView extends Component<Props> {
     }
     const columns = columnsName.reduce((res, elt) => {
       res.push(
-        <Table.HeaderCell key={`${this.props.id}_header_${elt}`} colSpan="2">
+        <Table.HeaderCell key={`header_${elt}`} colSpan="2">
           {elt}
         </Table.HeaderCell>
       );
       return res;
     }, []);
     const detailColumns = columnsName.reduce((res, elt) => {
-      res.push(<Table.HeaderCell key={`${this.props.id}_header_${elt}db`}>In DB</Table.HeaderCell>);
+      res.push(<Table.HeaderCell key={`db_${elt}`}>In DB</Table.HeaderCell>);
       res.push(
-        <Table.HeaderCell key={`${this.props.id}_header_${elt}dir`}>In folder</Table.HeaderCell>
+        <Table.HeaderCell key={`folder_${elt}`}>In folder</Table.HeaderCell>
       );
       return res;
     }, []);
@@ -160,7 +159,7 @@ export default class ResultTabModifiedView extends Component<Props> {
   render() {
     const { columns, detailColumns, rows } = this.renderFiles();
     return (
-      <Tab.Pane key={this.props.id} style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}>
+      <Tab.Pane key="scan_result_modified" style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}>
         <CompareDialogView
           open={this.state.open}
           close={this.close}
@@ -173,7 +172,7 @@ export default class ResultTabModifiedView extends Component<Props> {
         <Table className={styles.scrollableTable} celled structured>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell rowSpan="2">Name</Table.HeaderCell>
+              <Table.HeaderCell key="header_main" rowSpan="2">Name</Table.HeaderCell>
               {columns}
             </Table.Row>
             <Table.Row>{detailColumns}</Table.Row>

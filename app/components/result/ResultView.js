@@ -53,7 +53,6 @@ class ResultView extends Component<Props> {
           })`,
           render: () => (
             <ResultTabReferencesView
-              id="scan_result_references"
               files={duplicatefileRefs}
               removeFile={this.props.removeFile}
               openDbFolderFor={this.props.openDbFolderFor}
@@ -66,7 +65,7 @@ class ResultView extends Component<Props> {
     if (this.props.identicals.length > 0) {
       panes.push({
         menuItem: (
-          <Menu.Item key="messages">
+          <Menu.Item key="identical">
             Identical files ({this.props.identicals.length})<Button
               icon="trash"
               style={inlineStyles.trashButtonStyle}
@@ -78,7 +77,6 @@ class ResultView extends Component<Props> {
         ),
         render: () => (
           <ResultTabIdenticalView
-            id="scan_result_identical"
             files={this.props.identicals}
             removeFile={this.props.removeFile}
             openDbFolderFor={this.props.openDbFolderFor}
@@ -90,7 +88,7 @@ class ResultView extends Component<Props> {
     if (this.props.newFiles.length > 0) {
       panes.push({
         menuItem: `New files (${this.props.newFiles.length})`,
-        render: () => <ResultTabNewView id="scan_result_new" files={this.props.newFiles} />
+        render: () => <ResultTabNewView files={this.props.newFiles} />
       });
     }
     if (this.props.modified.length > 0) {
@@ -98,7 +96,6 @@ class ResultView extends Component<Props> {
         menuItem: `Modified files (${this.props.modified.length})`,
         render: () => (
           <ResultTabModifiedView
-            id="scan_result_modified"
             files={this.props.modified}
             copyModifiedAttribute={this.props.copyModifiedAttribute}
             openDbFolderFor={this.props.openDbFolderFor}
@@ -114,7 +111,6 @@ class ResultView extends Component<Props> {
         menuItem: `Possible duplicates (${this.props.duplicates.length})`,
         render: () => (
           <ResultTabDuplicateView
-            id="scan_result_duplicates"
             files={this.props.duplicates}
             removeFile={this.props.removeFile}
             openDbFolderFor={this.props.openDbFolderFor}
