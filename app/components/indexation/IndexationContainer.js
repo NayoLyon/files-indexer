@@ -6,13 +6,14 @@ import { connect } from 'react-redux';
 import IndexationView from './IndexationView';
 import * as IndexationActions from '../../modules/indexation/indexationAction';
 import { doScan, FileProps } from '../../api/filesystem';
-import { findDb, insertDb } from '../../api/database';
+import { findDb, updateDb, insertDb } from '../../api/database';
 
 type Props = {
   loadDatabase: string => void,
   indexProgress: (string, number) => void,
   startIndexation: () => void,
   endIndexation: () => void,
+  indexDuplicate: (string, Map<string, Array<string | number | Date>>) => void,
   masterFolder: string,
   dbLoaded: boolean,
   dbSize: number
@@ -29,11 +30,21 @@ class IndexationContainer extends Component<Props> {
   }
 
   async processFile(fileProps: FileProps) {
-    const occurences = await findDb(this.props.masterFolder, { hash: fileProps.hash });
-    if (occurences === null || occurences.length === 0) {
-      await insertDb(this.props.masterFolder, fileProps);
+    const occurences = await findDb(this.props.masterFolder, { relpath: fileProps.relpath });
+    if (occurences.length) {
+      if (occurences.length > 1) {
+        console.error(`More than 1 occurence for relpath ${fileProps.relpath}!! This should never happen! Will only compare to the first one...`);
+        console.error(occurences);
+      }
+
+      // File already indexed... Check that the file is correct in db or update it...
+      const diff = fileProps.compareToSamePath(occurences[0]);
+      if (diff) {
+        this.props.indexDuplicate(occurences[0], fileProps, diff);
+        await updateDb(this.props.masterFolder, occurences[0].cloneFromSamePath(fileProps));
+      }
     } else {
-      // TODO compare with current file, to manage re-indexation...
+      await insertDb(this.props.masterFolder, fileProps);
     }
   }
 

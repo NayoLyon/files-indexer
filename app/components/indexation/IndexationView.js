@@ -2,7 +2,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Grid, Icon, Header, Button } from 'semantic-ui-react';
+import { Grid, Icon, Header, Button, Table } from 'semantic-ui-react';
+
+import { printValue } from '../../utils/format';
 
 type Props = {
   index: () => void,
@@ -11,12 +13,56 @@ type Props = {
   indexing: boolean,
   isIndexed: boolean,
   step: string,
-  progress: number
+  progress: number,
+  duplicates: Map<string, { dbFile: FilePropsDb, file: FileProps, diff: Set<string> }>
 };
 
 class IndexationView extends Component<Props> {
   props: Props;
+  constructor(props) {
+    super(props);
+    this.renderAnomalies = this.renderAnomalies.bind(this);
+  }
 
+  renderAnomalies() {
+    if (this.props.duplicates.size === 0) {
+      return null;
+    }
+
+    const listItems = [];
+    this.props.duplicates.forEach((dupFile, relpath) => {
+      const {dbFile, file, diff } = dupFile;
+      let isFirst = true;
+      diff.forEach((prop) => {
+        let mainCell = null;
+        if (isFirst) {
+          mainCell = (
+            <Table.Cell textAlign="center" rowSpan={diff.size}>
+              {relpath}
+            </Table.Cell>
+          );
+        }
+        /* eslint-disable react/no-array-index-key */
+        const row = (
+          <Table.Row key={`${relpath}_${prop}`}>
+            {mainCell}
+            <Table.Cell textAlign="center">{prop}</Table.Cell>
+            <Table.Cell textAlign="center">{printValue(dbFile, prop)}</Table.Cell>
+            <Table.Cell textAlign="center">{printValue(file, prop)}</Table.Cell>
+          </Table.Row>
+        );
+        /* eslint-enable react/no-array-index-key */
+        listItems.push(row);
+        isFirst = false;
+      });
+    });
+
+    return (
+      <Table>
+        <Table.Body>{listItems}</Table.Body>
+      </Table>
+    );
+  }
   render() {
     let content = null;
     if (!this.props.isIndexed && !this.props.indexing) {
@@ -29,6 +75,7 @@ class IndexationView extends Component<Props> {
       );
     } else if (this.props.isIndexed) {
       // TODO displaying database content...
+      const indexAnomalies = this.renderAnomalies();
       content = (
         <div>
           <Header as="h2">Folder indexed...</Header>
@@ -36,6 +83,8 @@ class IndexationView extends Component<Props> {
           <Link to="/scan">
             <Button>Now scan folder</Button>
           </Link>
+          <Button onClick={this.props.index}>Full re-indexation</Button>
+          {indexAnomalies}
         </div>
       );
     }
@@ -64,7 +113,8 @@ function mapStateToProps(state) {
     indexing: state.indexationState.indexing,
     isIndexed: state.indexationState.isIndexed,
     step: state.indexationState.step,
-    progress: state.indexationState.progress
+    progress: state.indexationState.progress,
+    duplicates: state.indexationState.duplicates
   };
 }
 

@@ -49,6 +49,13 @@ export class FilePropsDb {
     this.relpath = path.join(path.dirname(this.relpath), name);
     // this.relpath = path.relative(rootPath, this.path);
   }
+  cloneFromSamePath(file: FileProps) {
+    const newFile = new FilePropsDb(this);
+    ['hash', 'size', 'modified', 'changed', 'created'].forEach(prop => {
+      newFile[prop] = file[prop];
+    });
+    return newFile;
+  }
 }
 
 export class FileProps {
@@ -88,6 +95,19 @@ export class FileProps {
     //   result.set('created', [this.created, dbFile.created]);
     // }
     return result;
+  }
+  compareToSamePath(dbFile: FilePropsDb) {
+    const result: Set<string> = new Set();
+    ['hash', 'size', 'modified', 'changed', 'created'].forEach(prop => {
+      if (dbFile[prop] instanceof Date) {
+        if (dbFile[prop].getTime() !== this[prop].getTime()) {
+          result.add(prop);
+        }
+      } else if (dbFile[prop] !== this[prop]) {
+        result.add(prop);
+      }
+    });
+    return result.size ? result : null;
   }
 }
 
