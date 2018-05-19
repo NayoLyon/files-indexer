@@ -53,7 +53,7 @@ export class FilePropsDb {
 
 export class FileProps {
   constructor(hash, file, stats, rootPath) {
-    this._id = hash;
+    this._id = undefined;
     this.name = path.basename(file);
     this.ext = path.extname(file);
     this.folder = path.dirname(file); // Useless ??
