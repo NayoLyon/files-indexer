@@ -74,3 +74,8 @@ export function updateDb(folder: string, obj: FilePropsDb) {
   const db = getDb(folder);
   return db.update({ _id: obj.id }, obj, { returnUpdatedDocs: true });
 }
+
+export function deleteDb(folder: string, obj: FilePropsDb) {
+  const db = getDb(folder);
+  return db.remove({ _id: obj.id }, obj);
+}
