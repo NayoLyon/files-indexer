@@ -7,6 +7,7 @@ import rootReducer, { fullStateType } from '../modules/reducers';
 import * as foldersActions from '../modules/folders/foldersAction';
 import * as indexationActions from '../modules/indexation/indexationAction';
 import * as scanActions from '../modules/scan/scanAction';
+import * as analyseActions from '../modules/analyseDb/analyseAction';
 
 const history = createHashHistory();
 
@@ -35,6 +36,7 @@ const configureStore = (initialState?: fullStateType) => {
 
   // Redux DevTools Configuration
   const actionCreators = {
+    ...analyseActions,
     ...scanActions,
     ...indexationActions,
     ...foldersActions,
