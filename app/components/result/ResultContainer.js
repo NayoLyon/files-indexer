@@ -78,6 +78,9 @@ class ResultContainer extends Component<Props> {
       case ScanActions.CONST_SCAN_TYPE_EXISTS:
         this.props.scanExistsRemove(file);
         break;
+      case ScanActions.CONST_SCAN_TYPE_NEW:
+        this.props.scanNewRemove(file);
+        return;
       default:
         console.error(`Unexpected removeFile of ${scanType}!!`);
     }

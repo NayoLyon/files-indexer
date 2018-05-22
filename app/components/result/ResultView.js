@@ -99,7 +99,13 @@ class ResultView extends Component<Props> {
     if (this.props.newFiles.length > 0) {
       panes.push({
         menuItem: `New files (${this.props.newFiles.length})`,
-        render: () => <ResultTabNewView files={this.props.newFiles} />
+        render: () => (
+          <ResultTabNewView
+            files={this.props.newFiles}
+            openFolderFor={this.props.openFolderFor}
+            removeFile={this.props.removeFile}
+          />
+        )
       });
     }
     if (this.props.modified.length > 0) {
