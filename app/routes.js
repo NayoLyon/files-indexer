@@ -3,15 +3,13 @@ import React from 'react';
 import { Switch, Route } from 'react-router';
 import App from './components/App';
 import HomeContainer from './components/home/HomeContainer';
-import IndexationContainer from './components/indexation/IndexationContainer';
-import ScanContainer from './components/scan/ScanContainer';
+import LayoutContainer from './components/LayoutContainer';
 
 export default () => (
   <App>
     <Switch>
-      <Route exact path="/scan" component={ScanContainer} />
-      <Route exact path="/index" component={IndexationContainer} />
-      <Route path="/" component={HomeContainer} />
+      <Route exact path="/" component={HomeContainer} />
+      <Route path="/" component={LayoutContainer} />
     </Switch>
   </App>
 );
