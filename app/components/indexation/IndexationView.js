@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Grid, Icon, Header, Button } from 'semantic-ui-react';
+import { Grid, Icon, Header, Button, Divider } from 'semantic-ui-react';
 
 import IndexationAnomaliesView from './IndexationAnomaliesView';
 
@@ -41,6 +41,10 @@ class IndexationView extends Component<Props> {
           </Link>
           <Button onClick={this.props.quickIndex}>Re-index</Button>
           <Button onClick={this.props.index}>Full re-indexation</Button>
+          <Divider />
+          <Link to="/analyseDb">
+            <Button>Analyse database content</Button>
+          </Link>
           <IndexationAnomaliesView />
         </div>
       );

@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import HomeContainer from './home/HomeContainer';
 import IndexationContainer from './indexation/IndexationContainer';
 import ScanContainer from './scan/ScanContainer';
+import AnalyseContainer from './analyseDb/AnalyseContainer';
 
 type Props = {
   dbLoaded: boolean
@@ -21,6 +22,7 @@ class LayoutContainer extends Component<Props> {
       <Switch>
         <Route exact path="/scan" component={ScanContainer} />
         <Route exact path="/index" component={IndexationContainer} />
+        <Route exact path="/analyseDb" component={AnalyseContainer} />
         <Route path="/" component={HomeContainer} />
       </Switch>
     );
