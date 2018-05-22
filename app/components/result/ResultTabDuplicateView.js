@@ -11,7 +11,7 @@ import CompareDialogView from './CompareDialogView';
 type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
-  removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb, ConstScanType) => void,
+  removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb | void, ConstScanType) => void,
   files: Array<{ file: FileProps, matches: Array<FilePropsDb> }>
 };
 

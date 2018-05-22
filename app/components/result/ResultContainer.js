@@ -61,7 +61,7 @@ class ResultContainer extends Component<Props> {
   }
   async removeFile(
     file: FileProps,
-    oldDbFile: Array<FilePropsDb> | FilePropsDb,
+    oldDbFile: Array<FilePropsDb> | FilePropsDb | void,
     scanType: ScanActions.ConstScanType
   ) {
     shell.moveItemToTrash(path.resolve(this.props.toScanFolder, file.relpath));

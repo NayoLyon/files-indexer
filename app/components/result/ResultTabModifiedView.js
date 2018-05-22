@@ -13,7 +13,7 @@ type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
   copyModifiedAttribute: (FileProps, FilePropsDb) => void,
-  removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb, ConstScanType) => void,
+  removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb | void, ConstScanType) => void,
   copyNameAttribute: (FileProps, FilePropsDb) => void,
   files: Array<{
     file: FileProps,
