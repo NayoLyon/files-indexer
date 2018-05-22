@@ -33,6 +33,17 @@ type Props = {
 
 class ResultView extends Component<Props> {
   props: Props;
+  static getStyles() {
+    return {
+      tabPaneStyle: {
+        overflowY: 'auto',
+        height: 'calc(100% - 3.5rem)'
+      },
+      buttonGroupStyle: {
+        marginRight: '1rem'
+      }
+    };
+  }
 
   render() {
     const inlineStyles = {

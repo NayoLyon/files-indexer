@@ -5,6 +5,7 @@ import { Tab, List, Button } from 'semantic-ui-react';
 import { FileProps, FilePropsDb } from '../../api/filesystem';
 import { CONST_SCAN_TYPE_IDENTICAL, ConstScanType } from '../../modules/scan/scanAction';
 
+import ResultView from './ResultView';
 import CompareDialogView from './CompareDialogView';
 
 type Props = {
@@ -16,17 +17,6 @@ type Props = {
 
 export default class ResultTabIdenticalView extends Component<Props> {
   props: Props;
-  static getStyles() {
-    return {
-      tabPaneStyle: {
-        overflowY: 'auto',
-        height: 'calc(100% - 3.5rem)'
-      },
-      buttonGroupStyle: {
-        marginRight: '1rem'
-      }
-    };
-  }
 
   constructor(props) {
     super(props);
@@ -44,7 +34,7 @@ export default class ResultTabIdenticalView extends Component<Props> {
   }
 
   renderFiles() {
-    const { buttonGroupStyle } = ResultTabIdenticalView.getStyles();
+    const { buttonGroupStyle } = ResultView.getStyles();
     const res = [];
     for (let i = 0; i < this.props.files.length; i += 1) {
       const { file, dbFile } = this.props.files[i];
@@ -68,7 +58,7 @@ export default class ResultTabIdenticalView extends Component<Props> {
     return res;
   }
   render() {
-    const { tabPaneStyle } = ResultTabIdenticalView.getStyles();
+    const { tabPaneStyle } = ResultView.getStyles();
     return (
       <Tab.Pane key="scan_result_identical" style={tabPaneStyle}>
         <CompareDialogView
