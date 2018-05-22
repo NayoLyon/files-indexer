@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { shell } from 'electron';
 import fs from 'fs';
 import path from 'path';
 
@@ -12,6 +11,7 @@ import ResultView from './ResultView';
 import { scanDbRef } from '../../modules/scan/scanReducer';
 import { updateDb } from '../../api/database';
 import * as ScanActions from '../../modules/scan/scanAction';
+import { openExplorerOn, deleteFile } from '../../utils/filesystem';
 
 type Props = {
   scanProgress: (string, number) => void,
@@ -38,9 +38,6 @@ type Props = {
 
 class ResultContainer extends Component<Props> {
   props: Props;
-  static openFolder(folder) {
-    shell.showItemInFolder(folder);
-  }
 
   constructor(props) {
     super(props);
@@ -54,17 +51,17 @@ class ResultContainer extends Component<Props> {
   }
 
   openDbFolderFor(file: FilePropsDb) {
-    ResultContainer.openFolder(path.resolve(this.props.masterFolder, file.relpath));
+    openExplorerOn(path.resolve(this.props.masterFolder, file.relpath));
   }
   openFolderFor(file: FileProps) {
-    ResultContainer.openFolder(path.resolve(this.props.toScanFolder, file.relpath));
+    openExplorerOn(path.resolve(this.props.toScanFolder, file.relpath));
   }
   async removeFile(
     file: FileProps,
     oldDbFile: Array<FilePropsDb> | FilePropsDb | void,
     scanType: ScanActions.ConstScanType
   ) {
-    shell.moveItemToTrash(path.resolve(this.props.toScanFolder, file.relpath));
+    deleteFile(path.resolve(this.props.toScanFolder, file.relpath));
     switch (scanType) {
       case ScanActions.CONST_SCAN_TYPE_MODIFIED:
         this.props.scanModifiedRemove(file);
