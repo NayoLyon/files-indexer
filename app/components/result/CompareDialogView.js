@@ -11,7 +11,7 @@ type Props = {
   openDbFolderFor: FilePropsDb => void,
   close: () => void,
   open: boolean,
-  dbFilesFirst: boolean,
+  dbFilesFirst: boolean | void,
   files: Array<FileProps | null> | null,
   dbFiles: Array<FilePropsDb | null> | null
 };
