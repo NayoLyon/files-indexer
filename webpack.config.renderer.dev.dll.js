@@ -16,6 +16,8 @@ const dist = path.resolve(process.cwd(), 'dll');
 export default merge.smart(baseConfig, {
   context: process.cwd(),
 
+  mode: 'development',
+
   devtool: 'eval',
 
   target: 'electron-renderer',
