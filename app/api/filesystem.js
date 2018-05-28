@@ -19,7 +19,7 @@ export type FilePropsType = {
 };
 
 export class FilePropsDb {
-  constructor(file: FilePropsType) {
+  constructor(file: FilePropsType | FileProps | FilePropsDb) {
     this._id = file._id;
     this.name = file.name;
     this.ext = file.ext;

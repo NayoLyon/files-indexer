@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import { Image, Card, Icon } from 'semantic-ui-react';
 import { lookup } from 'mime-types';
 
-import { FilePropsType } from '../../api/filesystem';
+import { FileProps, FilePropsDb } from '../../api/filesystem';
 import { printValue } from '../../utils/format';
 
 type Props = {
-  openFolderFor: FilePropsType => void,
-  file: FilePropsType
+  openFolderFor: FileProps | FilePropsDb => void,
+  file: FileProps | FilePropsDb
 };
 
 export default class FileDetailsView extends Component<Props> {

@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Modal, Button, Label } from 'semantic-ui-react';
 
-import { FileProps, FilePropsDb, FilePropsType } from '../../api/filesystem';
+import { FileProps, FilePropsDb } from '../../api/filesystem';
 
 import FileDetailsView from './FileDetailsView';
 
@@ -12,16 +12,16 @@ type Props = {
   close: () => void,
   open: boolean,
   dbFilesFirst: boolean | void,
-  files: Array<FileProps | null> | null,
-  dbFiles: Array<FilePropsDb | null> | null
+  files: Array<FileProps | null> | FileProps | null,
+  dbFiles: Array<FilePropsDb | null> | FilePropsDb | null
 };
 
 export default class CompareDialogView extends Component<Props> {
   props: Props;
 
   static renderFiles(
-    files: FilePropsType | Array<FilePropsType>,
-    openFolderFunc: FilePropsType => void
+    files: FileProps | FilePropsDb | Array<FileProps | FilePropsDb>,
+    openFolderFunc: FileProps | FilePropsDb => void
   ) {
     const res = [];
     if (files instanceof Array) {
@@ -35,12 +35,12 @@ export default class CompareDialogView extends Component<Props> {
     }
     return res;
   }
-  static renderFile(file: FilePropsType, type: string, openFolderFunc: FilePropsType => void) {
+  static renderFile(file: FileProps | FilePropsDb, type: string, openFolderFunc: FileProps | FilePropsDb => void) {
     return (
       <FileDetailsView key={`${type}_${file.relpath}`} file={file} openFolderFor={openFolderFunc} />
     );
   }
-  static getType(file: FilePropsType) {
+  static getType(file: FileProps | FilePropsDb) {
     if (file instanceof FileProps) {
       return 'scan';
     } else if (file instanceof FilePropsDb) {
