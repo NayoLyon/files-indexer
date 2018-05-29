@@ -20,14 +20,13 @@ type Props = {
   removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb | void, ConstScanType) => void,
   removeAllFiles: ConstScanType => void,
   copyNameAttribute: (FileProps, FilePropsDb) => void,
-  identicals: Array<{ file: FileProps, dbFile: FilePropsDb }>,
+  identicals: Array<FileProps>,
   newFiles: Array<FileProps>,
   modified: Array<{
     file: FileProps,
-    diff: Map<string, Array<string | number | Date>>,
-    dbFile: FilePropsDb
+    diff: Map<string, Array<string | number | Date>>
   }>,
-  duplicates: Array<{ file: FileProps, matches: Array<FilePropsDb> }>,
+  duplicates: Array<FileProps>,
   dbFilesRef: Map<string, scanDbRef>
 };
 

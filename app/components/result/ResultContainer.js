@@ -30,10 +30,10 @@ type Props = {
   ) => void,
   masterFolder: string,
   toScanFolder: string,
-  identicals: Array<{ file: FileProps, dbFile: FilePropsDb }>,
+  identicals: Array<FileProps>,
   dbFilesRef: Map<string, scanDbRef>,
   newFiles: Array<FileProps>,
-  duplicates: Array<{ file: FileProps, matches: Array<FilePropsDb> }>
+  duplicates: Array<FileProps>
 };
 
 class ResultContainer extends Component<Props> {
@@ -82,8 +82,8 @@ class ResultContainer extends Component<Props> {
   }
   async removeAllFiles(scanType: ScanActions.ConstScanType) {
     if (scanType === ScanActions.CONST_SCAN_TYPE_IDENTICAL) {
-      this.props.identicals.forEach(ident => {
-        this.removeFile(ident.file, ident.dbFile, scanType);
+      this.props.identicals.forEach(file => {
+        this.removeFile(file, file.dbFiles, scanType);
       });
     } else {
       console.error(`Unexpected scanType '${scanType}' for removeAllFiles. Skip action...`);
@@ -206,11 +206,11 @@ class ResultContainer extends Component<Props> {
       })
     );
     await Promise.all(
-      this.props.duplicates.map(async elt => {
+      this.props.duplicates.map(async file => {
         this.props.scanProgress('LISTING', counter / nbFilesToRescan);
         counter += 1;
-        filesToRescan.push(elt.file);
-        await this.props.scanDuplicateRemove(elt.file);
+        filesToRescan.push(file);
+        await this.props.scanDuplicateRemove(file);
       })
     );
 
@@ -255,4 +255,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(ScanActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ResultContainer);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ResultContainer);

@@ -32,8 +32,6 @@ export type scanActionType = {
   +progress: ?number,
   +file: ?FileProps,
   +diff: ?Map<string, Array<string | number | Date>>,
-  +matches: ?Array<FilePropsDb>,
-  +dbFile: ?FilePropsDb,
   +scanType: ?ConstScanType,
   +oldDbFile: ?(Array<FilePropsDb> | FilePropsDb),
   +newDbFile: ?FilePropsDb
@@ -59,11 +57,10 @@ export function scanProgress(step: string, progress: number) {
   };
 }
 
-function scanExistsAdd(file: FileProps, dbFile: FilePropsDb) {
+function scanExistsAdd(file: FileProps) {
   return {
     type: SCAN_EXISTS_ADD,
-    file,
-    dbFile
+    file
   };
 }
 export function scanExistsRemove(file: FileProps) {
@@ -86,16 +83,11 @@ export function scanNewRemove(file: FileProps) {
   };
 }
 
-function scanModifiedAdd(
-  file: FileProps,
-  diff: Map<string, Array<string | number | Date>>,
-  dbFile: FilePropsDb
-) {
+function scanModifiedAdd(file: FileProps, diff: Map<string, Array<string | number | Date>>) {
   return {
     type: SCAN_MODIFIED_ADD,
     file,
-    diff,
-    dbFile
+    diff
   };
 }
 export function scanModifiedRemove(file: FileProps) {
@@ -105,11 +97,10 @@ export function scanModifiedRemove(file: FileProps) {
   };
 }
 
-function scanDuplicateAdd(file: FileProps, matches: Array<FilePropsDb>) {
+function scanDuplicateAdd(file: FileProps) {
   return {
     type: SCAN_DUPLICATE_ADD,
-    file,
-    matches
+    file
   };
 }
 export function scanDuplicateRemove(file: FileProps) {
@@ -145,9 +136,12 @@ export function scanProcessFile(fileProps: FileProps, oldDbFile: FilePropsDb | v
         name: fileProps.name
       });
       if (occurences.length === 0) {
+        fileProps.setCompareType(CONST_SCAN_TYPE_NEW);
         await dispatch(scanNewAdd(fileProps));
       } else {
-        await dispatch(scanDuplicateAdd(fileProps, occurences));
+        fileProps.setCompareType(CONST_SCAN_TYPE_DUPLICATE);
+        fileProps.setDbMatches(occurences);
+        await dispatch(scanDuplicateAdd(fileProps));
         await Promise.all(
           occurences.map(async elt => {
             await dispatch(scanRefUpdate(fileProps, oldDbFile, elt, CONST_SCAN_TYPE_DUPLICATE));
@@ -160,12 +154,15 @@ export function scanProcessFile(fileProps: FileProps, oldDbFile: FilePropsDb | v
         throw Error(`Multiple occurences from hash ${fileProps.hash}!!`);
       }
       const inDb = occurences[0];
+      fileProps.setDbMatches(inDb);
       const compared: Map<string, Array<string | number | Date>> = fileProps.compareSameHash(inDb);
       if (compared.size > 0) {
-        await dispatch(scanModifiedAdd(fileProps, compared, inDb));
+        fileProps.setCompareType(CONST_SCAN_TYPE_MODIFIED);
+        await dispatch(scanModifiedAdd(fileProps, compared));
         await dispatch(scanRefUpdate(fileProps, oldDbFile, inDb, CONST_SCAN_TYPE_MODIFIED));
       } else {
-        await dispatch(scanExistsAdd(fileProps, inDb));
+        fileProps.setCompareType(CONST_SCAN_TYPE_IDENTICAL);
+        await dispatch(scanExistsAdd(fileProps));
         await dispatch(scanRefUpdate(fileProps, oldDbFile, inDb, CONST_SCAN_TYPE_IDENTICAL));
       }
     }

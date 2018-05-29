@@ -27,14 +27,13 @@ export type scanStateType = {
   +isScanned: boolean,
   +step: string,
   +progress: number,
-  +identicals: Array<{ file: FileProps, dbFile: FilePropsDb }>,
+  +identicals: Array<FileProps>,
   +newFiles: Array<FileProps>,
   +modified: Array<{
     file: FileProps,
-    diff: Map<string, Array<string | number | Date>>,
-    dbFile: FilePropsDb
+    diff: Map<string, Array<string | number | Date>>
   }>,
-  +duplicates: Array<{ file: FileProps, matches: Array<FilePropsDb> }>,
+  +duplicates: Array<FileProps>,
   +dbFilesRef: Map<string, scanDbRef>
 };
 
@@ -63,10 +62,10 @@ export default function scanReducer(state: scanStateType = defaultValue, action:
       return Object.assign({}, state, { step: action.step, progress: action.progress });
     case SCAN_EXISTS_ADD:
       return Object.assign({}, state, {
-        identicals: [...state.identicals, { file: action.file, dbFile: action.dbFile }]
+        identicals: [...state.identicals, action.file]
       });
     case SCAN_EXISTS_REMOVE: {
-      const newIdenticals = state.identicals.filter(elt => elt.file !== action.file);
+      const newIdenticals = state.identicals.filter(elt => elt !== action.file);
       return Object.assign({}, state, { identicals: newIdenticals });
     }
     case SCAN_NEW_ADD:
@@ -77,10 +76,7 @@ export default function scanReducer(state: scanStateType = defaultValue, action:
     }
     case SCAN_MODIFIED_ADD:
       return Object.assign({}, state, {
-        modified: [
-          ...state.modified,
-          { file: action.file, diff: action.diff, dbFile: action.dbFile }
-        ]
+        modified: [...state.modified, { file: action.file, diff: action.diff }]
       });
     case SCAN_MODIFIED_REMOVE: {
       const newModified = state.modified.filter(elt => elt.file !== action.file);
@@ -88,10 +84,10 @@ export default function scanReducer(state: scanStateType = defaultValue, action:
     }
     case SCAN_DUPLICATE_ADD:
       return Object.assign({}, state, {
-        duplicates: [...state.duplicates, { file: action.file, matches: action.matches }]
+        duplicates: [...state.duplicates, action.file]
       });
     case SCAN_DUPLICATE_REMOVE: {
-      const newDuplicates = state.duplicates.filter(elt => elt.file !== action.file);
+      const newDuplicates = state.duplicates.filter(elt => elt !== action.file);
       return Object.assign({}, state, { duplicates: newDuplicates });
     }
     case SCAN_DBREF_UPDATE: {

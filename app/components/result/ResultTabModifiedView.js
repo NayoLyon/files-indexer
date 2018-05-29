@@ -17,8 +17,7 @@ type Props = {
   copyNameAttribute: (FileProps, FilePropsDb) => void,
   files: Array<{
     file: FileProps,
-    diff: Map<string, Array<string | number | Date>>,
-    dbFile: FilePropsDb
+    diff: Map<string, Array<string | number | Date>>
   }>
 };
 
@@ -52,7 +51,8 @@ export default class ResultTabModifiedView extends Component<Props> {
       });
     }
     for (let i = 0; i < this.props.files.length; i += 1) {
-      const { file, diff, dbFile } = this.props.files[i];
+      const { file, diff } = this.props.files[i];
+      const dbFile = file.dbFiles[0];
 
       const fileDiff = columnsName.reduce((prevVal, elt) => {
         const curDiff = diff.get(elt);
@@ -106,11 +106,7 @@ export default class ResultTabModifiedView extends Component<Props> {
             );
           }
           prevVal.push(
-            <Table.Cell
-              key={`db_${elt}`}
-              textAlign="left"
-              verticalAlign="middle"
-            >
+            <Table.Cell key={`db_${elt}`} textAlign="left" verticalAlign="middle">
               {actionsDb}
               {printValue(dbFile, elt)}
             </Table.Cell>
@@ -122,9 +118,7 @@ export default class ResultTabModifiedView extends Component<Props> {
             </Table.Cell>
           );
         } else {
-          prevVal.push(
-            <Table.Cell key={`both_${elt}`} colSpan="2" textAlign="left" />
-          );
+          prevVal.push(<Table.Cell key={`both_${elt}`} colSpan="2" textAlign="left" />);
         }
         return prevVal;
       }, []);
@@ -149,9 +143,7 @@ export default class ResultTabModifiedView extends Component<Props> {
     }, []);
     const detailColumns = columnsName.reduce((res, elt) => {
       res.push(<Table.HeaderCell key={`db_${elt}`}>In DB</Table.HeaderCell>);
-      res.push(
-        <Table.HeaderCell key={`folder_${elt}`}>In folder</Table.HeaderCell>
-      );
+      res.push(<Table.HeaderCell key={`folder_${elt}`}>In folder</Table.HeaderCell>);
       return res;
     }, []);
     return { columns, detailColumns, rows };
@@ -159,7 +151,10 @@ export default class ResultTabModifiedView extends Component<Props> {
   render() {
     const { columns, detailColumns, rows } = this.renderFiles();
     return (
-      <Tab.Pane key="scan_result_modified" style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}>
+      <Tab.Pane
+        key="scan_result_modified"
+        style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}
+      >
         <CompareDialogView
           open={this.state.open}
           close={this.close}
@@ -172,7 +167,9 @@ export default class ResultTabModifiedView extends Component<Props> {
         <Table className={styles.scrollableTable} celled structured>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell key="header_main" rowSpan="2">Name</Table.HeaderCell>
+              <Table.HeaderCell key="header_main" rowSpan="2">
+                Name
+              </Table.HeaderCell>
               {columns}
             </Table.Row>
             <Table.Row>{detailColumns}</Table.Row>

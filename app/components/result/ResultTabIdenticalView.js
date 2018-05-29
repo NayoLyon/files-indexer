@@ -12,7 +12,7 @@ type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
   removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb | void, ConstScanType) => void,
-  files: Array<{ file: FileProps, dbFile: FilePropsDb }>
+  files: Array<FileProps>
 };
 
 export default class ResultTabIdenticalView extends Component<Props> {
@@ -37,7 +37,7 @@ export default class ResultTabIdenticalView extends Component<Props> {
     const { buttonGroupStyle } = ResultView.getStyles();
     const res = [];
     for (let i = 0; i < this.props.files.length; i += 1) {
-      const { file, dbFile } = this.props.files[i];
+      const file = this.props.files[i];
       res.push(
         <List.Item key={`file_${file.relpath}`}>
           <List.Content>
@@ -45,10 +45,10 @@ export default class ResultTabIdenticalView extends Component<Props> {
               <Button
                 icon="trash"
                 onClick={() => {
-                  this.props.removeFile(file, dbFile, CONST_SCAN_TYPE_IDENTICAL);
+                  this.props.removeFile(file, file.dbFiles, CONST_SCAN_TYPE_IDENTICAL);
                 }}
               />
-              <Button icon="search" onClick={this.show(file, dbFile)} />
+              <Button icon="search" onClick={this.show(file, file.dbFiles)} />
             </Button.Group>
             {file.relpath}
           </List.Content>

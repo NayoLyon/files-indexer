@@ -70,12 +70,27 @@ export class FileProps {
     this.modified = stats.mtime;
     this.changed = stats.ctime;
     this.created = stats.birthtime;
+    this.scanType = null;
+    this.matches = [];
   }
   get id() {
     return this._id;
   }
   async computeHash() {
     this.hash = await computeHashForFile(this.path);
+  }
+  setCompareType(scanType: string) {
+    this.scanType = scanType;
+  }
+  get dbFiles() {
+    return this.matches;
+  }
+  setDbMatches(dbFiles) {
+    if (dbFiles instanceof Array) {
+      this.matches = this.matches.concat(dbFiles);
+    } else {
+      this.matches.push(dbFiles);
+    }
   }
   compareSameHash(dbFile: FilePropsDb) {
     const result: Map<string, Array<string | number | Date>> = new Map();

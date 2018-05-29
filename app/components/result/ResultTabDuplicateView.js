@@ -12,7 +12,7 @@ type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
   removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb | void, ConstScanType) => void,
-  files: Array<{ file: FileProps, matches: Array<FilePropsDb> }>
+  files: Array<FileProps>
 };
 
 export default class ResultTabDuplicateView extends Component<Props> {
@@ -35,12 +35,12 @@ export default class ResultTabDuplicateView extends Component<Props> {
   renderFiles() {
     const rows = [];
     for (let i = 0; i < this.props.files.length; i += 1) {
-      const { file, matches } = this.props.files[i];
+      const file = this.props.files[i];
 
       rows.push(
         <Table.Row key={`folder_${file.relpath}`}>
-          <Table.Cell textAlign="center" rowSpan={matches.length + 1}>
-            <Button icon="search" onClick={this.show(file, matches)} />
+          <Table.Cell textAlign="center" rowSpan={file.dbFiles.length + 1}>
+            <Button icon="search" onClick={this.show(file, file.dbFiles)} />
             {file.name}
           </Table.Cell>
           <Table.Cell textAlign="center">In folder</Table.Cell>
@@ -58,7 +58,7 @@ export default class ResultTabDuplicateView extends Component<Props> {
               <Button
                 icon="trash"
                 onClick={() => {
-                  this.props.removeFile(file, matches, CONST_SCAN_TYPE_DUPLICATE);
+                  this.props.removeFile(file, file.dbFiles, CONST_SCAN_TYPE_DUPLICATE);
                 }}
               />
             </Button.Group>
@@ -66,18 +66,18 @@ export default class ResultTabDuplicateView extends Component<Props> {
         </Table.Row>
       );
 
-      for (let m = 0; m < matches.length; m += 1) {
+      for (let m = 0; m < file.dbFiles.length; m += 1) {
         rows.push(
-          <Table.Row key={`db_${file.relpath}_${matches[m].relpath}`}>
+          <Table.Row key={`db_${file.relpath}_${file.dbFiles[m].relpath}`}>
             <Table.Cell textAlign="center">Possible match {m + 1}</Table.Cell>
-            <Table.Cell textAlign="center">{printValue(matches[m], 'size')}</Table.Cell>
-            <Table.Cell textAlign="center">{printValue(matches[m], 'modified')}</Table.Cell>
+            <Table.Cell textAlign="center">{printValue(file.dbFiles[m], 'size')}</Table.Cell>
+            <Table.Cell textAlign="center">{printValue(file.dbFiles[m], 'modified')}</Table.Cell>
             <Table.Cell textAlign="center">
-              {printValue(matches[m], 'relpath')}
+              {printValue(file.dbFiles[m], 'relpath')}
               <Button
                 icon="external"
                 onClick={() => {
-                  this.props.openDbFolderFor(matches[m]);
+                  this.props.openDbFolderFor(file.dbFiles[m]);
                 }}
               />
             </Table.Cell>
@@ -89,7 +89,10 @@ export default class ResultTabDuplicateView extends Component<Props> {
   }
   render() {
     return (
-      <Tab.Pane key="scan_result_duplicates" style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}>
+      <Tab.Pane
+        key="scan_result_duplicates"
+        style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}
+      >
         <CompareDialogView
           open={this.state.open}
           close={this.close}
