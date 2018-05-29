@@ -95,18 +95,18 @@ export default function scanReducer(state: scanStateType = defaultValue, action:
       return Object.assign({}, state, { duplicates: newDuplicates });
     }
     case SCAN_DBREF_UPDATE: {
-      const nextDbRef = new Map(state.dbFilesRef);
+      const dbFilesRef = new Map(state.dbFilesRef);
       if (action.oldDbFile) {
         if (action.oldDbFile instanceof Array) {
           action.oldDbFile.forEach(dbFile => {
-            removeOldDbFile(action.file, dbFile, nextDbRef);
+            removeOldDbFile(action.file, dbFile, dbFilesRef);
           });
         } else {
-          removeOldDbFile(action.file, action.oldDbFile, nextDbRef);
+          removeOldDbFile(action.file, action.oldDbFile, dbFilesRef);
         }
       }
       if (action.newDbFile) {
-        const prevNewScanDbRef = nextDbRef.get(action.newDbFile.id);
+        const prevNewScanDbRef = dbFilesRef.get(action.newDbFile.id);
         let nextNewScanDbRef;
         if (prevNewScanDbRef) {
           // Copy the previous one, to append this new ref
@@ -122,9 +122,9 @@ export default function scanReducer(state: scanStateType = defaultValue, action:
           };
         }
         nextNewScanDbRef.files.set(action.file, action.scanType);
-        nextDbRef.set(action.newDbFile.id, nextNewScanDbRef);
+        dbFilesRef.set(action.newDbFile.id, nextNewScanDbRef);
       }
-      return Object.assign({}, state, { dbFilesRef: nextDbRef });
+      return Object.assign({}, state, { dbFilesRef });
     }
     default:
       return state;
