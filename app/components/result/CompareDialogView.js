@@ -9,7 +9,7 @@ import FileDetailsView from './FileDetailsView';
 type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
-  removeFile: FileProps => void,
+  removeFile: void | (FileProps => void),
   close: () => void,
   open: boolean,
   dbFilesFirst: boolean | void,
