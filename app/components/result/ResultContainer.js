@@ -66,13 +66,10 @@ class ResultContainer extends Component<Props> {
       case ScanActions.CONST_SCAN_TYPE_MODIFIED:
         this.props.scanModifiedRemove(file);
         break;
-      case ScanActions.CONST_SCAN_TYPE_IDENTICAL:
-        this.props.scanExistsRemove(file);
-        break;
       case ScanActions.CONST_SCAN_TYPE_DUPLICATE:
         this.props.scanDuplicateRemove(file);
         break;
-      case ScanActions.CONST_SCAN_TYPE_EXISTS:
+      case ScanActions.CONST_SCAN_TYPE_IDENTICAL:
         this.props.scanExistsRemove(file);
         break;
       case ScanActions.CONST_SCAN_TYPE_NEW:
@@ -159,7 +156,7 @@ class ResultContainer extends Component<Props> {
             // Do nothing, will be managed in the next step...
             oldDbMap.set(key, dbFile);
             break;
-          case ScanActions.CONST_SCAN_TYPE_EXISTS:
+          case ScanActions.CONST_SCAN_TYPE_IDENTICAL:
             filesToRescan.push(key);
             oldDbMap.set(key, dbFile);
             promises.push(this.props.scanExistsRemove(key));
@@ -183,7 +180,7 @@ class ResultContainer extends Component<Props> {
       //     case ScanActions.CONST_SCAN_TYPE_DUPLICATE:
       //       // Do nothing, will be managed in the next step...
       //       break;
-      //     case ScanActions.CONST_SCAN_TYPE_EXISTS:
+      //     case ScanActions.CONST_SCAN_TYPE_IDENTICAL:
       //       filesToRescan.push(key);
       //       await this.props.scanExistsRemove(key);
       //       break;

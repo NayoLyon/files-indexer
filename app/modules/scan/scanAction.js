@@ -18,14 +18,12 @@ export const SCAN_DBREF_ADD = 'SCAN_DBREF_ADD';
 export const SCAN_DBREF_UPDATE = 'SCAN_DBREF_UPDATE';
 export const CONST_SCAN_TYPE_DUPLICATE = 'duplicate';
 export const CONST_SCAN_TYPE_MODIFIED = 'modified';
-export const CONST_SCAN_TYPE_EXISTS = 'exists';
 export const CONST_SCAN_TYPE_IDENTICAL = 'identical';
 export const CONST_SCAN_TYPE_NEW = 'new';
 
 export type ConstScanType =
   | CONST_SCAN_TYPE_DUPLICATE
   | CONST_SCAN_TYPE_MODIFIED
-  | CONST_SCAN_TYPE_EXISTS
   | CONST_SCAN_TYPE_IDENTICAL
   | CONST_SCAN_TYPE_NEW;
 
@@ -178,7 +176,7 @@ export function scanProcessFile(fileProps: FileProps, oldDbFile: FilePropsDb | v
         await dispatch(scanRefUpdate(fileProps, oldDbFile, inDb, CONST_SCAN_TYPE_MODIFIED));
       } else {
         await dispatch(scanExistsAdd(fileProps, inDb));
-        await dispatch(scanRefUpdate(fileProps, oldDbFile, inDb, CONST_SCAN_TYPE_EXISTS));
+        await dispatch(scanRefUpdate(fileProps, oldDbFile, inDb, CONST_SCAN_TYPE_IDENTICAL));
       }
     }
   };
