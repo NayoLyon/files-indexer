@@ -57,7 +57,7 @@ class ResultContainer extends Component<Props> {
     openExplorerOn(path.resolve(this.props.toScanFolder, file.relpath));
   }
   async removeFile(file: FileProps) {
-    deleteFile(path.resolve(this.props.toScanFolder, file.relpath));
+    deleteFile(this.props.toScanFolder, file.relpath);
     switch (file.scanType) {
       case ScanActions.CONST_SCAN_TYPE_MODIFIED:
         this.props.scanModifiedRemove(file);

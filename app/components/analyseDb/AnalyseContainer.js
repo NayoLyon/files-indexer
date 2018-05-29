@@ -47,8 +47,7 @@ class AnalyseContainer extends Component<Props> {
     this.props.removeMissing(file);
   }
   removeFile(file: FilePropsDb) {
-    const filePath = path.resolve(this.props.masterFolder, file.relpath);
-    deleteFile(filePath);
+    deleteFile(this.props.masterFolder, file.relpath);
     this.props.removeDuplicate(file);
   }
 
