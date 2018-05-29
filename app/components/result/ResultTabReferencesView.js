@@ -112,6 +112,7 @@ export default class ResultTabReferencesView extends Component<Props> {
           close={this.close}
           openDbFolderFor={this.props.openDbFolderFor}
           openFolderFor={this.props.openFolderFor}
+          removeFile={this.props.removeFile}
           files={this.state.files}
           dbFiles={this.state.dbFile}
           dbFilesFirst

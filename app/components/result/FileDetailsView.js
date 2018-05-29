@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { Image, Card, Icon } from 'semantic-ui-react';
+import { Image, Card, Icon, Button } from 'semantic-ui-react';
 import { lookup } from 'mime-types';
 
 import { FileProps, FilePropsDb } from '../../api/filesystem';
 import { printValue } from '../../utils/format';
 
 type Props = {
-  openFolderFor: FileProps | FilePropsDb => void,
+  openFolderFor: (FileProps | FilePropsDb) => void,
+  removeFile: void | (FileProps => void),
   file: FileProps | FilePropsDb
 };
 
@@ -42,11 +43,26 @@ export default class FileDetailsView extends Component<Props> {
   }
 
   render() {
+    let actions = null;
+    if (this.props.removeFile) {
+      actions = (
+        <Button
+          icon="trash"
+          onClick={() => {
+            this.props.removeFile(this.props.file);
+          }}
+          style={{ marginLeft: '1rem' }}
+        />
+      );
+    }
     return (
       <Card style={FileDetailsView.inlineStyles.card}>
         {this.computePreview()}
         <Card.Content>
-          <Card.Header>{this.getProp('name')}</Card.Header>
+          <Card.Header>
+            {this.getProp('name')}
+            {actions}
+          </Card.Header>
           <Card.Description>
             Size:&nbsp;
             <span className="date">{this.getProp('size')}</span>
