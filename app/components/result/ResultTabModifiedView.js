@@ -11,9 +11,9 @@ import { printValue } from '../../utils/format';
 type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
-  copyModifiedAttribute: (FileProps, FilePropsDb) => void,
+  copyModifiedAttributeTo: (FileProps, FilePropsDb) => void,
   removeFile: FileProps => void,
-  copyNameAttribute: (FileProps, FilePropsDb) => void,
+  copyNameAttributeTo: (FileProps, FilePropsDb) => void,
   files: Array<{
     file: FileProps,
     diff: Map<string, Array<string | number | Date>>
@@ -89,7 +89,7 @@ export default class ResultTabModifiedView extends Component<Props> {
                 icon="triangle left"
                 color="green"
                 onClick={() => {
-                  this.props.copyModifiedAttribute(file, dbFile);
+                  this.props.copyModifiedAttributeTo(file, dbFile);
                 }}
               />
             );
@@ -99,7 +99,7 @@ export default class ResultTabModifiedView extends Component<Props> {
                 icon="triangle left"
                 color="green"
                 onClick={() => {
-                  this.props.copyNameAttribute(file, dbFile);
+                  this.props.copyNameAttributeTo(file, dbFile);
                 }}
               />
             );

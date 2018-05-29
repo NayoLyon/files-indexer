@@ -41,12 +41,12 @@ class ResultContainer extends Component<Props> {
 
   constructor(props) {
     super(props);
-    this.copyModifiedAttribute = this.copyModifiedAttribute.bind(this);
+    this.copyModifiedAttributeTo = this.copyModifiedAttributeTo.bind(this);
     this.openDbFolderFor = this.openDbFolderFor.bind(this);
     this.openFolderFor = this.openFolderFor.bind(this);
     this.dbFilePropUpdated = this.dbFilePropUpdated.bind(this);
     this.removeFile = this.removeFile.bind(this);
-    this.copyNameAttribute = this.copyNameAttribute.bind(this);
+    this.copyNameAttributeTo = this.copyNameAttributeTo.bind(this);
     this.removeAllFiles = this.removeAllFiles.bind(this);
   }
 
@@ -85,7 +85,7 @@ class ResultContainer extends Component<Props> {
       console.error(`Unexpected scanType '${scanType}' for removeAllFiles. Skip action...`);
     }
   }
-  async copyModifiedAttribute(file: FileProps, dbFile: FilePropsDb) {
+  async copyModifiedAttributeTo(file: FileProps, dbFile: FilePropsDb) {
     const dbFilePath = path.resolve(this.props.masterFolder, dbFile.relpath);
     const newDbFile = dbFile.clone();
     newDbFile.modified = new Date(file.modified);
@@ -105,7 +105,7 @@ class ResultContainer extends Component<Props> {
       // TODO propagate an error...
     }
   }
-  async copyNameAttribute(file: FileProps, dbFile: FilePropsDb) {
+  async copyNameAttributeTo(file: FileProps, dbFile: FilePropsDb) {
     const dbFilePath = path.resolve(this.props.masterFolder, dbFile.relpath);
     const newDbFile = dbFile.clone();
     newDbFile.setNewName(file.name);
@@ -227,10 +227,10 @@ class ResultContainer extends Component<Props> {
       <ResultView
         openDbFolderFor={this.openDbFolderFor}
         openFolderFor={this.openFolderFor}
-        copyModifiedAttribute={this.copyModifiedAttribute}
+        copyModifiedAttributeTo={this.copyModifiedAttributeTo}
         removeFile={this.removeFile}
         removeAllFiles={this.removeAllFiles}
-        copyNameAttribute={this.copyNameAttribute}
+        copyNameAttributeTo={this.copyNameAttributeTo}
       />
     );
   }

@@ -16,10 +16,10 @@ import ResultTabIdenticalView from './ResultTabIdenticalView';
 type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
-  copyModifiedAttribute: (FileProps, FilePropsDb) => void,
+  copyModifiedAttributeTo: (FileProps, FilePropsDb) => void,
   removeFile: FileProps => void,
   removeAllFiles: ConstScanType => void,
-  copyNameAttribute: (FileProps, FilePropsDb) => void,
+  copyNameAttributeTo: (FileProps, FilePropsDb) => void,
   identicals: Array<FileProps>,
   newFiles: Array<FileProps>,
   modified: Array<{
@@ -113,11 +113,11 @@ class ResultView extends Component<Props> {
         render: () => (
           <ResultTabModifiedView
             files={this.props.modified}
-            copyModifiedAttribute={this.props.copyModifiedAttribute}
+            copyModifiedAttributeTo={this.props.copyModifiedAttributeTo}
             openDbFolderFor={this.props.openDbFolderFor}
             openFolderFor={this.props.openFolderFor}
             removeFile={this.props.removeFile}
-            copyNameAttribute={this.props.copyNameAttribute}
+            copyNameAttributeTo={this.props.copyNameAttributeTo}
           />
         )
       });
