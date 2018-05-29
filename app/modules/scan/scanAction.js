@@ -59,7 +59,7 @@ export function scanProgress(step: string, progress: number) {
   };
 }
 
-export function scanExistsAdd(file: FileProps, dbFile: FilePropsDb) {
+function scanExistsAdd(file: FileProps, dbFile: FilePropsDb) {
   return {
     type: SCAN_EXISTS_ADD,
     file,
@@ -73,7 +73,7 @@ export function scanExistsRemove(file: FileProps) {
   };
 }
 
-export function scanNewAdd(file: FileProps) {
+function scanNewAdd(file: FileProps) {
   return {
     type: SCAN_NEW_ADD,
     file
@@ -86,7 +86,7 @@ export function scanNewRemove(file: FileProps) {
   };
 }
 
-export function scanModifiedAdd(
+function scanModifiedAdd(
   file: FileProps,
   diff: Map<string, Array<string | number | Date>>,
   dbFile: FilePropsDb
@@ -105,7 +105,7 @@ export function scanModifiedRemove(file: FileProps) {
   };
 }
 
-export function scanDuplicateAdd(file: FileProps, matches: Array<FilePropsDb>) {
+function scanDuplicateAdd(file: FileProps, matches: Array<FilePropsDb>) {
   return {
     type: SCAN_DUPLICATE_ADD,
     file,
