@@ -84,10 +84,12 @@ export default class ResultTabModifiedView extends Component<Props> {
               </Button.Group>
             );
           } else if (elt === 'modified') {
+            const buttonColor =
+              file.modified.getTime() < dbFile.modified.getTime() ? 'green' : 'orange';
             actionsFolder = (
               <Button
                 icon="triangle left"
-                color="green"
+                color={buttonColor}
                 onClick={() => {
                   this.props.copyModifiedAttributeTo(file, dbFile);
                 }}
