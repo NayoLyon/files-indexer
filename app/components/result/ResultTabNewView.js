@@ -2,14 +2,13 @@
 import React, { Component } from 'react';
 import { Tab, List, Button } from 'semantic-ui-react';
 
-import { FileProps, FilePropsDb } from '../../api/filesystem';
-import { CONST_SCAN_TYPE_NEW, ConstScanType } from '../../modules/scan/scanAction';
+import { FileProps } from '../../api/filesystem';
 
 import ResultView from './ResultView';
 
 type Props = {
   openFolderFor: FileProps => void,
-  removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb | void, ConstScanType) => void,
+  removeFile: FileProps => void,
   files: Array<FileProps>
 };
 
@@ -32,7 +31,7 @@ export default class ResultTabNewView extends Component<Props> {
               <Button
                 icon="trash"
                 onClick={() => {
-                  this.props.removeFile(file, undefined, CONST_SCAN_TYPE_NEW);
+                  this.props.removeFile(file);
                 }}
               />
               <Button

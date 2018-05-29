@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { Tab, Table, Button } from 'semantic-ui-react';
 
 import { FileProps, FilePropsDb } from '../../api/filesystem';
-import { CONST_SCAN_TYPE_DUPLICATE, ConstScanType } from '../../modules/scan/scanAction';
 import { printValue } from '../../utils/format';
 
 import CompareDialogView from './CompareDialogView';
@@ -11,7 +10,7 @@ import CompareDialogView from './CompareDialogView';
 type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
-  removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb | void, ConstScanType) => void,
+  removeFile: FileProps => void,
   files: Array<FileProps>
 };
 
@@ -58,7 +57,7 @@ export default class ResultTabDuplicateView extends Component<Props> {
               <Button
                 icon="trash"
                 onClick={() => {
-                  this.props.removeFile(file, file.dbFiles, CONST_SCAN_TYPE_DUPLICATE);
+                  this.props.removeFile(file);
                 }}
               />
             </Button.Group>

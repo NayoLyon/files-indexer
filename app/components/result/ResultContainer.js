@@ -56,13 +56,9 @@ class ResultContainer extends Component<Props> {
   openFolderFor(file: FileProps) {
     openExplorerOn(path.resolve(this.props.toScanFolder, file.relpath));
   }
-  async removeFile(
-    file: FileProps,
-    oldDbFile: Array<FilePropsDb> | FilePropsDb | void,
-    scanType: ScanActions.ConstScanType
-  ) {
+  async removeFile(file: FileProps) {
     deleteFile(path.resolve(this.props.toScanFolder, file.relpath));
-    switch (scanType) {
+    switch (file.scanType) {
       case ScanActions.CONST_SCAN_TYPE_MODIFIED:
         this.props.scanModifiedRemove(file);
         break;
@@ -76,14 +72,14 @@ class ResultContainer extends Component<Props> {
         this.props.scanNewRemove(file);
         return;
       default:
-        console.error(`Unexpected removeFile of ${scanType}!!`);
+        console.error(`Unexpected removeFile of ${file.scanType}!!`);
     }
-    this.props.scanRefUpdate(file, oldDbFile, undefined, 'whatever'); // TODO change 'whatever' to undefined ??
+    this.props.scanRefUpdate(file, file.dbFiles, undefined, 'whatever'); // TODO change 'whatever' to undefined ??
   }
   async removeAllFiles(scanType: ScanActions.ConstScanType) {
     if (scanType === ScanActions.CONST_SCAN_TYPE_IDENTICAL) {
       this.props.identicals.forEach(file => {
-        this.removeFile(file, file.dbFiles, scanType);
+        this.removeFile(file);
       });
     } else {
       console.error(`Unexpected scanType '${scanType}' for removeAllFiles. Skip action...`);

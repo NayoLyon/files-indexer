@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { Tab, Table, Button } from 'semantic-ui-react';
 
 import { FileProps, FilePropsDb } from '../../api/filesystem';
-import { CONST_SCAN_TYPE_MODIFIED, ConstScanType } from '../../modules/scan/scanAction';
 
 import CompareDialogView from './CompareDialogView';
 import styles from './Scrollables.css';
@@ -13,7 +12,7 @@ type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
   copyModifiedAttribute: (FileProps, FilePropsDb) => void,
-  removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb | void, ConstScanType) => void,
+  removeFile: FileProps => void,
   copyNameAttribute: (FileProps, FilePropsDb) => void,
   files: Array<{
     file: FileProps,
@@ -79,7 +78,7 @@ export default class ResultTabModifiedView extends Component<Props> {
                 <Button
                   icon="trash"
                   onClick={() => {
-                    this.props.removeFile(file, dbFile, CONST_SCAN_TYPE_MODIFIED);
+                    this.props.removeFile(file);
                   }}
                 />
               </Button.Group>

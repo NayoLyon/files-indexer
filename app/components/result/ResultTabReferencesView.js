@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Tab, Table, Button } from 'semantic-ui-react';
 
 import { FileProps, FilePropsDb } from '../../api/filesystem';
-import { ConstScanType, CONST_SCAN_TYPE_DUPLICATE } from '../../modules/scan/scanAction';
+import { CONST_SCAN_TYPE_DUPLICATE } from '../../modules/scan/scanAction';
 import { scanDbRef } from '../../modules/scan/scanReducer';
 import { printValue } from '../../utils/format';
 
@@ -12,7 +12,7 @@ import CompareDialogView from './CompareDialogView';
 type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
-  removeFile: (FileProps, Array<FilePropsDb> | FilePropsDb | void, ConstScanType) => void,
+  removeFile: FileProps => void,
   files: Array<scanDbRef>
 };
 
@@ -39,7 +39,7 @@ export default class ResultTabReferencesView extends Component<Props> {
     let i = 0;
     const addMatchRow = dbFile => (scanType, file) => {
       counter += 1;
-      const label = scanType === CONST_SCAN_TYPE_DUPLICATE ? "Possible match" : "Match";
+      const label = scanType === CONST_SCAN_TYPE_DUPLICATE ? 'Possible match' : 'Match';
       rows.push(
         <Table.Row key={`file_${dbFile.relpath}_${file.relpath}`}>
           <Table.Cell textAlign="center">
@@ -58,7 +58,7 @@ export default class ResultTabReferencesView extends Component<Props> {
             <Button
               icon="trash"
               onClick={() => {
-                this.props.removeFile(file, dbFile, scanType);
+                this.props.removeFile(file);
               }}
             />
             {scanType}
@@ -103,7 +103,10 @@ export default class ResultTabReferencesView extends Component<Props> {
   }
   render() {
     return (
-      <Tab.Pane key="scan_result_references" style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}>
+      <Tab.Pane
+        key="scan_result_references"
+        style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}
+      >
         <CompareDialogView
           open={this.state.open}
           close={this.close}
