@@ -6,6 +6,7 @@ import { Action } from '../actionType';
 export const SCAN_START = 'SCAN_START';
 export const SCAN_END = 'SCAN_END';
 export const SCAN_PROGRESS = 'SCAN_PROGRESS';
+export const SCAN_SET_ACTIVETAB = 'SCAN_SET_ACTIVETAB';
 export const SCAN_EXISTS_ADD = 'SCAN_EXISTS_ADD';
 export const SCAN_EXISTS_REMOVE = 'SCAN_EXISTS_REMOVE';
 export const SCAN_NEW_ADD = 'SCAN_NEW_ADD';
@@ -54,6 +55,13 @@ export function scanProgress(step: string, progress: number) {
     type: SCAN_PROGRESS,
     step,
     progress
+  };
+}
+
+export function scanSetTabActive(activeTab: string) {
+  return {
+    type: SCAN_SET_ACTIVETAB,
+    activeTab
   };
 }
 

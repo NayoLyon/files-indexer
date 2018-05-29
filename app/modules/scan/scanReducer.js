@@ -3,6 +3,7 @@ import {
   SCAN_START,
   SCAN_END,
   SCAN_PROGRESS,
+  SCAN_SET_ACTIVETAB,
   SCAN_EXISTS_ADD,
   SCAN_EXISTS_REMOVE,
   SCAN_NEW_ADD,
@@ -27,6 +28,7 @@ export type scanStateType = {
   +isScanned: boolean,
   +step: string,
   +progress: number,
+  +activeTab: string,
   +identicals: Array<FileProps>,
   +newFiles: Array<FileProps>,
   +modified: Array<{
@@ -42,6 +44,7 @@ const defaultValue: scanStateType = {
   isScanned: false,
   step: '',
   progress: 0,
+  activeTab: '',
   identicals: [],
   newFiles: [],
   modified: [],
@@ -60,6 +63,8 @@ export default function scanReducer(state: scanStateType = defaultValue, action:
       return Object.assign({}, state, { indexing: false, isScanned: true });
     case SCAN_PROGRESS:
       return Object.assign({}, state, { step: action.step, progress: action.progress });
+    case SCAN_SET_ACTIVETAB:
+      return { ...state, activeTab: action.activeTab };
     case SCAN_EXISTS_ADD:
       return Object.assign({}, state, {
         identicals: [...state.identicals, action.file]

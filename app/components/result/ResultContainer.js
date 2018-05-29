@@ -17,6 +17,7 @@ type Props = {
   scanProgress: (string, number) => void,
   startScan: () => void,
   endScan: () => void,
+  scanSetTabActive: string => void,
   scanExistsRemove: (file: FileProps) => void,
   scanNewRemove: (file: FileProps) => void,
   scanModifiedRemove: (file: FileProps) => void,
@@ -231,6 +232,7 @@ class ResultContainer extends Component<Props> {
         removeFile={this.removeFile}
         removeAllFiles={this.removeAllFiles}
         copyNameAttributeTo={this.copyNameAttributeTo}
+        setTabActive={this.props.scanSetTabActive}
       />
     );
   }

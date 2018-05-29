@@ -20,6 +20,8 @@ type Props = {
   removeFile: FileProps => void,
   removeAllFiles: ConstScanType => void,
   copyNameAttributeTo: (FileProps, FilePropsDb) => void,
+  setTabActive: string => void,
+  activeTab: string,
   identicals: Array<FileProps>,
   newFiles: Array<FileProps>,
   modified: Array<{
@@ -44,6 +46,15 @@ class ResultView extends Component<Props> {
     };
   }
 
+  constructor(props) {
+    super(props);
+    this.tabChange = this.tabChange.bind(this);
+  }
+
+  tabChange(event, data) {
+    this.props.setTabActive(data.panes[data.activeIndex].key);
+  }
+
   render() {
     const inlineStyles = {
       trashButtonStyle: { fontSize: '0.7rem', marginRight: '-0.8rem', marginLeft: '0.4rem' }
@@ -61,6 +72,7 @@ class ResultView extends Component<Props> {
           menuItem: `Caution: several files refers to the same db file!! (${
             duplicatefileRefs.length
           })`,
+          key: 'references',
           render: () => (
             <ResultTabReferencesView
               files={duplicatefileRefs}
@@ -85,6 +97,7 @@ class ResultView extends Component<Props> {
             />
           </Menu.Item>
         ),
+        key: 'identical',
         render: () => (
           <ResultTabIdenticalView
             files={this.props.identicals}
@@ -98,6 +111,7 @@ class ResultView extends Component<Props> {
     if (this.props.newFiles.length > 0) {
       panes.push({
         menuItem: `New files (${this.props.newFiles.length})`,
+        key: 'new',
         render: () => (
           <ResultTabNewView
             files={this.props.newFiles}
@@ -110,6 +124,7 @@ class ResultView extends Component<Props> {
     if (this.props.modified.length > 0) {
       panes.push({
         menuItem: `Modified files (${this.props.modified.length})`,
+        key: 'modified',
         render: () => (
           <ResultTabModifiedView
             files={this.props.modified}
@@ -125,6 +140,7 @@ class ResultView extends Component<Props> {
     if (this.props.duplicates.length > 0) {
       panes.push({
         menuItem: `Possible duplicates (${this.props.duplicates.length})`,
+        key: 'duplicates',
         render: () => (
           <ResultTabDuplicateView
             files={this.props.duplicates}
@@ -135,12 +151,24 @@ class ResultView extends Component<Props> {
         )
       });
     }
-    return <Tab style={{ height: '100%' }} panes={panes} />;
+    let activeIndex = panes.findIndex(pane => pane.key === this.props.activeTab);
+    if (activeIndex < 0) {
+      activeIndex = 0;
+    }
+    return (
+      <Tab
+        style={{ height: '100%' }}
+        panes={panes}
+        activeIndex={activeIndex}
+        onTabChange={this.tabChange}
+      />
+    );
   }
 }
 
 function mapStateToProps(state) {
   return {
+    activeTab: state.scanState.activeTab,
     identicals: state.scanState.identicals,
     newFiles: state.scanState.newFiles,
     modified: state.scanState.modified,
