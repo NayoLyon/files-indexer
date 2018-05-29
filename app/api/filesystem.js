@@ -92,6 +92,9 @@ export class FileProps {
       this.matches.push(dbFiles);
     }
   }
+  clearDbMatches() {
+    this.matches = [];
+  }
   compareSameHash(dbFile: FilePropsDb) {
     const result: Map<string, Array<string | number | Date>> = new Map();
     if (dbFile.name !== this.name) {

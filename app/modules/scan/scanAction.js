@@ -129,6 +129,7 @@ export function scanProcessFile(fileProps: FileProps, oldDbFile: FilePropsDb | v
   return async (dispatch: (action: Action) => void, getState) => {
     const { masterPath } = getState().foldersState;
 
+    fileProps.clearDbMatches();
     let occurences = await findDb(masterPath, { hash: fileProps.hash });
     if (occurences.length === 0) {
       // File not found in db... Search for files with similar properties
