@@ -150,4 +150,4 @@ function removeOldDbFile(file: FileProps, dbFile: FilePropsDb, mapDbRef: Map<str
       mapDbRef.set(dbFile.id, nextOldScanDbRef);
     }
   }
-};
+}
