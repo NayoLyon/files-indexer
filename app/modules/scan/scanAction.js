@@ -14,7 +14,6 @@ export const SCAN_MODIFIED_ADD = 'SCAN_MODIFIED_ADD';
 export const SCAN_MODIFIED_REMOVE = 'SCAN_MODIFIED_REMOVE';
 export const SCAN_DUPLICATE_ADD = 'SCAN_DUPLICATE_ADD';
 export const SCAN_DUPLICATE_REMOVE = 'SCAN_DUPLICATE_REMOVE';
-export const SCAN_DBREF_ADD = 'SCAN_DBREF_ADD';
 export const SCAN_DBREF_UPDATE = 'SCAN_DBREF_UPDATE';
 export const CONST_SCAN_TYPE_DUPLICATE = 'duplicate';
 export const CONST_SCAN_TYPE_MODIFIED = 'modified';
@@ -117,15 +116,6 @@ export function scanDuplicateRemove(file: FileProps) {
   return {
     type: SCAN_DUPLICATE_REMOVE,
     file
-  };
-}
-
-export function scanRefAdd(file: FileProps, dbFile: FilePropsDb, scanType: string) {
-  return {
-    type: SCAN_DBREF_ADD,
-    file,
-    dbFile,
-    scanType
   };
 }
 

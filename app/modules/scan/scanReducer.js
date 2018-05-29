@@ -11,7 +11,6 @@ import {
   SCAN_MODIFIED_REMOVE,
   SCAN_DUPLICATE_ADD,
   SCAN_DUPLICATE_REMOVE,
-  SCAN_DBREF_ADD,
   SCAN_DBREF_UPDATE,
   ConstScanType
 } from './scanAction';
@@ -94,20 +93,6 @@ export default function scanReducer(state: scanStateType = defaultValue, action:
     case SCAN_DUPLICATE_REMOVE: {
       const newDuplicates = state.duplicates.filter(elt => elt.file !== action.file);
       return Object.assign({}, state, { duplicates: newDuplicates });
-    }
-    case SCAN_DBREF_ADD: {
-      const nextDbRef = new Map(state.dbFilesRef);
-      const prevScanDbRef = nextDbRef.get(action.dbFile.id);
-      let newFileMap = new Map();
-      if (prevScanDbRef) {
-        newFileMap = new Map(prevScanDbRef.files);
-      }
-      newFileMap.set(action.file, action.scanType);
-      nextDbRef.set(action.dbFile.id, {
-        dbFile: action.dbFile,
-        files: newFileMap
-      });
-      return Object.assign({}, state, { dbFilesRef: nextDbRef });
     }
     case SCAN_DBREF_UPDATE: {
       const nextDbRef = new Map(state.dbFilesRef);
