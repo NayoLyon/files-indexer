@@ -1,8 +1,9 @@
 /* eslint no-await-in-loop: "off" */
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
+import { isEligibleFile } from '../utils/filesystem';
 
 export type FilePropsType = {
   _id: string,
@@ -206,7 +207,7 @@ function readDir(folder) {
       const file = content[i];
       if (fs.statSync(path.join(folder, file)).isDirectory()) {
         subFolders.push(path.join(folder, file));
-      } else if (!['.index.db', 'Thumbs.db'].includes(file)) {
+      } else if (isEligibleFile(file)) {
         fileList.push(path.join(folder, file));
       }
     }

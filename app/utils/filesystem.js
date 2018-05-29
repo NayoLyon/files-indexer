@@ -10,3 +10,7 @@ export function openExplorerFor(folder) {
 export function deleteFile(filePath) {
   shell.moveItemToTrash(filePath);
 }
+
+export function isEligibleFile(file) {
+  return !['.index.db', 'Thumbs.db'].includes(file);
+}
