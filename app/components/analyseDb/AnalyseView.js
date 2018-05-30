@@ -86,8 +86,14 @@ class AnalyseView extends Component<Props> {
       let infos = null;
       if (this.props.missingList.length || this.props.duplicateList.size) {
         const panes = [];
-        panes.push(this.renderMissing());
-        panes.push(this.renderDuplicates());
+        const tabMissing = this.renderMissing();
+        if (tabMissing) {
+          panes.push(tabMissing);
+        }
+        const tabDuplicates = this.renderDuplicates();
+        if (tabDuplicates) {
+          panes.push(tabDuplicates);
+        }
         infos = <Tab style={{ height: '100%' }} panes={panes} />;
       } else {
         infos = <p key="noErrors">No errors found in db.</p>;
