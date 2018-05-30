@@ -7,8 +7,8 @@ import { FileProps, FilePropsDb } from '../../api/filesystem';
 import FileDetailsView from './FileDetailsView';
 
 type Props = {
-  openFolderFor: FileProps => void,
-  openDbFolderFor: FilePropsDb => void,
+  openFolderFor: void | (FileProps => void),
+  openDbFolderFor: void | (FilePropsDb => void),
   removeFile: void | (FileProps => void),
   close: () => void,
   open: boolean,
@@ -114,33 +114,38 @@ export default class CompareDialogView extends Component<Props> {
         paddingTop: '1rem'
       }
     };
-    if (!this.props.files || !this.props.dbFiles) {
+    if (!this.props.files && !this.props.dbFiles) {
       return null;
     }
+    const dbFilesFirst = (this.props.dbFilesFirst && this.props.dbFiles) || !this.props.files;
 
     let filesDetails;
 
     // Display the files in the given order
-    if (this.props.dbFilesFirst) {
+    if (dbFilesFirst) {
       filesDetails = CompareDialogView.renderFiles(this.props.dbFiles, this.props.openDbFolderFor);
-      filesDetails.push(CompareDialogView.getDivider('Db', 'Folder'));
-      filesDetails = filesDetails.concat(
-        CompareDialogView.renderFiles(
-          this.props.files,
-          this.props.openFolderFor,
-          this.props.removeFile
-        )
-      );
+      if (this.props.files) {
+        filesDetails.push(CompareDialogView.getDivider('Db', 'Folder'));
+        filesDetails = filesDetails.concat(
+          CompareDialogView.renderFiles(
+            this.props.files,
+            this.props.openFolderFor,
+            this.props.removeFile
+          )
+        );
+      }
     } else {
       filesDetails = CompareDialogView.renderFiles(
         this.props.files,
         this.props.openFolderFor,
         this.props.removeFile
       );
-      filesDetails.push(CompareDialogView.getDivider('Folder', 'Db'));
-      filesDetails = filesDetails.concat(
-        CompareDialogView.renderFiles(this.props.dbFiles, this.props.openDbFolderFor)
-      );
+      if (this.props.dbFiles) {
+        filesDetails.push(CompareDialogView.getDivider('Folder', 'Db'));
+        filesDetails = filesDetails.concat(
+          CompareDialogView.renderFiles(this.props.dbFiles, this.props.openDbFolderFor)
+        );
+      }
     }
     return (
       <Modal open={this.props.open} onClose={this.props.close} style={inlineStyle.modal}>
