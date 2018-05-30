@@ -5,6 +5,7 @@ import { Tab, List, Button } from 'semantic-ui-react';
 import { FileProps } from '../../api/filesystem';
 
 import ResultView from './ResultView';
+import CompareDialogView from './CompareDialogView';
 
 type Props = {
   openFolderFor: FileProps => void,
@@ -17,6 +18,16 @@ export default class ResultTabNewView extends Component<Props> {
   constructor(props) {
     super(props);
     this.renderFiles = this.renderFiles.bind(this);
+    this.close = this.close.bind(this);
+    this.show = this.show.bind(this);
+    this.state = { open: false, file: null };
+  }
+
+  close() {
+    this.setState({ open: false });
+  }
+  show(file) {
+    return () => {console.log("Show modal ??"); this.setState({ file, open: true })};
   }
 
   renderFiles() {
@@ -40,6 +51,7 @@ export default class ResultTabNewView extends Component<Props> {
                   this.props.openFolderFor(file);
                 }}
               />
+              <Button icon="search" onClick={this.show(file)} />
             </Button.Group>
             {file.relpath}
           </List.Content>
@@ -51,6 +63,12 @@ export default class ResultTabNewView extends Component<Props> {
   render() {
     return (
       <Tab.Pane key="scan_result_new" style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}>
+        <CompareDialogView
+          open={this.state.open}
+          close={this.close}
+          openFolderFor={this.props.openFolderFor}
+          files={this.state.file}
+        />
         <List selection verticalAlign="middle">
           {this.renderFiles()}
         </List>
