@@ -14,7 +14,7 @@ import {
   SCAN_DUPLICATE_REMOVE,
   SCAN_DBREF_UPDATE
 } from './scanAction';
-import { SELECT_TOSCAN_FOLDER } from '../folders/foldersAction';
+import { SELECT_MASTER_FOLDER, SELECT_TOSCAN_FOLDER } from '../folders/foldersAction';
 import type { Action } from '../actionType';
 import { FileProps, FilePropsDb } from '../../api/filesystem';
 
@@ -53,6 +53,7 @@ const defaultValue: scanStateType = {
 
 export default function scanReducer(state: scanStateType = defaultValue, action: Action) {
   switch (action.type) {
+    case SELECT_MASTER_FOLDER:
     case SELECT_TOSCAN_FOLDER:
       // When we change the folder, we re-initialize scan state...
       return { ...defaultValue };

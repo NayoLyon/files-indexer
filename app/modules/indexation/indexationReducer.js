@@ -6,6 +6,7 @@ import {
   INDEXATION_PROGRESS,
   INDEXATION_DUPLICATE
 } from './indexationAction';
+import { SELECT_MASTER_FOLDER, SELECT_TOSCAN_FOLDER } from '../folders/foldersAction';
 import type { Action } from '../actionType';
 import { FilePropsDb, FileProps } from '../../api/filesystem';
 
@@ -34,6 +35,9 @@ export default function indexationReducer(
   action: Action
 ) {
   switch (action.type) {
+    case SELECT_MASTER_FOLDER:
+    case SELECT_TOSCAN_FOLDER:
+      return defaultValue;
     case INDEXATION_LOAD_DATABASE:
       return {
         ...state,
