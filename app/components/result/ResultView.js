@@ -62,9 +62,9 @@ class ResultView extends Component<Props> {
     const panes = [];
     if (this.props.dbFilesRef.size > 0) {
       const duplicatefileRefs = [];
-      this.props.dbFilesRef.forEach(value => {
-        if (value.files.size > 1) {
-          duplicatefileRefs.push(value);
+      this.props.dbFilesRef.forEach(dbRef => {
+        if (dbRef.filesMatching.size > 1) {
+          duplicatefileRefs.push(dbRef);
         }
       });
       if (duplicatefileRefs.length > 0) {

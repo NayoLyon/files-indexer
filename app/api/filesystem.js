@@ -71,11 +71,26 @@ export class FileProps {
     this.modified = stats.mtime;
     this.changed = stats.ctime;
     this.created = stats.birthtime;
+    this.hash = null;
     this.scanType = null;
     this.matches = [];
   }
   get id() {
-    return this._id;
+    return this.relpath;
+  }
+  clone() {
+    const clone = new FileProps(
+      this.path,
+      {
+        size: this.size,
+        mtime: this.modified,
+        ctime: this.changed,
+        birthtime: this.created
+      },
+      getRootPath(this.path, this.relpath)
+    );
+    clone.hash = this.hash;
+    return clone;
   }
   async computeHash() {
     this.hash = await computeHashForFile(this.path);
@@ -92,9 +107,6 @@ export class FileProps {
     } else {
       this.matches.push(dbFiles);
     }
-  }
-  clearDbMatches() {
-    this.matches = [];
   }
   compareSameHash(dbFile: FilePropsDb) {
     const result: Map<string, Array<string | number | Date>> = new Map();
@@ -215,15 +227,15 @@ function readDir(folder) {
   });
 }
 
-// function getRootPath(fullPath: string, relPath: string): string | null {
-//   let res = fullPath;
-//   let prevRes = null;
-//   while (fullPath !== path.resolve(res, relPath) && res !== prevRes) {
-//     prevRes = res;
-//     res = path.dirname(res);
-//   }
-//   if (fullPath === path.resolve(res, relPath)) {
-//     return res;
-//   }
-//   return null;
-// }
+function getRootPath(fullPath: string, relPath: string): string | null {
+  let res = fullPath;
+  let prevRes = null;
+  while (fullPath !== path.resolve(res, relPath) && res !== prevRes) {
+    prevRes = res;
+    res = path.dirname(res);
+  }
+  if (fullPath === path.resolve(res, relPath)) {
+    return res;
+  }
+  return null;
+}

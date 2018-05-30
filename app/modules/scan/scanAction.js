@@ -137,42 +137,44 @@ export function scanProcessFile(fileProps: FileProps, oldDbFile: FilePropsDb | v
   return async (dispatch: (action: Action) => void, getState) => {
     const { masterPath } = getState().foldersState;
 
-    fileProps.clearDbMatches();
-    let occurences = await findDb(masterPath, { hash: fileProps.hash });
+    const newFileProps = fileProps.clone();
+    let occurences = await findDb(masterPath, { hash: newFileProps.hash });
     if (occurences.length === 0) {
       // File not found in db... Search for files with similar properties
       occurences = await findDb(masterPath, {
-        name: fileProps.name
+        name: newFileProps.name
       });
       if (occurences.length === 0) {
-        fileProps.setCompareType(CONST_SCAN_TYPE_NEW);
-        await dispatch(scanNewAdd(fileProps));
+        newFileProps.setCompareType(CONST_SCAN_TYPE_NEW);
+        await dispatch(scanNewAdd(newFileProps));
       } else {
-        fileProps.setCompareType(CONST_SCAN_TYPE_DUPLICATE);
-        fileProps.setDbMatches(occurences);
-        await dispatch(scanDuplicateAdd(fileProps));
+        newFileProps.setCompareType(CONST_SCAN_TYPE_DUPLICATE);
+        newFileProps.setDbMatches(occurences);
+        await dispatch(scanDuplicateAdd(newFileProps));
         await Promise.all(
           occurences.map(async elt => {
-            await dispatch(scanRefUpdate(fileProps, oldDbFile, elt, CONST_SCAN_TYPE_DUPLICATE));
+            await dispatch(scanRefUpdate(newFileProps, oldDbFile, elt, CONST_SCAN_TYPE_DUPLICATE));
           })
         );
       }
     } else {
       if (occurences.length > 1) {
         console.error(occurences);
-        throw Error(`Multiple occurences from hash ${fileProps.hash}!!`);
+        throw Error(`Multiple occurences from hash ${newFileProps.hash}!!`);
       }
       const inDb = occurences[0];
-      fileProps.setDbMatches(inDb);
-      const compared: Map<string, Array<string | number | Date>> = fileProps.compareSameHash(inDb);
+      newFileProps.setDbMatches(inDb);
+      const compared: Map<string, Array<string | number | Date>> = newFileProps.compareSameHash(
+        inDb
+      );
       if (compared.size > 0) {
-        fileProps.setCompareType(CONST_SCAN_TYPE_MODIFIED);
-        await dispatch(scanModifiedAdd(fileProps, compared));
-        await dispatch(scanRefUpdate(fileProps, oldDbFile, inDb, CONST_SCAN_TYPE_MODIFIED));
+        newFileProps.setCompareType(CONST_SCAN_TYPE_MODIFIED);
+        await dispatch(scanModifiedAdd(newFileProps, compared));
+        await dispatch(scanRefUpdate(newFileProps, oldDbFile, inDb, CONST_SCAN_TYPE_MODIFIED));
       } else {
-        fileProps.setCompareType(CONST_SCAN_TYPE_IDENTICAL);
-        await dispatch(scanExistsAdd(fileProps));
-        await dispatch(scanRefUpdate(fileProps, oldDbFile, inDb, CONST_SCAN_TYPE_IDENTICAL));
+        newFileProps.setCompareType(CONST_SCAN_TYPE_IDENTICAL);
+        await dispatch(scanExistsAdd(newFileProps));
+        await dispatch(scanRefUpdate(newFileProps, oldDbFile, inDb, CONST_SCAN_TYPE_IDENTICAL));
       }
     }
   };

@@ -143,50 +143,50 @@ class ResultContainer extends Component<Props> {
     const dbRefInstance = this.props.dbFilesRef.get(dbFile.id);
     const oldDbMap = new Map();
     if (dbRefInstance) {
-      nbFilesToRescan += dbRefInstance.files.size;
+      nbFilesToRescan += dbRefInstance.filesMatching.size;
       const promises = [];
-      dbRefInstance.files.forEach((val, key) => {
+      dbRefInstance.filesMatching.forEach(fileProps => {
         this.props.scanProgress('LISTING', counter / nbFilesToRescan);
         counter += 1;
-        switch (val) {
+        switch (fileProps.scanType) {
           case ScanActions.CONST_SCAN_TYPE_DUPLICATE:
             // Do nothing, will be managed in the next step...
-            oldDbMap.set(key, dbFile);
+            oldDbMap.set(fileProps, dbFile);
             break;
           case ScanActions.CONST_SCAN_TYPE_IDENTICAL:
-            filesToRescan.push(key);
-            oldDbMap.set(key, dbFile);
-            promises.push(this.props.scanExistsRemove(key));
+            filesToRescan.push(fileProps);
+            oldDbMap.set(fileProps, dbFile);
+            promises.push(this.props.scanExistsRemove(fileProps));
             break;
           case ScanActions.CONST_SCAN_TYPE_MODIFIED:
-            filesToRescan.push(key);
-            oldDbMap.set(key, dbFile);
-            promises.push(this.props.scanModifiedRemove(key));
+            filesToRescan.push(fileProps);
+            oldDbMap.set(fileProps, dbFile);
+            promises.push(this.props.scanModifiedRemove(fileProps));
             break;
           default:
-            console.warn('Unexpected type!! Skip the error...', val, key);
+            console.warn('Unexpected type!! Skip the error...', fileProps.scanType, fileProps);
         }
       });
       await Promise.all(promises);
       // /* eslint-disable no-restricted-syntax */
       // /* eslint-disable no-await-in-loop */
-      // for (const [ key, val ] of dbRefInstance.files) {
+      // for (const [ filePropsRelPath, fileProps ] of dbRefInstance.filesMatching) {
       //   this.props.scanProgress('LISTING', counter / nbFilesToRescan);
       //   counter += 1;
-      //   switch (val) {
+      //   switch (fileProps.scanType) {
       //     case ScanActions.CONST_SCAN_TYPE_DUPLICATE:
       //       // Do nothing, will be managed in the next step...
       //       break;
       //     case ScanActions.CONST_SCAN_TYPE_IDENTICAL:
-      //       filesToRescan.push(key);
-      //       await this.props.scanExistsRemove(key);
+      //       filesToRescan.push(fileProps);
+      //       await this.props.scanExistsRemove(fileProps);
       //       break;
       //     case ScanActions.CONST_SCAN_TYPE_MODIFIED:
-      //       filesToRescan.push(key);
-      //       await this.props.scanModifiedRemove(key);
+      //       filesToRescan.push(fileProps);
+      //       await this.props.scanModifiedRemove(fileProps);
       //       break;
       //     default:
-      //       console.warn('Unexpected type!! Skip the error...', val, key);
+      //       console.warn('Unexpected type!! Skip the error...', fileProps.scanType, fileProps);
       //   }
       // }
       // /* eslint-enable no-await-in-loop */

@@ -37,46 +37,46 @@ export default class ResultTabReferencesView extends Component<Props> {
     const rows = [];
     let counter = 0;
     let i = 0;
-    const addMatchRow = dbFile => (scanType, file) => {
+    const addMatchRow = dbFile => fileProps => {
       counter += 1;
-      const label = scanType === CONST_SCAN_TYPE_DUPLICATE ? 'Possible match' : 'Match';
+      const label = fileProps.scanType === CONST_SCAN_TYPE_DUPLICATE ? 'Possible match' : 'Match';
       rows.push(
-        <Table.Row key={`file_${dbFile.relpath}_${file.relpath}`}>
+        <Table.Row key={`file_${dbFile.relpath}_${fileProps.relpath}`}>
           <Table.Cell textAlign="center">
             <Button
               icon="external"
               onClick={() => {
-                this.props.openFolderFor(file);
+                this.props.openFolderFor(fileProps);
               }}
             />
             {label} {counter}
           </Table.Cell>
-          <Table.Cell textAlign="center">{printValue(file, 'size')}</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(file, 'modified')}</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(file, 'relpath')}</Table.Cell>
+          <Table.Cell textAlign="center">{printValue(fileProps, 'size')}</Table.Cell>
+          <Table.Cell textAlign="center">{printValue(fileProps, 'modified')}</Table.Cell>
+          <Table.Cell textAlign="center">{printValue(fileProps, 'relpath')}</Table.Cell>
           <Table.Cell textAlign="center">
             <Button
               icon="trash"
               onClick={() => {
-                this.props.removeFile(file);
+                this.props.removeFile(fileProps);
               }}
             />
-            {scanType}
+            {fileProps.scanType}
           </Table.Cell>
         </Table.Row>
       );
     };
     for (; i < this.props.files.length; i += 1) {
-      const { dbFile, files } = this.props.files[i];
+      const { dbFile, filesMatching } = this.props.files[i];
 
       const filesView = [];
-      files.forEach((scanType, file) => {
-        filesView.push(file);
+      filesMatching.forEach(fileProps => {
+        filesView.push(fileProps);
       });
 
       rows.push(
         <Table.Row key={`db_${dbFile.relpath}`}>
-          <Table.Cell textAlign="center" rowSpan={files.size + 1}>
+          <Table.Cell textAlign="center" rowSpan={filesMatching.size + 1}>
             <Button icon="search" onClick={this.show(filesView, dbFile)} />
             {dbFile.name}
           </Table.Cell>
@@ -97,7 +97,7 @@ export default class ResultTabReferencesView extends Component<Props> {
       );
 
       counter = 0;
-      files.forEach(addMatchRow(dbFile));
+      filesMatching.forEach(addMatchRow(dbFile));
     }
     return rows;
   }
