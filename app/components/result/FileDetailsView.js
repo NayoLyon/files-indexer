@@ -34,8 +34,12 @@ export default class FileDetailsView extends Component<Props> {
   }
   computePreview() {
     const mimeType = lookup(this.getProp('path'));
+    const adjustStyle = {
+      objectFit: 'contain',
+      maxHeight: '50vh'
+    };
     if (mimeType.match('^image/')) {
-      return <Image size="huge" src={this.getProp('path')} />;
+      return <Image style={adjustStyle} size="huge" src={this.getProp('path')} />;
     }
     return (
       <Card.Header style={FileDetailsView.inlineStyles.genericHeaderStyles}>{mimeType}</Card.Header>
