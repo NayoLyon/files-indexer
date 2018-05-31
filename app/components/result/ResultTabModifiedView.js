@@ -89,23 +89,26 @@ export default class ResultTabModifiedView extends Component<Props> {
     );
     return headers;
   }
-  customRenderer(props) {
-    if (props.column.startsWith('db_')) {
-      const prop = props.column.substr('db_'.length);
-      return this.renderDbFile(props.row, prop);
-    } else if (props.column.startsWith('folder_')) {
-      const prop = props.column.substr('folder_'.length);
-      return this.renderFile(props.row, prop);
+  cellRenderer(props) {
+    const As = props.as;
+    const { row, column } = props;
+    const { key, ...columnAttributes } = column;
+    if (key.startsWith('db_')) {
+      const prop = key.substr('db_'.length);
+      return this.renderDbFile(As, row, prop, columnAttributes);
+    } else if (key.startsWith('folder_')) {
+      const prop = key.substr('folder_'.length);
+      return this.renderFile(As, row, prop, columnAttributes);
     }
     // Else, this is name...
-    return {
-      content: [
-        <Button icon="search" key="search" onClick={this.show(props.row.file)} />,
-        props.row.file.name
-      ]
-    };
+    return (
+      <As {...columnAttributes}>
+        <Button icon="search" key="search" onClick={this.show(row.file)} />
+        {row.file.name}
+      </As>
+    );
   }
-  renderDbFile(row, prop) {
+  renderDbFile(As, row, prop, columnAttributes) {
     const { file, diff } = row;
     const dbFile = file.dbFiles[0];
     const curDiff = diff.get(prop);
@@ -120,11 +123,16 @@ export default class ResultTabModifiedView extends Component<Props> {
             }}
           />
         ) : null;
-      return { content: [actionsDb, printValue(dbFile, prop)] };
+      return (
+        <As {...columnAttributes}>
+          {actionsDb}
+          {printValue(dbFile, prop)}
+        </As>
+      );
     }
-    return { colSpan: 2 };
+    return <As {...columnAttributes} colSpan={2} />;
   }
-  renderFile(row, prop) {
+  renderFile(As, row, prop, columnAttributes) {
     const { file, diff } = row;
     const dbFile = file.dbFiles[0];
     const curDiff = diff.get(prop);
@@ -171,7 +179,12 @@ export default class ResultTabModifiedView extends Component<Props> {
           />
         );
       }
-      return { content: [actionsFolder, printValue(file, prop)] };
+      return (
+        <As {...columnAttributes}>
+          {actionsFolder}
+          {printValue(file, prop)}
+        </As>
+      );
     }
     return null;
   }
@@ -195,7 +208,7 @@ export default class ResultTabModifiedView extends Component<Props> {
           data={this.props.files}
           headers={headers}
           rowKey="file.relpath"
-          customRenderer={this.customRenderer.bind(this)}
+          cellRenderer={this.cellRenderer.bind(this)}
           className={styles.scrollableTable}
         />
       </Tab.Pane>

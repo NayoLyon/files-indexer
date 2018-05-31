@@ -18,7 +18,8 @@ export type HeaderRowType = Array<{
 export type HeaderType = HeaderRowType | Array<HeaderRowType>;
 
 type Props = {
-  customRenderer: ({ row: *, column: string }) => *,
+  cellRenderer: React.Component | ((*) => *),
+  rowRenderer: React.Component | ((*) => *),
   headers: HeaderType,
   data: Array<>,
   rowKey: string
@@ -70,43 +71,39 @@ export default class TableView extends Component<Props> {
 
     return { tableHeader, columns };
   }
-  static renderRows(data, columns, rowKey, customRenderer) {
-    const rows = [];
-    data.forEach(row => {
-      rows.push(
-        <Table.Row key={TableView.getKeyFromRow(row, rowKey)}>
-          {columns.reduce((cells, col) => {
-            const render = customRenderer({ row, column: col.prop.key });
-            if (render) {
-              const { content, ...attributes } = render;
-              cells.push(
-                <Table.Cell {...col.prop} {...attributes}>
-                  {content}
-                </Table.Cell>
-              );
-            }
-            return cells;
-          }, [])}
-        </Table.Row>
-      );
-    });
-    return rows;
+  static renderRows(data, columns, valueGetter, CellRenderer, RowRenderer) {
+    return data.map(row => (
+      <RowRenderer
+        as={Table.Row}
+        key={valueGetter(row)}
+        columns={columns}
+        row={row}
+        cellRenderer={CellRenderer}
+      />
+    ));
   }
-  static getKeyFromRow(row, rowKey) {
-    const firstPartIndex = rowKey.indexOf('.');
-    if (firstPartIndex < 0) {
-      return row[rowKey];
+  static computeValueGetter(rowKey) {
+    const keyParts = rowKey.split('.');
+    if (keyParts.length === 1) {
+      const prop = keyParts[0];
+      return row => row[prop];
     }
-    const firstPart = rowKey.substr(0, firstPartIndex);
-    return TableView.getKeyFromRow(row[firstPart], rowKey.substr(firstPartIndex + 1));
+    return row =>
+      keyParts.reduce(
+        (obj, prop) => (!obj || typeof obj[prop] === 'undefined' ? null : obj[prop]),
+        row
+      );
   }
   render() {
-    const { headers, customRenderer, data, rowKey, ...rest } = this.props;
+    const { headers, cellRenderer, rowRenderer, data, rowKey, ...rest } = this.props;
     const { tableHeader, columns } = TableView.renderHeader(headers);
+    const valueGetter = TableView.computeValueGetter(rowKey);
     return (
       <Table celled structured {...rest}>
         <Table.Header>{tableHeader}</Table.Header>
-        <Table.Body>{TableView.renderRows(data, columns, rowKey, customRenderer)}</Table.Body>
+        <Table.Body>
+          {TableView.renderRows(data, columns, valueGetter, cellRenderer, rowRenderer)}
+        </Table.Body>
       </Table>
     );
   }
