@@ -5,7 +5,6 @@ import { Tab, Button } from 'semantic-ui-react';
 import { FileProps, FilePropsDb } from '../../api/filesystem';
 
 import CompareDialogView from './CompareDialogView';
-import styles from './Scrollables.css';
 import { printValue } from '../../utils/format';
 import TableContainer from '../table/TableContainer';
 
@@ -67,22 +66,29 @@ export default class ResultTabModifiedView extends Component<Props> {
             key: 'header_main',
             label: 'Name',
             colProps: { key: 'name', textAlign: 'center' },
-            rowSpan: 2
+            rowSpan: 2,
+            sortStyle: 'alphabet',
+            sortKey: 'file.name'
           }
         ]
       )
     );
     headers.push(
       columnsName.reduce((res, elt) => {
+        const sortStyle = elt === 'modified' ? '' : 'alphabet';
         res.push({
           key: `db_${elt}`,
           label: 'In DB',
-          colProps: { key: `db_${elt}`, textAlign: 'left', verticalAlign: 'middle' }
+          colProps: { key: `db_${elt}`, textAlign: 'left', verticalAlign: 'middle' },
+          sortStyle,
+          sortKey: `file.dbFiles[0].${elt}`
         });
         res.push({
           key: `folder_${elt}`,
           label: 'In folder',
-          colProps: { key: `folder_${elt}`, textAlign: 'left' }
+          colProps: { key: `folder_${elt}`, textAlign: 'left' },
+          sortStyle,
+          sortKey: `file.${elt}`
         });
         return res;
       }, [])
@@ -209,7 +215,8 @@ export default class ResultTabModifiedView extends Component<Props> {
           headers={headers}
           rowKey="file.relpath"
           cellRenderer={this.cellRenderer.bind(this)}
-          className={styles.scrollableTable}
+          defaultSortKey='file.name'
+          defaultPageSize={5}
         />
       </Tab.Pane>
     );
