@@ -1,6 +1,8 @@
 // @flow
 import React, { Component } from 'react';
-import { Table } from 'semantic-ui-react';
+import { Table, Icon } from 'semantic-ui-react';
+
+import { computeValueGetter } from '../../utils/arraySort';
 
 export type HeaderRowType = Array<{
   key: string,
@@ -13,7 +15,9 @@ export type HeaderRowType = Array<{
   textAlign?: string,
   verticalAlign?: string,
   rowSpan?: number,
-  colSpan?: number
+  colSpan?: number,
+  sortStyle?: string,
+  sortKey?: string
 }>;
 export type HeaderType = HeaderRowType | Array<HeaderRowType>;
 
@@ -22,18 +26,54 @@ type Props = {
   rowRenderer: React.Component | ((*) => *),
   headers: HeaderType,
   data: Array<>,
-  rowKey: string
+  rowKey: string,
+  sortKey: string,
+  sortAscending: boolean,
+  onSort: string => void
 };
 
 export default class TableView extends Component<Props> {
   props: Props;
 
+  static getSort(sortStyle, sortKey, propsSort) {
+    let sortIconName = 'alphabet ';
+    if (typeof sortStyle !== 'undefined') {
+      if (sortStyle.length > 0) {
+        sortIconName = `${sortStyle} `;
+      } else {
+        sortIconName = '';
+      }
+    }
+
+    if (propsSort.sortKey !== sortKey || propsSort.sortAscending) {
+      sortIconName = `${sortIconName}ascending`;
+    } else {
+      sortIconName = `${sortIconName}descending`;
+    }
+
+    let sortRender = null;
+    let sortClick = null;
+
+    if (sortKey) {
+      sortRender = (
+        <Icon
+          name={`sort ${sortIconName}`}
+          disabled={propsSort.sortKey !== sortKey}
+          style={{ marginLeft: '0.5rem' }}
+        />
+      );
+      sortClick = () => propsSort.onSort(sortKey);
+    }
+    return { sortRender, sortClick };
+  }
   /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["columns"] }] */
-  static renderHeaderRow(headerRow, key, columns) {
+  static renderHeaderRow(headerRow, key, columns, propsSort) {
     const cells = [];
     let columnIndex = 0;
     headerRow.forEach(header => {
-      const { label, colProps, ...attributes } = header;
+      const { label, colProps, sortStyle, sortKey, ...attributes } = header;
+      const { sortRender, sortClick } = TableView.getSort(sortStyle, sortKey, propsSort);
+
       while (columns[columnIndex] && columns[columnIndex].rowSpan) {
         columns[columnIndex].rowSpan -= 1;
         columnIndex += 1;
@@ -53,20 +93,25 @@ export default class TableView extends Component<Props> {
           columnIndex += 1;
         }
       }
-      cells.push(<Table.HeaderCell {...attributes}>{label}</Table.HeaderCell>);
+      cells.push(
+        <Table.HeaderCell {...attributes} onClick={sortClick}>
+          {label}
+          {sortRender}
+        </Table.HeaderCell>
+      );
     });
     return <Table.Row key={`row_${key}`}>{cells}</Table.Row>;
   }
-  static renderHeader(headers) {
+  static renderHeader(headers, propsSort) {
     const tableHeader = [];
     const columns = [];
 
     if (headers[0] instanceof Array) {
       headers.forEach((headerRow, index) => {
-        tableHeader.push(TableView.renderHeaderRow(headerRow, index, columns));
+        tableHeader.push(TableView.renderHeaderRow(headerRow, index, columns, propsSort));
       });
     } else {
-      tableHeader.push(TableView.renderHeaderRow(headers, 0, columns));
+      tableHeader.push(TableView.renderHeaderRow(headers, 0, columns, propsSort));
     }
 
     return { tableHeader, columns };
@@ -82,22 +127,25 @@ export default class TableView extends Component<Props> {
       />
     ));
   }
-  static computeValueGetter(rowKey) {
-    const keyParts = rowKey.split('.');
-    if (keyParts.length === 1) {
-      const prop = keyParts[0];
-      return row => row[prop];
-    }
-    return row =>
-      keyParts.reduce(
-        (obj, prop) => (!obj || typeof obj[prop] === 'undefined' ? null : obj[prop]),
-        row
-      );
-  }
+
   render() {
-    const { headers, cellRenderer, rowRenderer, data, rowKey, ...rest } = this.props;
-    const { tableHeader, columns } = TableView.renderHeader(headers);
-    const valueGetter = TableView.computeValueGetter(rowKey);
+    const {
+      headers,
+      rowKey,
+      rowRenderer,
+      cellRenderer,
+      data,
+      sortKey,
+      sortAscending,
+      onSort,
+      ...rest
+    } = this.props;
+    const { tableHeader, columns } = TableView.renderHeader(headers, {
+      sortKey,
+      sortAscending,
+      onSort
+    });
+    const valueGetter = computeValueGetter(rowKey);
     return (
       <Table celled structured {...rest}>
         <Table.Header>{tableHeader}</Table.Header>
