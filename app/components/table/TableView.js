@@ -66,29 +66,29 @@ export default class TableView extends Component<Props> {
     }
     return { sortRender, sortClick };
   }
-  /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["columns"] }] */
-  static renderHeaderRow(headerRow, key, columns, propsSort) {
+  /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["howToRenderRows"] }] */
+  static renderHeaderRow(headerRow, key, howToRenderRows, propsSort) {
     const cells = [];
     let columnIndex = 0;
     headerRow.forEach(header => {
       const { label, colProps, sortStyle, sortKey, ...attributes } = header;
       const { sortRender, sortClick } = TableView.getSort(sortStyle, sortKey, propsSort);
 
-      while (columns[columnIndex] && columns[columnIndex].rowSpan) {
-        columns[columnIndex].rowSpan -= 1;
+      while (howToRenderRows[columnIndex] && howToRenderRows[columnIndex].rowSpan) {
+        howToRenderRows[columnIndex].rowSpan -= 1;
         columnIndex += 1;
       }
-      if (columns.length <= columnIndex) {
-        columns.push({ prop: null, rowSpan: attributes.rowSpan ? attributes.rowSpan - 1 : 0 });
+      if (howToRenderRows.length <= columnIndex) {
+        howToRenderRows.push({ prop: null, rowSpan: attributes.rowSpan ? attributes.rowSpan - 1 : 0 });
       }
       if (colProps) {
-        columns[columnIndex].prop = colProps;
+        howToRenderRows[columnIndex].prop = colProps;
       }
       columnIndex += 1;
       if (attributes.colSpan) {
         for (let i = 1; i < attributes.colSpan; i += 1) {
-          if (columns.length <= columnIndex) {
-            columns.push({ prop: null, rowSpan: attributes.rowSpan ? attributes.rowSpan - 1 : 0 });
+          if (howToRenderRows.length <= columnIndex) {
+            howToRenderRows.push({ prop: null, rowSpan: attributes.rowSpan ? attributes.rowSpan - 1 : 0 });
           }
           columnIndex += 1;
         }
@@ -104,24 +104,24 @@ export default class TableView extends Component<Props> {
   }
   static renderHeader(headers, propsSort) {
     const tableHeader = [];
-    const columns = [];
+    const howToRenderRows = [];
 
     if (headers[0] instanceof Array) {
       headers.forEach((headerRow, index) => {
-        tableHeader.push(TableView.renderHeaderRow(headerRow, index, columns, propsSort));
+        tableHeader.push(TableView.renderHeaderRow(headerRow, index, howToRenderRows, propsSort));
       });
     } else {
-      tableHeader.push(TableView.renderHeaderRow(headers, 0, columns, propsSort));
+      tableHeader.push(TableView.renderHeaderRow(headers, 0, howToRenderRows, propsSort));
     }
 
-    return { tableHeader, columns };
+    return { tableHeader, howToRenderRows };
   }
-  static renderRows(data, columns, valueGetter, CellRenderer, RowRenderer) {
+  static renderRows(data, howToRenderRows, valueGetter, CellRenderer, RowRenderer) {
     return data.map(row => (
       <RowRenderer
         as={Table.Row}
         key={valueGetter(row)}
-        columns={columns}
+        columns={howToRenderRows}
         row={row}
         cellRenderer={CellRenderer}
       />
@@ -140,7 +140,7 @@ export default class TableView extends Component<Props> {
       onSort,
       ...rest
     } = this.props;
-    const { tableHeader, columns } = TableView.renderHeader(headers, {
+    const { tableHeader, howToRenderRows } = TableView.renderHeader(headers, {
       sortKey,
       sortAscending,
       onSort
@@ -150,7 +150,7 @@ export default class TableView extends Component<Props> {
       <Table celled structured {...rest}>
         <Table.Header>{tableHeader}</Table.Header>
         <Table.Body>
-          {TableView.renderRows(data, columns, valueGetter, cellRenderer, rowRenderer)}
+          {TableView.renderRows(data, howToRenderRows, valueGetter, cellRenderer, rowRenderer)}
         </Table.Body>
       </Table>
     );
