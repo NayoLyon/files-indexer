@@ -13,8 +13,8 @@ type Props = {
   close: () => void,
   open: boolean,
   dbFilesFirst: boolean | void,
-  files: Array<FileProps | null> | FileProps | null,
-  dbFiles: Array<FilePropsDb | null> | FilePropsDb | null
+  files: Array<FileProps> | FileProps | void,
+  dbFiles: Array<FilePropsDb> | FilePropsDb | void
 };
 
 export default class CompareDialogView extends Component<Props> {

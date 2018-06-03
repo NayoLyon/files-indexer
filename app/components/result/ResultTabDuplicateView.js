@@ -21,7 +21,7 @@ export default class ResultTabDuplicateView extends Component<Props> {
     this.renderFiles = this.renderFiles.bind(this);
     this.close = this.close.bind(this);
     this.show = this.show.bind(this);
-    this.state = { open: false, file: null, dbFiles: null };
+    this.state = { open: false, file: undefined, dbFiles: undefined };
   }
 
   close() {

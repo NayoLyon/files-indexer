@@ -28,7 +28,7 @@ export default class ResultTabModifiedView extends Component<Props> {
     this.show = this.show.bind(this);
     this.renderDbFile = this.renderDbFile.bind(this);
     this.renderFile = this.renderFile.bind(this);
-    this.state = { open: false, file: null, dbFile: null };
+    this.state = { open: false, file: undefined, dbFile: undefined };
   }
 
   close() {

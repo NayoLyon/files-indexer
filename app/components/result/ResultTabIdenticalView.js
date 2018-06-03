@@ -22,7 +22,7 @@ export default class ResultTabIdenticalView extends Component<Props> {
     this.renderFiles = this.renderFiles.bind(this);
     this.close = this.close.bind(this);
     this.show = this.show.bind(this);
-    this.state = { open: false, file: null, dbFile: null };
+    this.state = { open: false, file: undefined, dbFile: undefined };
   }
 
   close() {

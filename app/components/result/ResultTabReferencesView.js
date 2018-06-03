@@ -73,7 +73,7 @@ export default class ResultTabReferencesView extends Component<Props> {
     this.matchRowRenderer = this.matchRowRenderer.bind(this);
     this.close = this.close.bind(this);
     this.show = this.show.bind(this);
-    this.state = { open: false, files: null, dbFile: null };
+    this.state = { open: false, files: undefined, dbFile: undefined };
   }
 
   close() {
