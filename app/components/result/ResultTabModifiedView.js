@@ -22,6 +22,22 @@ type Props = {
 
 export default class ResultTabModifiedView extends Component<Props> {
   props: Props;
+  static filterNameDiffer(file) {
+    return file.diff.get('name');
+  }
+  static filterModifiedLess(file) {
+    return (
+      file.diff.get('modified') &&
+      file.file.modified.getTime() < file.file.dbFiles[0].modified.getTime()
+    );
+  }
+  static filterModifiedGreater(file) {
+    return (
+      file.diff.get('modified') &&
+      file.file.modified.getTime() > file.file.dbFiles[0].modified.getTime()
+    );
+  }
+
   constructor(props) {
     super(props);
     this.close = this.close.bind(this);
@@ -196,6 +212,29 @@ export default class ResultTabModifiedView extends Component<Props> {
   }
   render() {
     const headers = this.computeHeader();
+    const filters = [
+      {
+        label: 'Name differs',
+        color: 'grey',
+        property: 'filterName',
+        value: 'diff',
+        filterFunc: ResultTabModifiedView.filterNameDiffer
+      },
+      {
+        label: 'Modified less',
+        color: 'green',
+        property: 'filterModified',
+        value: 'less',
+        filterFunc: ResultTabModifiedView.filterModifiedLess
+      },
+      {
+        label: 'Modified greater',
+        color: 'orange',
+        property: 'filterModified',
+        value: 'greater',
+        filterFunc: ResultTabModifiedView.filterModifiedGreater
+      }
+    ];
     return (
       <Tab.Pane key="scan_result_modified" style={{ height: 'calc(100% - 3.5rem)' }}>
         <CompareDialogView
@@ -214,6 +253,7 @@ export default class ResultTabModifiedView extends Component<Props> {
           cellRenderer={this.cellRenderer.bind(this)}
           defaultSortKey="file.name"
           defaultPageSize={5}
+          filters={filters}
         />
       </Tab.Pane>
     );
