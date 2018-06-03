@@ -80,7 +80,18 @@ function computeType(dataList, valueGetter) {
 }
 
 export function computeValueGetter(rowKey) {
-  const keyParts = rowKey.split('.');
+  const keyParts = rowKey.split('.').reduce((list, keyPart) => {
+    const matches = keyPart.match(/^(.*)\[(\d+)\]$/);
+    if (matches) {
+      const matchedProp = matches[1];
+      const index = parseInt(matches[2], 10);
+      // Prop is in the form 'prop[index]', where index is an integer.
+      list.push(matchedProp, index);
+    } else {
+      list.push(keyPart);
+    }
+    return list;
+  }, []);
   if (keyParts.length === 1) {
     const prop = keyParts[0];
     return row => row[prop];
