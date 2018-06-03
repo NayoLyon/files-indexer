@@ -153,10 +153,7 @@ export default class ResultTabReferencesView extends Component<Props> {
   render() {
     const headers = ResultTabReferencesView.computeHeader();
     return (
-      <Tab.Pane
-        key="scan_result_references"
-        style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}
-      >
+      <Tab.Pane key="scan_result_references" style={{ height: 'calc(100% - 3.5rem)' }}>
         <CompareDialogView
           open={this.state.open}
           close={this.close}
@@ -172,7 +169,7 @@ export default class ResultTabReferencesView extends Component<Props> {
           headers={headers}
           rowKey="dbFile.relpath"
           rowRenderer={this.rowRenderer}
-          defaultSortKey='dbFile.name'
+          defaultSortKey="dbFile.name"
           defaultPageSize={4}
           pageSizeList={[1, 2, 3, 4, 5, 10, 20]}
         />

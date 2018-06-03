@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { Table, Icon, Pagination, Dropdown } from 'semantic-ui-react';
+import { Table, Icon, Pagination, Dropdown, Container, Button } from 'semantic-ui-react';
 
 import { computeValueGetter } from '../../utils/arraySort';
 
@@ -20,6 +20,14 @@ export type HeaderRowType = Array<{
   sortKey?: string
 }>;
 export type HeaderType = HeaderRowType | Array<HeaderRowType>;
+export type FilterType = {
+  label: string,
+  color: string,
+  property: string,
+  value: string,
+  filterFunc: (*) => boolean,
+  isActive?: boolean
+};
 
 type Props = {
   cellRenderer: React.Component | ((*) => *),
@@ -30,6 +38,9 @@ type Props = {
   sortKey: string,
   sortAscending: boolean,
   onSort: string => void,
+  filters: Array<FilterType>,
+  filtersState: *,
+  toggleFilter: FilterType => void,
   page: number,
   pageSize: number,
   onPageChange: number => void,
@@ -139,6 +150,19 @@ export default class TableView extends Component<Props> {
       />
     ));
   }
+  static renderFiltersButton(filters, filtersState, toggleFilter) {
+    return filters.map(filter => (
+      <Button
+        key={`${filter.property}_${filter.value}`}
+        toggle
+        color={filter.color}
+        style={filtersState[filter.property] === filter.value ? { color: '#BBBBBB' } : {}}
+        onClick={() => toggleFilter(filter)}
+      >
+        {filter.label}
+      </Button>
+    ));
+  }
 
   render() {
     const {
@@ -156,6 +180,9 @@ export default class TableView extends Component<Props> {
       tableSize,
       onPageSizeChange,
       pageSizes,
+      filters,
+      filtersState,
+      toggleFilter,
       ...rest
     } = this.props;
     const { tableHeader, howToRenderRows } = TableView.renderHeader(headers, {
@@ -164,13 +191,15 @@ export default class TableView extends Component<Props> {
       onSort
     });
     const valueGetter = computeValueGetter(rowKey);
+    let headerSize = 0
     let pagination = null;
     if (pageSize > 0) {
+      headerSize += 3.5;
       const totalPages = Math.ceil(tableSize / pageSize);
       pagination = (
         <React.Fragment>
           <Pagination
-            defaultActivePage={page}
+            activePage={page}
             ellipsisItem={{ content: <Icon name="ellipsis horizontal" />, icon: true }}
             firstItem={{ content: <Icon name="angle double left" />, icon: true }}
             lastItem={{ content: <Icon name="angle double right" />, icon: true }}
@@ -190,15 +219,37 @@ export default class TableView extends Component<Props> {
         </React.Fragment>
       );
     }
+    let filterContainer = null;
+    if (this.props.filters.length) {
+      headerSize += 3.5;
+      filterContainer = (
+        <Container textAlign="center" style={{ height: '3rem' }}>
+          {TableView.renderFiltersButton(filters, filtersState, toggleFilter)}
+        </Container>
+      );
+    }
     return (
       <React.Fragment>
+        {filterContainer}
         {pagination}
-        <Table celled structured {...rest}>
-          <Table.Header>{tableHeader}</Table.Header>
-          <Table.Body>
-            {TableView.renderRows(data, howToRenderRows, valueGetter, cellRenderer, rowRenderer)}
-          </Table.Body>
-        </Table>
+        <div
+          style={{
+            overflowY: 'auto',
+            width: '100%',
+            height: `calc(100% - ${headerSize}rem)`,
+            padding: '1rem',
+            position: 'absolute',
+            bottom: 0,
+            left: 0
+          }}
+        >
+          <Table celled structured {...rest}>
+            <Table.Header>{tableHeader}</Table.Header>
+            <Table.Body>
+              {TableView.renderRows(data, howToRenderRows, valueGetter, cellRenderer, rowRenderer)}
+            </Table.Body>
+          </Table>
+        </div>
       </React.Fragment>
     );
   }

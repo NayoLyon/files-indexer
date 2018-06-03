@@ -197,10 +197,7 @@ export default class ResultTabModifiedView extends Component<Props> {
   render() {
     const headers = this.computeHeader();
     return (
-      <Tab.Pane
-        key="scan_result_modified"
-        style={{ overflowY: 'auto', height: 'calc(100% - 3.5rem)' }}
-      >
+      <Tab.Pane key="scan_result_modified" style={{ height: 'calc(100% - 3.5rem)' }}>
         <CompareDialogView
           open={this.state.open}
           close={this.close}
@@ -215,7 +212,7 @@ export default class ResultTabModifiedView extends Component<Props> {
           headers={headers}
           rowKey="file.relpath"
           cellRenderer={this.cellRenderer.bind(this)}
-          defaultSortKey='file.name'
+          defaultSortKey="file.name"
           defaultPageSize={5}
         />
       </Tab.Pane>
