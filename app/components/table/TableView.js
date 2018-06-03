@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { Table, Icon } from 'semantic-ui-react';
+import { Table, Icon, Pagination, Dropdown } from 'semantic-ui-react';
 
 import { computeValueGetter } from '../../utils/arraySort';
 
@@ -29,7 +29,13 @@ type Props = {
   rowKey: string,
   sortKey: string,
   sortAscending: boolean,
-  onSort: string => void
+  onSort: string => void,
+  page: number,
+  pageSize: number,
+  onPageChange: number => void,
+  onPageSizeChange: number => void,
+  tableSize: number,
+  pageSizes: Array<{ text: string, value: number }>
 };
 
 export default class TableView extends Component<Props> {
@@ -79,7 +85,10 @@ export default class TableView extends Component<Props> {
         columnIndex += 1;
       }
       if (howToRenderRows.length <= columnIndex) {
-        howToRenderRows.push({ prop: null, rowSpan: attributes.rowSpan ? attributes.rowSpan - 1 : 0 });
+        howToRenderRows.push({
+          prop: null,
+          rowSpan: attributes.rowSpan ? attributes.rowSpan - 1 : 0
+        });
       }
       if (colProps) {
         howToRenderRows[columnIndex].prop = colProps;
@@ -88,7 +97,10 @@ export default class TableView extends Component<Props> {
       if (attributes.colSpan) {
         for (let i = 1; i < attributes.colSpan; i += 1) {
           if (howToRenderRows.length <= columnIndex) {
-            howToRenderRows.push({ prop: null, rowSpan: attributes.rowSpan ? attributes.rowSpan - 1 : 0 });
+            howToRenderRows.push({
+              prop: null,
+              rowSpan: attributes.rowSpan ? attributes.rowSpan - 1 : 0
+            });
           }
           columnIndex += 1;
         }
@@ -138,6 +150,12 @@ export default class TableView extends Component<Props> {
       sortKey,
       sortAscending,
       onSort,
+      page,
+      pageSize,
+      onPageChange,
+      tableSize,
+      onPageSizeChange,
+      pageSizes,
       ...rest
     } = this.props;
     const { tableHeader, howToRenderRows } = TableView.renderHeader(headers, {
@@ -146,13 +164,42 @@ export default class TableView extends Component<Props> {
       onSort
     });
     const valueGetter = computeValueGetter(rowKey);
+    let pagination = null;
+    if (pageSize > 0) {
+      const totalPages = Math.ceil(tableSize / pageSize);
+      pagination = (
+        <React.Fragment>
+          <Pagination
+            defaultActivePage={page}
+            ellipsisItem={{ content: <Icon name="ellipsis horizontal" />, icon: true }}
+            firstItem={{ content: <Icon name="angle double left" />, icon: true }}
+            lastItem={{ content: <Icon name="angle double right" />, icon: true }}
+            prevItem={{ content: <Icon name="angle left" />, icon: true }}
+            nextItem={{ content: <Icon name="angle right" />, icon: true }}
+            totalPages={totalPages}
+            onPageChange={(e, { activePage }) => onPageChange(activePage)}
+          />
+          <Dropdown
+            style={{ float: 'right' }}
+            compact
+            selection
+            value={pageSize}
+            options={pageSizes}
+            onChange={(e, target) => onPageSizeChange(target.value)}
+          />
+        </React.Fragment>
+      );
+    }
     return (
-      <Table celled structured {...rest}>
-        <Table.Header>{tableHeader}</Table.Header>
-        <Table.Body>
-          {TableView.renderRows(data, howToRenderRows, valueGetter, cellRenderer, rowRenderer)}
-        </Table.Body>
-      </Table>
+      <React.Fragment>
+        {pagination}
+        <Table celled structured {...rest}>
+          <Table.Header>{tableHeader}</Table.Header>
+          <Table.Body>
+            {TableView.renderRows(data, howToRenderRows, valueGetter, cellRenderer, rowRenderer)}
+          </Table.Body>
+        </Table>
+      </React.Fragment>
     );
   }
 }
