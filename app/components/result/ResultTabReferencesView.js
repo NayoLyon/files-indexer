@@ -7,6 +7,7 @@ import { CONST_SCAN_TYPE_DUPLICATE } from '../../modules/scan/scanAction';
 import { scanDbRef } from '../../modules/scan/scanReducer';
 import { printValue } from '../../utils/format';
 
+import TableContainer from '../table/TableContainer';
 import CompareDialogView from './CompareDialogView';
 
 type Props = {
@@ -18,9 +19,58 @@ type Props = {
 
 export default class ResultTabReferencesView extends Component<Props> {
   props: Props;
+  static computeHeader() {
+    const headers = [];
+    headers.push([
+      {
+        key: 'name',
+        label: 'Name',
+        colProps: { key: 'name' },
+        rowSpan: 2,
+        sortStyle: 'alphabet',
+        sortKey: 'dbFile.name'
+      },
+      {
+        key: 'origin',
+        label: 'Origin',
+        colProps: { key: 'origin' },
+        rowSpan: 2
+      },
+      {
+        key: 'matches',
+        label: 'Possible matches in DB',
+        colSpan: 4
+      }
+    ]);
+    headers.push([
+      {
+        key: 'size',
+        label: 'Size',
+        colProps: { key: 'size' }
+      },
+      {
+        key: 'modified',
+        label: 'Modified date',
+        colProps: { key: 'modified' }
+      },
+      {
+        key: 'relpath',
+        label: 'Relative path',
+        colProps: { key: 'relpath' }
+      },
+      {
+        key: 'scanType',
+        label: 'Ref type',
+        colProps: { key: 'scanType' }
+      }
+    ]);
+    return headers;
+  }
+
   constructor(props) {
     super(props);
-    this.renderFiles = this.renderFiles.bind(this);
+    this.rowRenderer = this.rowRenderer.bind(this);
+    this.matchRowRenderer = this.matchRowRenderer.bind(this);
     this.close = this.close.bind(this);
     this.show = this.show.bind(this);
     this.state = { open: false, files: null, dbFile: null };
@@ -33,11 +83,9 @@ export default class ResultTabReferencesView extends Component<Props> {
     return () => this.setState({ files, dbFile, open: true });
   }
 
-  renderFiles() {
-    const rows = [];
+  matchRowRenderer(dbFile, rows) {
     let counter = 0;
-    let i = 0;
-    const addMatchRow = dbFile => fileProps => {
+    return fileProps => {
       counter += 1;
       const label = fileProps.scanType === CONST_SCAN_TYPE_DUPLICATE ? 'Possible match' : 'Match';
       rows.push(
@@ -66,42 +114,44 @@ export default class ResultTabReferencesView extends Component<Props> {
         </Table.Row>
       );
     };
-    for (; i < this.props.files.length; i += 1) {
-      const { dbFile, filesMatching } = this.props.files[i];
+  }
+  rowRenderer(props) {
+    const As = props.as;
+    const { row } = props;
 
-      const filesView = [];
-      filesMatching.forEach(fileProps => {
-        filesView.push(fileProps);
-      });
+    const { dbFile, filesMatching } = row;
 
-      rows.push(
-        <Table.Row key={`db_${dbFile.relpath}`}>
-          <Table.Cell textAlign="center" rowSpan={filesMatching.size + 1}>
-            <Button icon="search" onClick={this.show(filesView, dbFile)} />
-            {dbFile.name}
-          </Table.Cell>
-          <Table.Cell textAlign="center">
-            <Button
-              icon="external"
-              onClick={() => {
-                this.props.openDbFolderFor(dbFile);
-              }}
-            />
-            In DB
-          </Table.Cell>
-          <Table.Cell textAlign="center">{printValue(dbFile, 'size')}</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(dbFile, 'modified')}</Table.Cell>
-          <Table.Cell textAlign="center">{printValue(dbFile, 'relpath')}</Table.Cell>
-          <Table.Cell textAlign="center" />
-        </Table.Row>
-      );
+    const filesView = [];
+    filesMatching.forEach(fileProps => {
+      filesView.push(fileProps);
+    });
 
-      counter = 0;
-      filesMatching.forEach(addMatchRow(dbFile));
-    }
+    const rows = [
+      <As key={`db_${dbFile.relpath}`}>
+        <Table.Cell textAlign="center" rowSpan={filesMatching.size + 1}>
+          <Button icon="search" onClick={this.show(filesView, dbFile)} />
+          {dbFile.name}
+        </Table.Cell>
+        <Table.Cell textAlign="center">
+          <Button
+            icon="external"
+            onClick={() => {
+              this.props.openDbFolderFor(dbFile);
+            }}
+          />
+          In DB
+        </Table.Cell>
+        <Table.Cell textAlign="center">{printValue(dbFile, 'size')}</Table.Cell>
+        <Table.Cell textAlign="center">{printValue(dbFile, 'modified')}</Table.Cell>
+        <Table.Cell textAlign="center">{printValue(dbFile, 'relpath')}</Table.Cell>
+        <Table.Cell textAlign="center" />
+      </As>
+    ];
+    filesMatching.forEach(this.matchRowRenderer(dbFile, rows));
     return rows;
   }
   render() {
+    const headers = ResultTabReferencesView.computeHeader();
     return (
       <Tab.Pane
         key="scan_result_references"
@@ -117,22 +167,15 @@ export default class ResultTabReferencesView extends Component<Props> {
           dbFiles={this.state.dbFile}
           dbFilesFirst
         />
-        <Table celled structured>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell rowSpan="2">Name</Table.HeaderCell>
-              <Table.HeaderCell rowSpan="2">Origin</Table.HeaderCell>
-              <Table.HeaderCell colSpan="4">Possible matches in DB</Table.HeaderCell>
-            </Table.Row>
-            <Table.Row>
-              <Table.HeaderCell>Size</Table.HeaderCell>
-              <Table.HeaderCell>Modified date</Table.HeaderCell>
-              <Table.HeaderCell>Relative path</Table.HeaderCell>
-              <Table.HeaderCell>Ref type</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>{this.renderFiles()}</Table.Body>
-        </Table>
+        <TableContainer
+          data={this.props.files}
+          headers={headers}
+          rowKey="dbFile.relpath"
+          rowRenderer={this.rowRenderer}
+          defaultSortKey='dbFile.name'
+          defaultPageSize={4}
+          pageSizeList={[1, 2, 3, 4, 5, 10, 20]}
+        />
       </Tab.Pane>
     );
   }
