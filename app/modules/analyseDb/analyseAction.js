@@ -14,14 +14,6 @@ export const ANALYSE_MISSING_REMOVE = 'ANALYSE_MISSING_REMOVE';
 export const ANALYSE_DUPLICATES_SET = 'ANALYSE_DUPLICATES_SET';
 export const ANALYSE_DUPLICATE_REMOVE = 'ANALYSE_DUPLICATE_REMOVE';
 
-export type analyseActionType = {
-  +type: string,
-  +step: ?string,
-  +progress: ?number,
-  +dbFile: ?FilePropsDb,
-  +duplicateList: Map<string, Array<FilePropsDb>>
-};
-
 function startAnalyse() {
   return {
     type: ANALYSE_START

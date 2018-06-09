@@ -27,17 +27,6 @@ export type ConstScanType =
   | CONST_SCAN_TYPE_IDENTICAL
   | CONST_SCAN_TYPE_NEW;
 
-export type scanActionType = {
-  +type: string,
-  +step: ?string,
-  +progress: ?number,
-  +file: ?FileProps,
-  +diff: ?Map<string, Array<string | number | Date>>,
-  +scanType: ?ConstScanType,
-  +oldDbFile: ?(Array<FilePropsDb> | FilePropsDb),
-  +newDbFile: ?FilePropsDb
-};
-
 export function startScan() {
   return {
     type: SCAN_START

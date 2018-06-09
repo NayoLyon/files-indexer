@@ -9,17 +9,6 @@ export const INDEXATION_END = 'INDEXATION_END';
 export const INDEXATION_PROGRESS = 'INDEXATION_PROGRESS';
 export const INDEXATION_DUPLICATE = 'INDEXATION_DUPLICATE';
 
-export type indexationActionType = {
-  +type: string,
-  +dbSize: ?number,
-  +isIndexed: ?boolean,
-  +step: ?string,
-  +progress: ?number,
-  +dbFile: FilePropsDb,
-  +newFile: FileProps,
-  +diff: Set<string>
-};
-
 function databaseLoaded(dbSize: number, isIndexed: boolean) {
   return {
     type: INDEXATION_LOAD_DATABASE,

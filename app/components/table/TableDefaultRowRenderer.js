@@ -1,9 +1,10 @@
 // @flow
 import React, { Component } from 'react';
+import type { Element } from 'react';
 import { Table } from 'semantic-ui-react';
 
 type Props = {
-  as: React.Element,
+  as: Element,
   cellRenderer: (* => *) | React.Component,
   columns: Array<{ prop: *, rowSpan: number }>,
   row: *
