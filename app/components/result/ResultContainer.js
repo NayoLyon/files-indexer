@@ -39,6 +39,13 @@ type Props = {
 
 class ResultContainer extends Component<Props> {
   props: Props;
+  static wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+  static async promisifyFunc(func, ...args) {
+    await func(...args);
+    await ResultContainer.wait(1);
+  }
 
   constructor(props) {
     super(props);
@@ -144,8 +151,8 @@ class ResultContainer extends Component<Props> {
     const oldDbMap = new Map();
     if (dbRefInstance) {
       nbFilesToRescan += dbRefInstance.filesMatching.size;
-      const promises = [];
-      dbRefInstance.filesMatching.forEach(fileProps => {
+      /* eslint-disable-next-line no-restricted-syntax */
+      for (const [, fileProps] of dbRefInstance.filesMatching) {
         this.props.scanProgress('LISTING', counter / nbFilesToRescan);
         counter += 1;
         switch (fileProps.scanType) {
@@ -156,18 +163,19 @@ class ResultContainer extends Component<Props> {
           case ScanActions.CONST_SCAN_TYPE_IDENTICAL:
             filesToRescan.push(fileProps);
             oldDbMap.set(fileProps, dbFile);
-            promises.push(this.props.scanExistsRemove(fileProps));
+            /* eslint-disable-next-line no-await-in-loop */
+            await ResultContainer.promisifyFunc(this.props.scanExistsRemove, fileProps);
             break;
           case ScanActions.CONST_SCAN_TYPE_MODIFIED:
             filesToRescan.push(fileProps);
             oldDbMap.set(fileProps, dbFile);
-            promises.push(this.props.scanModifiedRemove(fileProps));
+            /* eslint-disable-next-line no-await-in-loop */
+            await ResultContainer.promisifyFunc(this.props.scanModifiedRemove, fileProps);
             break;
           default:
             console.warn('Unexpected type!! Skip the error...', fileProps.scanType, fileProps);
         }
-      });
-      await Promise.all(promises);
+      }
       // /* eslint-disable no-restricted-syntax */
       // /* eslint-disable no-await-in-loop */
       // for (const [ filePropsRelPath, fileProps ] of dbRefInstance.filesMatching) {
@@ -194,31 +202,30 @@ class ResultContainer extends Component<Props> {
     }
     // Retrieve all files duplicated and new (not connected to dbFile by hash)
     //  and remove all scan references to these files
-    await Promise.all(
-      this.props.newFiles.map(async elt => {
-        this.props.scanProgress('LISTING', counter / nbFilesToRescan);
-        counter += 1;
-        filesToRescan.push(elt);
-        await this.props.scanNewRemove(elt);
-      })
-    );
-    await Promise.all(
-      this.props.duplicates.map(async file => {
-        this.props.scanProgress('LISTING', counter / nbFilesToRescan);
-        counter += 1;
-        filesToRescan.push(file);
-        await this.props.scanDuplicateRemove(file);
-      })
-    );
+    for (let index = 0; index < this.props.newFiles.length; index += 1) {
+      const elt = this.props.newFiles[index];
+      this.props.scanProgress('LISTING', counter / nbFilesToRescan);
+      counter += 1;
+      filesToRescan.push(elt);
+      /* eslint-disable-next-line no-await-in-loop */
+      await ResultContainer.promisifyFunc(this.props.scanNewRemove, elt);
+    }
+    for (let index = 0; index < this.props.duplicates.length; index += 1) {
+      const file = this.props.duplicates[index];
+      this.props.scanProgress('LISTING', counter / nbFilesToRescan);
+      counter += 1;
+      filesToRescan.push(file);
+      /* eslint-disable-next-line no-await-in-loop */
+      await ResultContainer.promisifyFunc(this.props.scanDuplicateRemove, file);
+    }
 
     // Rescan them all
-    counter = 0;
-    await Promise.all(
-      filesToRescan.map(async elt => {
-        this.props.scanProgress('INDEXING', counter / filesToRescan.length);
-        await this.props.scanProcessFile(elt, oldDbMap.get(elt));
-      })
-    );
+    for (let index = 0; index < filesToRescan.length; index += 1) {
+      const elt = filesToRescan[index];
+      this.props.scanProgress('INDEXING', index / filesToRescan.length);
+      /* eslint-disable-next-line no-await-in-loop */
+      await ResultContainer.promisifyFunc(this.props.scanProcessFile, elt, oldDbMap.get(elt));
+    }
 
     this.props.endScan();
   }
@@ -253,7 +260,4 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(ScanActions, dispatch);
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ResultContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(ResultContainer);
