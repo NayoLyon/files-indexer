@@ -182,7 +182,7 @@ export default class ResultTabModifiedView extends Component<Props> {
           file.modified.getTime() < dbFile.modified.getTime() ? 'green' : 'orange';
         actionsFolder = (
           <Button
-            icon="long arrow left"
+            icon="long arrow alternate left"
             key="copy"
             color={buttonColor}
             onClick={() => {
@@ -193,7 +193,7 @@ export default class ResultTabModifiedView extends Component<Props> {
       } else if (prop === 'name') {
         actionsFolder = (
           <Button
-            icon="long arrow left"
+            icon="long arrow alternate left"
             key="copy"
             onClick={() => {
               this.props.copyNameAttributeTo(file, dbFile);
