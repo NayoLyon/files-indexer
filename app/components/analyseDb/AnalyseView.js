@@ -79,7 +79,7 @@ class AnalyseView extends Component<Props> {
     } else if (this.props.loading) {
       content = (
         <Header as="h2">
-          {this.props.step} at {Math.round(this.props.progress * 100)}%
+          {this.props.step} at {Math.floor(this.props.progress * 100)}%
         </Header>
       );
     } else if (this.props.isAnalysed) {
