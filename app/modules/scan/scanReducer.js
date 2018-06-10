@@ -112,7 +112,7 @@ export default function scanReducer(state: scanStateType = defaultValue, action:
         if (prevNewScanDbRef) {
           // Copy the previous one, to append this new ref
           nextNewScanDbRef = {
-            dbFile: prevNewScanDbRef.dbFile,
+            dbFile: action.newDbFile,
             filesMatching: new Map(prevNewScanDbRef.filesMatching)
           };
         } else {
