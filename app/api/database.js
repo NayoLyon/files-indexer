@@ -65,7 +65,7 @@ export async function findDb(folder: string, what): Array<FilePropsDb> {
   }
 }
 
-export function insertDb(folder: string, obj) {
+export function insertDb(folder: string, obj: FilePropsDb) {
   const db = getDb(folder);
   return db.insert(obj);
 }

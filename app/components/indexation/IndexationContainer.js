@@ -68,7 +68,7 @@ class IndexationContainer extends Component<Props> {
           console.info('Adding new file in db', fileProps);
           this.props.indexDuplicate(undefined, fileProps, new Set(['new']));
         }
-        await insertDb(this.props.masterFolder, fileProps);
+        await insertDb(this.props.masterFolder, new FilePropsDb(fileProps));
       }
     };
   }
