@@ -148,11 +148,12 @@ export function scanProcessFile(fileProps: FileProps, oldDbFile: FilePropsDb | v
       }
     } else {
       if (occurences.length > 1) {
-        console.error(occurences);
-        throw Error(`Multiple occurences from hash ${newFileProps.hash}!!`);
+        console.error(`Multiple occurences from hash ${newFileProps.hash}!!`, occurences);
+        console.warn('We will only compare to the first one...');
+        // throw Error(`Multiple occurences from hash ${newFileProps.hash}!!`);
       }
       const inDb = occurences[0];
-      newFileProps.setDbMatches(inDb);
+      newFileProps.setDbMatches(occurences);
       const compared: Map<string, Array<string | number | Date>> = newFileProps.compareSameHash(
         inDb
       );
