@@ -9,6 +9,7 @@ import { doScan, FileProps, FilePropsDb } from '../../api/filesystem';
 import { findDb, updateDb, insertDb } from '../../api/database';
 
 type Props = {
+  createDatabase: string => void,
   loadDatabase: string => void,
   indexProgress: (string, number) => void,
   startIndexation: () => void,
@@ -27,13 +28,13 @@ class IndexationContainer extends Component<Props> {
     this.processFileWithHash = this.processFileWithHash.bind(this);
     this.startIndex = this.startIndex.bind(this);
 
-    this.props.loadDatabase(this.props.masterFolder);
+    this.props.createDatabase(this.props.masterFolder);
   }
 
   // This method returns a function to process a file scanned on the disk.
   // This method returns either the function to process a file with its hash already computed,
   // or the function to process a file with its hash NOT YET computed.
-  processFileWithHash(hashComputed: boolean=true) {
+  processFileWithHash(hashComputed: boolean = true) {
     return async (fileProps: FileProps) => {
       const occurences = await findDb(this.props.masterFolder, { relpath: fileProps.relpath });
       if (occurences.length) {
@@ -75,10 +76,15 @@ class IndexationContainer extends Component<Props> {
   // This method returns the function to index the db folder.
   // This method returns either the function to perform a full re-indexation (hash computed, withHash=true)
   // or the function to perform a quick re-indexation (no hash computed unless file is modified or new, withHash=false)
-  startIndex(withHash: boolean=true) {
+  startIndex(withHash: boolean = true) {
     return async () => {
       this.props.startIndexation();
-      await doScan(this.props.masterFolder, this.processFileWithHash(withHash), this.props.indexProgress, withHash);
+      await doScan(
+        this.props.masterFolder,
+        this.processFileWithHash(withHash),
+        this.props.indexProgress,
+        withHash
+      );
 
       this.props.loadDatabase(this.props.masterFolder);
 

@@ -1,5 +1,5 @@
 // @flow
-import { getDatabaseSize } from '../../api/database';
+import { getDatabaseSize, initDatabase } from '../../api/database';
 import { Action } from '../actionType';
 import { FilePropsDb, FileProps } from '../../api/filesystem';
 
@@ -43,6 +43,14 @@ export function indexDuplicate(dbFile: FilePropsDb | void, newFile: FileProps, d
     dbFile,
     newFile,
     diff
+  };
+}
+
+export function createDatabase(folder: string) {
+  return async (dispatch: (action: Action) => void) => {
+    await initDatabase(folder);
+
+    dispatch(loadDatabase(folder));
   };
 }
 

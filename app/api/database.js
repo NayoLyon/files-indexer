@@ -17,8 +17,10 @@ export function onClose() {
   // We cannot do it on the fly as NeDB always create a new file and does not allow callback on write...
   // Force this file to hidden, for windows...
   dbStore.forEach((db, folder) => {
-    const dbPath = getDbFile(folder);
-    setSync(dbPath, { hidden: true });
+    if (!db.nedb.inMemoryOnly) {
+      const dbPath = getDbFile(folder);
+      setSync(dbPath, { hidden: true });
+    }
   });
 }
 function getDb(folder: string) {
@@ -29,23 +31,36 @@ function getDb(folder: string) {
   return db;
 }
 
-export async function getDatabaseSize(folder: string): number {
+export async function initDatabase(folder: string, isInMemory: boolean | void): void {
   try {
     if (folder === '') {
-      return -1;
+      return;
     }
     let db = null;
     try {
       db = getDb(folder);
     } catch (err) {
-      db = new Datastore({ filename: getDbFile(folder), autoload: true });
+      if (isInMemory) {
+        db = new Datastore({ inMemoryOnly: true, autoload: true });
+      } else {
+        db = new Datastore({ filename: getDbFile(folder), autoload: true });
+        await db.ensureIndex({ fieldName: 'relpath', unique: true });
+        await db.ensureIndex({ fieldName: 'hash' });
+      }
       dbStore.set(folder, db);
-      await db.ensureIndex({ fieldName: 'relpath', unique: true });
-      await db.ensureIndex({ fieldName: 'hash' });
     }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function getDatabaseSize(folder: string): number {
+  const db = getDb(folder);
+  try {
     return await db.count({});
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return -1;
   }
 }
