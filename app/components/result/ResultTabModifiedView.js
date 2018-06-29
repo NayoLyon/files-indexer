@@ -14,27 +14,22 @@ type Props = {
   copyModifiedAttributeTo: (FileProps, FilePropsDb) => void,
   removeFile: FileProps => void,
   copyNameAttributeTo: (FileProps, FilePropsDb) => void,
-  files: Array<{
-    file: FileProps,
-    diff: Map<string, Array<string | number | Date>>
-  }>
+  files: Array<FileProps>
 };
 
 export default class ResultTabModifiedView extends Component<Props> {
   props: Props;
   static filterNameDiffer(file) {
-    return file.diff.get('name');
+    return file.diff.includes('name');
   }
   static filterModifiedLess(file) {
     return (
-      file.diff.get('modified') &&
-      file.file.modified.getTime() < file.file.dbFiles[0].modified.getTime()
+      file.diff.includes('modified') && file.modified.getTime() < file.dbFiles[0].modified.getTime()
     );
   }
   static filterModifiedGreater(file) {
     return (
-      file.diff.get('modified') &&
-      file.file.modified.getTime() > file.file.dbFiles[0].modified.getTime()
+      file.diff.includes('modified') && file.modified.getTime() > file.dbFiles[0].modified.getTime()
     );
   }
 
@@ -59,9 +54,9 @@ export default class ResultTabModifiedView extends Component<Props> {
     // To have a pretty table, I need to parse the files twice:
     // one to compute the columns, and the other to actually create the rows.
     for (let i = 0; i < this.props.files.length; i += 1) {
-      this.props.files[i].diff.forEach((val, key) => {
-        if (!columnsName.includes(key)) {
-          columnsName.push(key);
+      this.props.files[i].diff.forEach(prop => {
+        if (!columnsName.includes(prop)) {
+          columnsName.push(prop);
         }
       });
     }
@@ -125,16 +120,15 @@ export default class ResultTabModifiedView extends Component<Props> {
     // Else, this is name...
     return (
       <As {...columnAttributes}>
-        <Button icon="search" key="search" onClick={this.show(row.file)} />
-        {row.file.name}
+        <Button icon="search" key="search" onClick={this.show(row)} />
+        {row.name}
       </As>
     );
   }
   renderDbFile(As, row, prop, columnAttributes) {
-    const { file, diff } = row;
-    const dbFile = file.dbFiles[0];
-    const curDiff = diff.get(prop);
-    if (curDiff || prop === 'relpath') {
+    const { diff } = row;
+    const dbFile = row.dbFiles[0];
+    if (diff.includes(prop) || prop === 'relpath') {
       const actionsDb =
         prop === 'relpath' ? (
           <Button
@@ -155,10 +149,9 @@ export default class ResultTabModifiedView extends Component<Props> {
     return <As {...columnAttributes} colSpan={2} />;
   }
   renderFile(As, row, prop, columnAttributes) {
-    const { file, diff } = row;
-    const dbFile = file.dbFiles[0];
-    const curDiff = diff.get(prop);
-    if (curDiff || prop === 'relpath') {
+    const { diff } = row;
+    const dbFile = row.dbFiles[0];
+    if (diff.includes(prop) || prop === 'relpath') {
       let actionsFolder = null;
       if (prop === 'relpath') {
         actionsFolder = (
@@ -166,27 +159,26 @@ export default class ResultTabModifiedView extends Component<Props> {
             <Button
               icon="external"
               onClick={() => {
-                this.props.openFolderFor(file);
+                this.props.openFolderFor(row);
               }}
             />
             <Button
               icon="trash"
               onClick={() => {
-                this.props.removeFile(file);
+                this.props.removeFile(row);
               }}
             />
           </Button.Group>
         );
       } else if (prop === 'modified') {
-        const buttonColor =
-          file.modified.getTime() < dbFile.modified.getTime() ? 'green' : 'orange';
+        const buttonColor = row.modified.getTime() < dbFile.modified.getTime() ? 'green' : 'orange';
         actionsFolder = (
           <Button
             icon="long arrow alternate left"
             key="copy"
             color={buttonColor}
             onClick={() => {
-              this.props.copyModifiedAttributeTo(file, dbFile);
+              this.props.copyModifiedAttributeTo(row, dbFile);
             }}
           />
         );
@@ -196,7 +188,7 @@ export default class ResultTabModifiedView extends Component<Props> {
             icon="long arrow alternate left"
             key="copy"
             onClick={() => {
-              this.props.copyNameAttributeTo(file, dbFile);
+              this.props.copyNameAttributeTo(row, dbFile);
             }}
           />
         );
@@ -204,7 +196,7 @@ export default class ResultTabModifiedView extends Component<Props> {
       return (
         <As {...columnAttributes}>
           {actionsFolder}
-          {printValue(file, prop)}
+          {printValue(row, prop)}
         </As>
       );
     }
@@ -249,9 +241,9 @@ export default class ResultTabModifiedView extends Component<Props> {
         <TableContainer
           data={this.props.files}
           headers={headers}
-          rowKey="file.relpath"
+          rowKey="relpath"
           cellRenderer={this.cellRenderer.bind(this)}
-          defaultSortKey="file.name"
+          defaultSortKey="name"
           defaultPageSize={5}
           filters={filters}
         />

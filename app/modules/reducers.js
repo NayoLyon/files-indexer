@@ -5,8 +5,10 @@ import foldersReducer, { foldersStateType } from './folders/foldersReducer';
 import indexationReducer, { indexationStateType } from './indexation/indexationReducer';
 import scanReducer, { scanStateType } from './scan/scanReducer';
 import analyseReducer, { analyseStateType } from './analyseDb/analyseReducer';
+import resultReducer, { resultStateType } from './result/resultReducer';
 
 export type fullStateType = {
+  +resultState: resultStateType,
   +analyseState: analyseStateType,
   +scanState: scanStateType,
   +indexationState: indexationStateType,
@@ -15,6 +17,7 @@ export type fullStateType = {
 };
 
 const rootReducer = combineReducers({
+  resultState: resultReducer,
   analyseState: analyseReducer,
   scanState: scanReducer,
   indexationState: indexationReducer,

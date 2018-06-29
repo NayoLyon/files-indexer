@@ -1,6 +1,6 @@
 import { setSync } from 'winattr';
 
-import { FilePropsDb } from './filesystem';
+import { FilePropsType } from './filesystem';
 
 const Datastore = require('nedb-promise');
 
@@ -31,6 +31,19 @@ function getDb(folder: string) {
   return db;
 }
 
+export async function closeDatabase(folder: string): void {
+  const db = dbStore.get(folder);
+  if (typeof db !== 'undefined') {
+    dbStore.delete(folder);
+    if (!db.nedb.inMemoryOnly) {
+      db.on('compaction.done', () => {
+        const dbPath = getDbFile(folder);
+        setSync(dbPath, { hidden: true });
+      });
+      db.persistence.compactDatafile();
+    }
+  }
+}
 export async function initDatabase(folder: string, isInMemory: boolean | void): void {
   try {
     if (folder === '') {
@@ -42,6 +55,7 @@ export async function initDatabase(folder: string, isInMemory: boolean | void): 
     } catch (err) {
       if (isInMemory) {
         db = new Datastore({ inMemoryOnly: true, autoload: true });
+        await db.ensureIndex({ fieldName: 'relpath' });
       } else {
         db = new Datastore({ filename: getDbFile(folder), autoload: true });
         await db.ensureIndex({ fieldName: 'relpath', unique: true });
@@ -65,32 +79,43 @@ export async function getDatabaseSize(folder: string): number {
   }
 }
 
-export async function findDb(folder: string, what): Array<FilePropsDb> {
+export async function findDb(folder: string, what, toClass) {
   const db = getDb(folder);
   try {
     const occurences = await db.find(what);
-    const res = [];
-    occurences.forEach(elt => {
-      res.push(FilePropsDb.fromFile(elt));
-    });
-    return res;
+    if (toClass != null) {
+      const res = [];
+      occurences.forEach(elt => {
+        res.push(toClass.fromDb(elt));
+      });
+      return res;
+    }
+    return occurences;
   } catch (err) {
     console.error('Error in DB find', err);
     throw err;
   }
 }
 
-export function insertDb(folder: string, obj: FilePropsDb) {
+export function insertDb(folder: string, obj: FilePropsType) {
   const db = getDb(folder);
   return db.insert(obj);
 }
 
-export function updateDb(folder: string, obj: FilePropsDb) {
+export function updateDb(folder: string, obj: FilePropsType) {
   const db = getDb(folder);
   return db.update({ _id: obj.id }, obj, { returnUpdatedDocs: true });
 }
-
-export function deleteDb(folder: string, obj: FilePropsDb) {
+export function updateDbQuery(folder: string, query, obj) {
   const db = getDb(folder);
-  return db.remove({ _id: obj.id }, obj);
+  return db.update(query, obj, { returnUpdatedDocs: true });
+}
+
+export function deleteDb(folder: string, obj: FilePropsType) {
+  const db = getDb(folder);
+  return db.remove({ _id: obj.id }, {});
+}
+export function deleteDbQuery(folder: string, query, options) {
+  const db = getDb(folder);
+  return db.remove(query, options);
 }

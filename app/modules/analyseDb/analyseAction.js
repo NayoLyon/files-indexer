@@ -72,7 +72,7 @@ export function doAnalyse(folder: string) {
   return async (dispatch: (action: Action) => void) => {
     dispatch(startAnalyse());
 
-    const files = await findDb(folder, {});
+    const files = await findDb(folder, {}, FilePropsDb);
     const duplicateList = new Map();
     const filesHash = new Map();
     files.forEach((file, index) => {

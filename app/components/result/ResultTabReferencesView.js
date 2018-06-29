@@ -1,10 +1,10 @@
 // @flow
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Tab, Table, Button } from 'semantic-ui-react';
 
-import { FileProps, FilePropsDb } from '../../api/filesystem';
+import { FileProps, FilePropsDb, FilePropsDbDuplicates } from '../../api/filesystem';
 import { CONST_SCAN_TYPE_DUPLICATE } from '../../modules/scan/scanAction';
-import { scanDbRef } from '../../modules/scan/scanReducer';
 import { printValue } from '../../utils/format';
 
 import TableContainer from '../table/TableContainer';
@@ -14,10 +14,11 @@ type Props = {
   openFolderFor: FileProps => void,
   openDbFolderFor: FilePropsDb => void,
   removeFile: FileProps => void,
-  files: Array<scanDbRef>
+  filesProps: Map<string, FileProps>,
+  files: Array<FilePropsDbDuplicates>
 };
 
-export default class ResultTabReferencesView extends Component<Props> {
+class ResultTabReferencesView extends Component<Props> {
   props: Props;
   static computeHeader() {
     const headers = [];
@@ -28,7 +29,7 @@ export default class ResultTabReferencesView extends Component<Props> {
         colProps: { key: 'name' },
         rowSpan: 2,
         sortStyle: 'alphabet',
-        sortKey: 'dbFile.name'
+        sortKey: 'name'
       },
       {
         key: 'origin',
@@ -85,7 +86,8 @@ export default class ResultTabReferencesView extends Component<Props> {
 
   matchRowRenderer(dbFile, rows) {
     let counter = 0;
-    return fileProps => {
+    return filePropsId => {
+      const fileProps = this.props.filesProps.get(filePropsId);
       counter += 1;
       const label = fileProps.scanType === CONST_SCAN_TYPE_DUPLICATE ? 'Possible match' : 'Match';
       rows.push(
@@ -119,35 +121,30 @@ export default class ResultTabReferencesView extends Component<Props> {
     const As = props.as;
     const { row } = props;
 
-    const { dbFile, filesMatching } = row;
-
-    const filesView = [];
-    filesMatching.forEach(fileProps => {
-      filesView.push(fileProps);
-    });
+    const { relpath, name, filesMatching } = row;
 
     const rows = [
-      <As key={`db_${dbFile.relpath}`}>
-        <Table.Cell textAlign="center" rowSpan={filesMatching.size + 1}>
-          <Button icon="search" onClick={this.show(filesView, dbFile)} />
-          {dbFile.name}
+      <As key={`db_${relpath}`}>
+        <Table.Cell textAlign="center" rowSpan={filesMatching.length + 1}>
+          <Button icon="search" onClick={this.show(filesMatching, row)} />
+          {name}
         </Table.Cell>
         <Table.Cell textAlign="center">
           <Button
             icon="external"
             onClick={() => {
-              this.props.openDbFolderFor(dbFile);
+              this.props.openDbFolderFor(row);
             }}
           />
           In DB
         </Table.Cell>
-        <Table.Cell textAlign="center">{printValue(dbFile, 'size')}</Table.Cell>
-        <Table.Cell textAlign="center">{printValue(dbFile, 'modified')}</Table.Cell>
-        <Table.Cell textAlign="center">{printValue(dbFile, 'relpath')}</Table.Cell>
+        <Table.Cell textAlign="center">{printValue(row, 'size')}</Table.Cell>
+        <Table.Cell textAlign="center">{printValue(row, 'modified')}</Table.Cell>
+        <Table.Cell textAlign="center">{printValue(row, 'relpath')}</Table.Cell>
         <Table.Cell textAlign="center" />
       </As>
     ];
-    filesMatching.forEach(this.matchRowRenderer(dbFile, rows));
+    filesMatching.forEach(this.matchRowRenderer(row, rows));
     return rows;
   }
   render() {
@@ -167,9 +164,9 @@ export default class ResultTabReferencesView extends Component<Props> {
         <TableContainer
           data={this.props.files}
           headers={headers}
-          rowKey="dbFile.relpath"
+          rowKey="relpath"
           rowRenderer={this.rowRenderer}
-          defaultSortKey="dbFile.name"
+          defaultSortKey="name"
           defaultPageSize={4}
           pageSizeList={[1, 2, 3, 4, 5, 10, 20]}
         />
@@ -177,3 +174,11 @@ export default class ResultTabReferencesView extends Component<Props> {
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    filesProps: state.resultState.filesProps
+  };
+}
+
+export default connect(mapStateToProps)(ResultTabReferencesView);

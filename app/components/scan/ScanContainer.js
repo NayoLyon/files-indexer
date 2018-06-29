@@ -20,7 +20,7 @@ class ScanContainer extends Component<Props> {
   props: Props;
 
   async scan() {
-    this.props.startScan();
+    await this.props.startScan();
 
     await doScan(this.props.toScanFolder, this.props.scanProcessFile, this.props.scanProgress);
 

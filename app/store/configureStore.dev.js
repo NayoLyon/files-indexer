@@ -8,6 +8,7 @@ import * as foldersActions from '../modules/folders/foldersAction';
 import * as indexationActions from '../modules/indexation/indexationAction';
 import * as scanActions from '../modules/scan/scanAction';
 import * as analyseActions from '../modules/analyseDb/analyseAction';
+import * as resultActions from '../modules/result/resultAction';
 
 const history = createHashHistory();
 
@@ -36,6 +37,7 @@ const configureStore = (initialState?: fullStateType) => {
 
   // Redux DevTools Configuration
   const actionCreators = {
+    ...resultActions,
     ...analyseActions,
     ...scanActions,
     ...indexationActions,
@@ -60,7 +62,10 @@ const configureStore = (initialState?: fullStateType) => {
   const store = createStore(rootReducer, initialState, enhancer);
 
   if (module.hot) {
-    module.hot.accept('../modules/reducers', () => store.replaceReducer(require('../modules/reducers'))); // eslint-disable-line global-require
+    module.hot.accept('../modules/reducers', () =>
+      // eslint-disable-next-line global-require
+      store.replaceReducer(require('../modules/reducers'))
+    );
   }
 
   return store;

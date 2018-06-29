@@ -36,7 +36,11 @@ class IndexationContainer extends Component<Props> {
   // or the function to process a file with its hash NOT YET computed.
   processFileWithHash(hashComputed: boolean = true) {
     return async (fileProps: FileProps) => {
-      const occurences = await findDb(this.props.masterFolder, { relpath: fileProps.relpath });
+      const occurences = await findDb(
+        this.props.masterFolder,
+        { relpath: fileProps.relpath },
+        FilePropsDb
+      );
       if (occurences.length) {
         if (occurences.length > 1) {
           console.error(
@@ -69,7 +73,7 @@ class IndexationContainer extends Component<Props> {
           console.info('Adding new file in db', fileProps);
           this.props.indexDuplicate(undefined, fileProps, new Set(['new']));
         }
-        await insertDb(this.props.masterFolder, new FilePropsDb(fileProps));
+        await insertDb(this.props.masterFolder, fileProps.toFilePropsDb());
       }
     };
   }

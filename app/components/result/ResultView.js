@@ -3,8 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Tab, Menu, Button } from 'semantic-ui-react';
 
-import { FileProps, FilePropsDb } from '../../api/filesystem';
-import { scanDbRef } from '../../modules/scan/scanReducer';
+import { FileProps, FilePropsDb, FilePropsDbDuplicates } from '../../api/filesystem';
 import { CONST_SCAN_TYPE_IDENTICAL, ConstScanType } from '../../modules/scan/scanAction';
 
 import ResultTabNewView from './ResultTabNewView';
@@ -21,15 +20,13 @@ type Props = {
   removeAllFiles: ConstScanType => void,
   copyNameAttributeTo: (FileProps, FilePropsDb) => void,
   setTabActive: string => void,
+  loadingResult: boolean,
   activeTab: string,
   identicals: Array<FileProps>,
   newFiles: Array<FileProps>,
-  modified: Array<{
-    file: FileProps,
-    diff: Map<string, Array<string | number | Date>>
-  }>,
+  modified: Array<FileProps>,
   duplicates: Array<FileProps>,
-  dbFilesRef: Map<string, scanDbRef>
+  dbFilesRef: Array<FilePropsDbDuplicates>
 };
 
 class ResultView extends Component<Props> {
@@ -56,17 +53,15 @@ class ResultView extends Component<Props> {
   }
 
   render() {
+    if (this.props.loadingResult) {
+      return null;
+    }
     const inlineStyles = {
       trashButtonStyle: { fontSize: '0.7rem', marginRight: '-0.8rem', marginLeft: '0.4rem' }
     };
     const panes = [];
-    if (this.props.dbFilesRef.size > 0) {
-      const duplicatefileRefs = [];
-      this.props.dbFilesRef.forEach(dbRef => {
-        if (dbRef.filesMatching.size > 1) {
-          duplicatefileRefs.push(dbRef);
-        }
-      });
+    if (this.props.dbFilesRef.length > 0) {
+      const duplicatefileRefs = this.props.dbFilesRef;
       if (duplicatefileRefs.length > 0) {
         panes.push({
           menuItem: `Caution: several files refers to the same db file!! (${
@@ -168,12 +163,13 @@ class ResultView extends Component<Props> {
 
 function mapStateToProps(state) {
   return {
-    activeTab: state.scanState.activeTab,
-    identicals: state.scanState.identicals,
-    newFiles: state.scanState.newFiles,
-    modified: state.scanState.modified,
-    duplicates: state.scanState.duplicates,
-    dbFilesRef: state.scanState.dbFilesRef
+    loadingResult: state.resultState.loading,
+    activeTab: state.resultState.activeTab,
+    identicals: state.resultState.identicals,
+    newFiles: state.resultState.newFiles,
+    modified: state.resultState.modified,
+    duplicates: state.resultState.duplicates,
+    dbFilesRef: state.resultState.dbFilesRef
   };
 }
 

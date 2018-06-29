@@ -34,6 +34,15 @@ type analyseActionType = {
   +duplicateList: Map<string, Array<FilePropsDb>>
 };
 
+type resultActionType = {
+  +type: string,
+  +identicals: ?Array<FileProps>,
+  +newFiles: ?Array<FileProps>,
+  +modified: ?Array<FileProps>,
+  +duplicates: ?Array<FileProps>,
+  +dbFilesRef: ?Array<FilePropsDbDuplicates>
+};
+
 type actionType = {
   +type: string
 };
@@ -43,4 +52,5 @@ export type Action =
   | foldersActionType
   | indexationActionType
   | scanActionType
-  | analyseActionType;
+  | analyseActionType
+  | resultActionType;
