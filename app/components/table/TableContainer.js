@@ -23,15 +23,6 @@ type Props = {
 
 export default class TableContainer extends Component<Props> {
   props: Props;
-  static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.data !== prevState.originalData) {
-      const newState = TableContainer.filterAndSortData(prevState, nextProps);
-      newState.originalData = nextProps.data;
-      return newState;
-    }
-
-    return null;
-  }
   /*
   This methods requires the following info:
     - state.filtersState
@@ -98,6 +89,15 @@ export default class TableContainer extends Component<Props> {
     this.changePage = this.changePage.bind(this);
     this.changePageSize = this.changePageSize.bind(this);
     this.toggleFilter = this.toggleFilter.bind(this);
+  }
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.data !== prevState.originalData) {
+      const newState = TableContainer.filterAndSortData(prevState, nextProps);
+      newState.originalData = nextProps.data;
+      return newState;
+    }
+
+    return null;
   }
   shouldComponentUpdate(nextProps, nextState) {
     if (
