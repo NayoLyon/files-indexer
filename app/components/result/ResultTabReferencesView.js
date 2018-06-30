@@ -80,7 +80,10 @@ class ResultTabReferencesView extends Component<Props> {
   close() {
     this.setState({ open: false });
   }
-  show(files, dbFile) {
+
+  show(filesId, dbFile) {
+    const {filesProps} = this.props;
+    const files = filesId.map(fileId => filesProps.get(fileId));
     return () => this.setState({ files, dbFile, open: true });
   }
 
