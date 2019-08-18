@@ -41,6 +41,9 @@ describe('main window', function spec() {
   it('should haven\'t any logs in console of main window', async () => {
     const { client } = this.app;
     const logs = await client.getRenderProcessLogs();
+    // The tests are in development mode, so there are warnings, by electron itself...
+    // Disable these warnings
+    process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
     // Print renderer process logs
     logs.forEach(log => {
       console.log(log.message);
