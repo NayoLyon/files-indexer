@@ -1,0 +1,12 @@
+#root {
+  height: 100%;
+}
+
+/* Prevent Firefox outline for a focused elements... */
+a:focus {
+  outline: none;
+}
+
+i.icon {
+  backface-visibility: unset;/* Fix Chrome bug with not animated icon being blurred... */
+}
