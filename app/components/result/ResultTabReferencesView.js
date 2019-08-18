@@ -20,6 +20,7 @@ type Props = {
 
 class ResultTabReferencesView extends Component<Props> {
   props: Props;
+
   static computeHeader() {
     const headers = [];
     headers.push([
@@ -88,9 +89,10 @@ class ResultTabReferencesView extends Component<Props> {
   }
 
   matchRowRenderer(dbFile, rows) {
+    const { filesProps, openFolderFor, removeFile } = this.props;
     let counter = 0;
     return filePropsId => {
-      const fileProps = this.props.filesProps.get(filePropsId);
+      const fileProps = filesProps.get(filePropsId);
       counter += 1;
       const label = fileProps.scanType === CONST_SCAN_TYPE_DUPLICATE ? 'Possible match' : 'Match';
       rows.push(
@@ -99,7 +101,7 @@ class ResultTabReferencesView extends Component<Props> {
             <Button
               icon="external"
               onClick={() => {
-                this.props.openFolderFor(fileProps);
+                openFolderFor(fileProps);
               }}
             />
             {label} {counter}
@@ -111,7 +113,7 @@ class ResultTabReferencesView extends Component<Props> {
             <Button
               icon="trash"
               onClick={() => {
-                this.props.removeFile(fileProps);
+                removeFile(fileProps);
               }}
             />
             {fileProps.scanType}
@@ -120,9 +122,11 @@ class ResultTabReferencesView extends Component<Props> {
       );
     };
   }
+
   rowRenderer(props) {
     const As = props.as;
     const { row } = props;
+    const { openDbFolderFor } = this.props;
 
     const { relpath, name, filesMatching } = row;
 
@@ -136,7 +140,7 @@ class ResultTabReferencesView extends Component<Props> {
           <Button
             icon="external"
             onClick={() => {
-              this.props.openDbFolderFor(row);
+              openDbFolderFor(row);
             }}
           />
           In DB
@@ -150,22 +154,25 @@ class ResultTabReferencesView extends Component<Props> {
     filesMatching.forEach(this.matchRowRenderer(row, rows));
     return rows;
   }
+
   render() {
     const headers = ResultTabReferencesView.computeHeader();
+    const { open, files, dbFile } = this.state;
+    const { openDbFolderFor, openFolderFor, removeFile, files: filesFromProps } = this.props;
     return (
       <Tab.Pane key="scan_result_references" style={{ height: 'calc(100% - 3.5rem)' }}>
         <CompareDialogView
-          open={this.state.open}
+          open={open}
           close={this.close}
-          openDbFolderFor={this.props.openDbFolderFor}
-          openFolderFor={this.props.openFolderFor}
-          removeFile={this.props.removeFile}
-          files={this.state.files}
-          dbFiles={this.state.dbFile}
+          openDbFolderFor={openDbFolderFor}
+          openFolderFor={openFolderFor}
+          removeFile={removeFile}
+          files={files}
+          dbFiles={dbFile}
           dbFilesFirst
         />
         <TableContainer
-          data={this.props.files}
+          data={filesFromProps}
           headers={headers}
           rowKey="relpath"
           rowRenderer={this.rowRenderer}

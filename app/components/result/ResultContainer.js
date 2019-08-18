@@ -25,9 +25,11 @@ type Props = {
 
 class ResultContainer extends Component<Props> {
   props: Props;
+
   static wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
   static async promisifyFunc(func, ...args) {
     await func(...args);
     await ResultContainer.wait(1);
@@ -40,22 +42,27 @@ class ResultContainer extends Component<Props> {
     this.openFolderFor = this.openFolderFor.bind(this);
     this.copyNameAttributeTo = this.copyNameAttributeTo.bind(this);
 
-    this.props.loadResult();
+    props.loadResult();
   }
 
   openDbFolderFor(file: FilePropsDb) {
-    openExplorerOn(path.resolve(this.props.masterFolder, file.relpath));
+    const { masterFolder } = this.props;
+    openExplorerOn(path.resolve(masterFolder, file.relpath));
   }
+
   openFolderFor(file: FileProps) {
-    openExplorerOn(path.resolve(this.props.toScanFolder, file.relpath));
+    const { toScanFolder } = this.props;
+    openExplorerOn(path.resolve(toScanFolder, file.relpath));
   }
+
   async copyModifiedAttributeTo(file: FileProps, dbFile: FilePropsDb) {
-    const dbFilePath = path.resolve(this.props.masterFolder, dbFile.relpath);
+    const { masterFolder, dbFilePropUpdated } = this.props;
+    const dbFilePath = path.resolve(masterFolder, dbFile.relpath);
     const newDbFile = dbFile.clone();
     newDbFile.modified = new Date(file.modified);
     fs.utimesSync(dbFilePath, fs.statSync(dbFilePath).atime, newDbFile.modified);
     try {
-      const updatedDoc = await updateDb(this.props.masterFolder, newDbFile);
+      const updatedDoc = await updateDb(masterFolder, newDbFile);
       if (updatedDoc[0] !== 1) {
         console.error(updatedDoc, newDbFile);
         throw Error(`Document ${newDbFile.relpath} not updated!!`);
@@ -63,17 +70,19 @@ class ResultContainer extends Component<Props> {
         console.error(updatedDoc, newDbFile);
         throw Error(`Wrong document ${newDbFile.relpath} not updated!!`);
       }
-      this.props.dbFilePropUpdated(dbFile);
+      dbFilePropUpdated(dbFile);
     } catch (err) {
       console.warn('Error while updating doc', err);
       // TODO propagate an error...
     }
   }
+
   async copyNameAttributeTo(file: FileProps, dbFile: FilePropsDb) {
-    const dbFilePath = path.resolve(this.props.masterFolder, dbFile.relpath);
+    const { masterFolder, dbFilePropUpdated } = this.props;
+    const dbFilePath = path.resolve(masterFolder, dbFile.relpath);
     const newDbFile = dbFile.clone();
     newDbFile.setNewName(file.name);
-    const dbFileNewPath = path.resolve(this.props.masterFolder, newDbFile.relpath);
+    const dbFileNewPath = path.resolve(masterFolder, newDbFile.relpath);
     if (fs.existsSync(dbFileNewPath)) {
       const err = new Error(`File '${newDbFile.relpath}' already exists!`);
       console.log(err);
@@ -81,7 +90,7 @@ class ResultContainer extends Component<Props> {
     }
     fs.renameSync(dbFilePath, dbFileNewPath);
     try {
-      const updatedDoc = await updateDb(this.props.masterFolder, newDbFile);
+      const updatedDoc = await updateDb(masterFolder, newDbFile);
       if (updatedDoc[0] !== 1) {
         console.error(updatedDoc, newDbFile);
         throw Error(`Document ${newDbFile.relpath} not updated!!`);
@@ -89,7 +98,7 @@ class ResultContainer extends Component<Props> {
         console.error(updatedDoc, newDbFile);
         throw Error(`Wrong document ${newDbFile.relpath} not updated!!`);
       }
-      this.props.dbFilePropUpdated(dbFile);
+      dbFilePropUpdated(dbFile);
     } catch (err) {
       console.warn('Error while updating doc', err);
       // TODO propagate an error...
@@ -97,15 +106,16 @@ class ResultContainer extends Component<Props> {
   }
 
   render() {
+    const { removeFile, removeAllFiles, resultSetTabActive } = this.props;
     return (
       <ResultView
         openDbFolderFor={this.openDbFolderFor}
         openFolderFor={this.openFolderFor}
         copyModifiedAttributeTo={this.copyModifiedAttributeTo}
-        removeFile={this.props.removeFile}
-        removeAllFiles={this.props.removeAllFiles}
+        removeFile={removeFile}
+        removeAllFiles={removeAllFiles}
         copyNameAttributeTo={this.copyNameAttributeTo}
-        setTabActive={this.props.resultSetTabActive}
+        setTabActive={resultSetTabActive}
       />
     );
   }
