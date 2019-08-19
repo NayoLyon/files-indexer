@@ -1,7 +1,6 @@
-const Datastore = require("nedb-promise");
-
 const { remote } = window.require("electron");
 
+const Datastore = remote.require("nedb-promise");
 const { setSync } = remote.require("winattr");
 const path = remote.require("path");
 // const { setSync } = app.__utils;
