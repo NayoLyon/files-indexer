@@ -44,11 +44,10 @@ class IndexationView extends Component {
 			<Grid padded style={{ height: "100vh" }}>
 				<Grid.Column stretched>
 					<Grid.Row style={{ flex: "0 0 4rem" }}>
-						{/* <Link to="/"> */}
-						<Button icon onClick={this.props.goToHome}>
-							<Icon name="arrow left" size="huge" />
-						</Button>
-						{/* </Link> */}
+						<Button
+							icon={<Icon name="arrow left" className="button" size="huge" />}
+							onClick={this.props.goToHome}
+						/>
 					</Grid.Row>
 					<Grid.Row style={{ flex: "0 0 2rem" }}>
 						<Header>Indexation of folder {this.props.masterFolder}</Header>

@@ -96,11 +96,10 @@ class AnalyzeView extends Component {
 			<Grid padded style={{ height: "100vh" }}>
 				<Grid.Column stretched>
 					<Grid.Row style={{ flex: "0 0 4rem" }}>
-						{/* <Link to="/index"> */}
-						<Button icon onClick={this.props.goToIndex}>
-							<Icon name="arrow left" size="huge" />
-						</Button>
-						{/* </Link> */}
+						<Button
+							icon={<Icon name="arrow left" className="button" size="huge" />}
+							onClick={this.props.goToIndex}
+						/>
 					</Grid.Row>
 					<Grid.Row style={{ flex: "0 0 2rem" }}>
 						<Header>Analyze of folder {this.props.masterFolder}</Header>

@@ -28,11 +28,10 @@ class ScanView extends Component {
 			<Grid padded style={{ height: "100vh" }}>
 				<Grid.Column stretched>
 					<Grid.Row style={{ flex: "0 0 4rem" }}>
-						{/* <Link to="/index"> */}
-						<Button onClick={this.props.goToIndex}>
-							<Icon name="arrow left" size="huge" />
-						</Button>
-						{/* </Link> */}
+						<Button
+							icon={<Icon name="arrow left" className="button" size="huge" />}
+							onClick={this.props.goToIndex}
+						/>
 					</Grid.Row>
 					<Grid.Row style={{ flex: "0 0 2rem" }}>
 						<Header>Scan folder {this.props.toScanFolder}</Header>
