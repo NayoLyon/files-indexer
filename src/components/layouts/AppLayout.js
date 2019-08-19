@@ -23,7 +23,7 @@ class AppLayout extends Component {
 	// 	}
 	// }
 	render() {
-		const { divBackgroundStyle, divContentStyle } = this.getStyles();
+		const { divBackgroundStyle } = this.getStyles();
 
 		// if (!this.props.logged) {
 		// 	return <LoaderCustom />;
@@ -31,17 +31,15 @@ class AppLayout extends Component {
 
 		return (
 			<div style={divBackgroundStyle}>
-				<div style={divContentStyle}>
-					<Container>
-						<Switch>
-							<Route exact path={routes.index} component={IndexationContainer} />
-							<Route exact path={routes.scan} component={ScanContainer} />
-							<Route exact path={routes.analyzeDb} component={AnalyzeContainer} />
-							<Route exact path={routes.base} component={HomeContainer} />
-							<Route path={routes.base} component={NotFound} />
-						</Switch>
-					</Container>
-				</div>
+				<Container>
+					<Switch>
+						<Route exact path={routes.index} component={IndexationContainer} />
+						<Route exact path={routes.scan} component={ScanContainer} />
+						<Route exact path={routes.analyzeDb} component={AnalyzeContainer} />
+						<Route exact path={routes.base} component={HomeContainer} />
+						<Route path={routes.base} component={NotFound} />
+					</Switch>
+				</Container>
 			</div>
 		);
 	}
@@ -57,9 +55,6 @@ class AppLayout extends Component {
 				overflowY: "auto",
 				top: 0,
 				left: 0
-			},
-			divContentStyle: {
-				marginBottom: 40
 			}
 		};
 	}
