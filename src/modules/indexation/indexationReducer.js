@@ -13,7 +13,7 @@ const defaultValue = {
 	isIndexed: false,
 	dbSize: -1,
 	step: "",
-	progress: 0,
+	progress: { percent: 0 },
 	duplicates: new Map()
 };
 
@@ -38,7 +38,22 @@ export default function indexationReducer(state = defaultValue, action) {
 		case INDEXATION_END:
 			return { ...state, indexing: false, isIndexed: true };
 		case INDEXATION_PROGRESS:
-			return { ...state, step: action.step, progress: action.progress };
+			if (state.step === action.step) {
+				const stateProgress = state.progress.total
+					? (state.progress.value / state.progress.total) * 100
+					: state.progress.percent;
+				const actionProgress = action.progress.total
+					? (action.progress.value / action.progress.total) * 100
+					: action.progress.percent;
+				if (Math.round(100 * stateProgress) === Math.round(100 * actionProgress)) {
+					return state;
+				}
+			}
+			return {
+				...state,
+				step: action.step,
+				progress: action.progress
+			};
 		case INDEXATION_DUPLICATE: {
 			const duplicates = new Map(state.duplicates);
 			duplicates.set(action.newFile.relpath, {

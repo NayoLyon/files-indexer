@@ -12,7 +12,7 @@ const defaultValue = {
 	loading: false,
 	isAnalyzed: false,
 	step: "",
-	progress: 0,
+	progress: { value: 0, total: -1 },
 	missingList: [],
 	duplicateList: new Map()
 };

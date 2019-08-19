@@ -75,7 +75,7 @@ export function doAnalyze(folder) {
 		const duplicateList = new Map();
 		const filesHash = new Map();
 		files.forEach((file, index) => {
-			dispatch(analyzeProgress("INDEXING", index / files.length));
+			dispatch(analyzeProgress("INDEXING", { value: index, total: files.length }));
 			const filePath = path.resolve(folder, file.relpath);
 			if (!fs.existsSync(filePath)) {
 				dispatch(analyzeMissingAdd(file));

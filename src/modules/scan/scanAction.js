@@ -151,7 +151,7 @@ export function removeAllFiles(scanType) {
 		if (scanType === CONST_SCAN_TYPE_IDENTICAL) {
 			const identicals = await findDb("scan", { scanType }, FileProps);
 			for (let i = 0; i < identicals.length; i += 1) {
-				dispatch(scanProgress("REMOVING", i / identicals.length));
+				dispatch(scanProgress("REMOVING", { value: i, total: identicals.length }));
 				const file = identicals[i];
 				deleteFile(getState().foldersState.toScanPath, file.relpath);
 				/* eslint-disable-next-line no-await-in-loop */
@@ -189,7 +189,7 @@ export function dbFilePropUpdated(dbFile) {
 		const nbFilesToRescan = filesToRescan.length;
 		for (let i = 0; i < nbFilesToRescan; i += 1) {
 			const fileProps = filesToRescan[i];
-			dispatch(scanProgress("LISTING", i / nbFilesToRescan));
+			dispatch(scanProgress("LISTING", { value: i, total: nbFilesToRescan }));
 			/* eslint-disable-next-line no-await-in-loop */
 			await scanRemove(fileProps);
 		}
@@ -197,7 +197,7 @@ export function dbFilePropUpdated(dbFile) {
 		// Rescan them all
 		for (let index = 0; index < filesToRescan.length; index += 1) {
 			const elt = filesToRescan[index];
-			dispatch(scanProgress("INDEXING", index / filesToRescan.length));
+			dispatch(scanProgress("INDEXING", { value: index, total: filesToRescan.length }));
 			/* eslint-disable-next-line no-await-in-loop */
 			await dispatch(scanProcessFile(elt));
 		}

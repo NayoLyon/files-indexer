@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Grid, Icon, Header, Button } from "semantic-ui-react";
+import { Grid, Icon, Header, Button, Progress } from "semantic-ui-react";
 
 import ResultContainer from "../result/ResultContainer";
 
@@ -11,9 +11,12 @@ class ScanView extends Component {
 			content = <Button onClick={this.props.scan}>Start Scan</Button>;
 		} else if (this.props.indexing) {
 			content = (
-				<Header as="h2">
-					{this.props.step} at {Math.floor(this.props.progress * 100)}%
-				</Header>
+				<Progress
+					{...this.props.progress}
+					progress={this.props.progress.total ? "ratio" : "percent"}
+				>
+					{this.props.step}
+				</Progress>
 			);
 		} else if (this.props.isScanned) {
 			content = <ResultContainer />;

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Grid, Icon, Header, Button, Tab } from "semantic-ui-react";
+import { Grid, Icon, Header, Button, Tab, Progress } from "semantic-ui-react";
 
 import MissingTab from "./MissingTab";
 import DuplicateTab from "./DuplicateTab";
@@ -60,9 +60,12 @@ class AnalyzeView extends Component {
 			content = null;
 		} else if (this.props.loading) {
 			content = (
-				<Header as="h2">
-					{this.props.step} at {Math.floor(this.props.progress * 100)}%
-				</Header>
+				<Progress
+					{...this.props.progress}
+					progress={this.props.progress.total ? "ratio" : "percent"}
+				>
+					{this.props.step}
+				</Progress>
 			);
 		} else if (this.props.isAnalyzed) {
 			let infos = null;

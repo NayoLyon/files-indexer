@@ -5,7 +5,7 @@ const defaultValue = {
 	indexing: false,
 	isScanned: false,
 	step: "",
-	progress: 0
+	progress: { percent: 0 }
 };
 
 export default function scanReducer(state = defaultValue, action) {
@@ -19,7 +19,22 @@ export default function scanReducer(state = defaultValue, action) {
 		case SCAN_END:
 			return { ...state, indexing: false, isScanned: true };
 		case SCAN_PROGRESS:
-			return { ...state, step: action.step, progress: action.progress };
+			if (state.step === action.step) {
+				const stateProgress = state.progress.total
+					? (state.progress.value / state.progress.total) * 100
+					: state.progress.percent;
+				const actionProgress = action.progress.total
+					? (action.progress.value / action.progress.total) * 100
+					: action.progress.percent;
+				if (Math.round(100 * stateProgress) === Math.round(100 * actionProgress)) {
+					return state;
+				}
+			}
+			return {
+				...state,
+				step: action.step,
+				progress: action.progress
+			};
 		default:
 			return state;
 	}
