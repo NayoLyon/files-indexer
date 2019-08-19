@@ -244,7 +244,11 @@ async function walkDir(folder, progressStart, progressEnd, progressCallback) {
 	const [fileList, subFolders] = await readDir(folder);
 
 	const progressStep = (progressEnd - progressStart) / (subFolders.length + 1);
-	progressCallback("LISTING", { percent: progressStart + progressStep }, folder);
+	progressCallback(
+		"LISTING",
+		{ percent: Math.round((progressStart + progressStep) * 100) / 100 },
+		folder
+	);
 
 	for (let i = 0; i < subFolders.length; i += 1) {
 		const subFolder = subFolders[i];
