@@ -1,10 +1,9 @@
 const Datastore = require("nedb-promise");
 
-const path = require("path");
-
 const { remote } = window.require("electron");
 
 const { setSync } = remote.require("winattr");
+const path = remote.require("path");
 // const { setSync } = app.__utils;
 
 const dbStore = new Map();
