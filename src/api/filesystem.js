@@ -193,7 +193,7 @@ export class FileProps {
 }
 
 export async function doScan(folder, fileCallback, progressCallback, hashRequired) {
-	progressCallback("LISTING", { percent: 0 });
+	progressCallback("LISTING", { percent: 0 }, folder);
 	let files;
 	try {
 		files = await walkDir(folder, 0, 100, progressCallback);
@@ -206,7 +206,7 @@ export async function doScan(folder, fileCallback, progressCallback, hashRequire
 	console.log(`Found ${files.length} files...`);
 	for (let i = 0; i < files.length; i += 1) {
 		const file = files[i];
-		progressCallback("INDEXING", { value: i, total: files.length });
+		progressCallback("INDEXING", { value: i, total: files.length }, file);
 
 		const stats = fs.statSync(file);
 
@@ -244,7 +244,7 @@ async function walkDir(folder, progressStart, progressEnd, progressCallback) {
 	const [fileList, subFolders] = await readDir(folder);
 
 	const progressStep = (progressEnd - progressStart) / (subFolders.length + 1);
-	progressCallback("LISTING", { percent: progressStart + progressStep });
+	progressCallback("LISTING", { percent: progressStart + progressStep }, folder);
 
 	for (let i = 0; i < subFolders.length; i += 1) {
 		const subFolder = subFolders[i];

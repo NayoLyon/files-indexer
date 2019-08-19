@@ -11,12 +11,15 @@ class ScanView extends Component {
 			content = <Button onClick={this.props.scan}>Start Scan</Button>;
 		} else if (this.props.indexing) {
 			content = (
-				<Progress
-					{...this.props.progress}
-					progress={this.props.progress.total ? "ratio" : "percent"}
-				>
-					{this.props.step}
-				</Progress>
+				<React.Fragment>
+					<Progress
+						{...this.props.progress}
+						progress={this.props.progress.total ? "ratio" : "percent"}
+					>
+						{this.props.step}
+					</Progress>
+					<p>Working on {this.props.fileProgress}...</p>
+				</React.Fragment>
 			);
 		} else if (this.props.isScanned) {
 			content = <ResultContainer />;
@@ -47,7 +50,8 @@ function mapStateToProps(state) {
 		indexing: state.scanState.indexing,
 		isScanned: state.scanState.isScanned,
 		step: state.scanState.step,
-		progress: state.scanState.progress
+		progress: state.scanState.progress,
+		fileProgress: state.scanState.fileProgress
 	};
 }
 

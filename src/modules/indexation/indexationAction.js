@@ -26,11 +26,12 @@ export function endIndexation() {
 	};
 }
 
-export function indexProgress(step, progress) {
+export function indexProgress(step, progress, folder) {
 	return {
 		type: INDEXATION_PROGRESS,
 		step,
-		progress
+		progress,
+		folder
 	};
 }
 

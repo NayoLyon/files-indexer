@@ -5,7 +5,8 @@ const defaultValue = {
 	indexing: false,
 	isScanned: false,
 	step: "",
-	progress: { percent: 0 }
+	progress: { percent: 0 },
+	fileProgress: ""
 };
 
 export default function scanReducer(state = defaultValue, action) {
@@ -33,7 +34,8 @@ export default function scanReducer(state = defaultValue, action) {
 			return {
 				...state,
 				step: action.step,
-				progress: action.progress
+				progress: action.progress,
+				fileProgress: action.file
 			};
 		default:
 			return state;

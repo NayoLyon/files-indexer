@@ -11,12 +11,15 @@ class IndexationView extends Component {
 			content = <Button onClick={this.props.index}>Start Indexation</Button>;
 		} else if (this.props.indexing) {
 			content = (
-				<Progress
-					{...this.props.progress}
-					progress={this.props.progress.total ? "ratio" : "percent"}
-				>
-					{this.props.step}
-				</Progress>
+				<React.Fragment>
+					<Progress
+						{...this.props.progress}
+						progress={this.props.progress.total ? "ratio" : "percent"}
+					>
+						{this.props.step}
+					</Progress>
+					<p>Working on {this.props.folderProgress}...</p>
+				</React.Fragment>
 			);
 		} else if (this.props.isIndexed) {
 			// TODO displaying database content...
@@ -64,7 +67,8 @@ function mapStateToProps(state) {
 		indexing: state.indexationState.indexing,
 		isIndexed: state.indexationState.isIndexed,
 		step: state.indexationState.step,
-		progress: state.indexationState.progress
+		progress: state.indexationState.progress,
+		folderProgress: state.indexationState.folderProgress
 	};
 }
 

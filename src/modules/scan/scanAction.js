@@ -30,11 +30,12 @@ export function endScan() {
 	};
 }
 
-export function scanProgress(step, progress) {
+export function scanProgress(step, progress, file) {
 	return {
 		type: SCAN_PROGRESS,
 		step,
-		progress
+		progress,
+		file
 	};
 }
 
@@ -151,8 +152,10 @@ export function removeAllFiles(scanType) {
 		if (scanType === CONST_SCAN_TYPE_IDENTICAL) {
 			const identicals = await findDb("scan", { scanType }, FileProps);
 			for (let i = 0; i < identicals.length; i += 1) {
-				dispatch(scanProgress("REMOVING", { value: i, total: identicals.length }));
 				const file = identicals[i];
+				dispatch(
+					scanProgress("REMOVING", { value: i, total: identicals.length }, file.relpath)
+				);
 				deleteFile(getState().foldersState.toScanPath, file.relpath);
 				/* eslint-disable-next-line no-await-in-loop */
 				await scanRemove(file);
@@ -189,7 +192,9 @@ export function dbFilePropUpdated(dbFile) {
 		const nbFilesToRescan = filesToRescan.length;
 		for (let i = 0; i < nbFilesToRescan; i += 1) {
 			const fileProps = filesToRescan[i];
-			dispatch(scanProgress("LISTING", { value: i, total: nbFilesToRescan }));
+			dispatch(
+				scanProgress("LISTING", { value: i, total: nbFilesToRescan }, fileProps.relpath)
+			);
 			/* eslint-disable-next-line no-await-in-loop */
 			await scanRemove(fileProps);
 		}
@@ -197,7 +202,9 @@ export function dbFilePropUpdated(dbFile) {
 		// Rescan them all
 		for (let index = 0; index < filesToRescan.length; index += 1) {
 			const elt = filesToRescan[index];
-			dispatch(scanProgress("INDEXING", { value: index, total: filesToRescan.length }));
+			dispatch(
+				scanProgress("INDEXING", { value: index, total: filesToRescan.length }, elt.relpath)
+			);
 			/* eslint-disable-next-line no-await-in-loop */
 			await dispatch(scanProcessFile(elt));
 		}

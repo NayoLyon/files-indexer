@@ -14,6 +14,7 @@ const defaultValue = {
 	dbSize: -1,
 	step: "",
 	progress: { percent: 0 },
+	folderProgress: "",
 	duplicates: new Map()
 };
 
@@ -52,7 +53,8 @@ export default function indexationReducer(state = defaultValue, action) {
 			return {
 				...state,
 				step: action.step,
-				progress: action.progress
+				progress: action.progress,
+				folderProgress: action.folder
 			};
 		case INDEXATION_DUPLICATE: {
 			const duplicates = new Map(state.duplicates);
