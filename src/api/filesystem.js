@@ -194,7 +194,13 @@ export class FileProps {
 
 export async function doScan(folder, fileCallback, progressCallback, hashRequired) {
 	progressCallback("LISTING", 0);
-	const files = await walkDir(folder, 0, 1, progressCallback);
+	let files;
+	try {
+		files = await walkDir(folder, 0, 1, progressCallback);
+	} catch (error) {
+		console.log("Error listing folder!", error);
+		return;
+	}
 
 	// Now scanning files to store in DB
 	console.log(`Found ${files.length} files...`);
@@ -257,22 +263,29 @@ async function walkDir(folder, progressStart, progressEnd, progressCallback) {
 
 	return fileList;
 }
-function readDir(folder) {
-	return new Promise(resolve => {
-		const content = fs.readdirSync(folder);
-
-		const fileList = [];
-		const subFolders = [];
-		for (let i = 0; i < content.length; i += 1) {
-			const file = content[i];
-			if (fs.statSync(path.join(folder, file)).isDirectory()) {
-				subFolders.push(path.join(folder, file));
-			} else if (isEligibleFile(file)) {
-				fileList.push(path.join(folder, file));
-			}
-		}
-		resolve([fileList, subFolders]);
+const fsReadDir = (path, opts) =>
+	new Promise((resolve, reject) => {
+		fs.readdir(path, opts, (err, data) => {
+			if (err) reject(err);
+			else resolve(data);
+		});
 	});
+async function readDir(folder) {
+	const content = await fsReadDir(folder);
+	// const content = fs.readdirSync(folder);
+
+	const fileList = [];
+	const subFolders = [];
+	for (let i = 0; i < content.length; i += 1) {
+		const file = content[i];
+		if (fs.statSync(path.join(folder, file)).isDirectory()) {
+			subFolders.push(path.join(folder, file));
+		} else if (isEligibleFile(file)) {
+			fileList.push(path.join(folder, file));
+		}
+	}
+	subFolders.sort((a, b) => a.localeCompare(b));
+	return [fileList, subFolders];
 }
 /*
 function getRootPath(fullPath: string, relPath: string): string | null {
