@@ -5,6 +5,17 @@ const electron = window.require("electron");
 const fs = electron.remote.require("fs");
 const path = electron.remote.require("path");
 
+const fsExists = path =>
+	new Promise((resolve, reject) => {
+		fs.access(path, fs.constants.F_OK, err => {
+			if (err) {
+				resolve(false);
+			} else {
+				resolve(true);
+			}
+		});
+	});
+
 export const ANALYZE_START = "ANALYZE_START";
 export const ANALYZE_END = "ANALYZE_END";
 export const ANALYZE_PROGRESS = "ANALYZE_PROGRESS";
@@ -74,10 +85,13 @@ export function doAnalyze(folder) {
 		const files = await findDb(folder, {}, FilePropsDb);
 		const duplicateList = new Map();
 		const filesHash = new Map();
-		files.forEach((file, index) => {
+		dispatch(analyzeProgress("INDEXING", { value: 0, total: files.length }));
+		for (let index = 0; index < files.length; index++) {
+			const file = files[index];
 			dispatch(analyzeProgress("INDEXING", { value: index, total: files.length }));
 			const filePath = path.resolve(folder, file.relpath);
-			if (!fs.existsSync(filePath)) {
+			const fileExists = await fsExists(filePath);
+			if (!fileExists) {
 				dispatch(analyzeMissingAdd(file));
 			} else {
 				const otherFileSameHash = filesHash.get(file.hash);
@@ -92,7 +106,7 @@ export function doAnalyze(folder) {
 					filesHash.set(file.hash, file);
 				}
 			}
-		});
+		}
 
 		dispatch(analyzeDuplicate(duplicateList));
 
