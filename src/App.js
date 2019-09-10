@@ -1,9 +1,10 @@
-import { Component } from "react";
+import React, { Component } from "react";
 import { connect } from "react-redux";
-import RouterContainer from "./router";
 // import Store from "./ElectronStore";
 
 import { loadConfig } from "./modules/folders/foldersAction";
+
+import AppLayout from "./components/layouts/AppLayout";
 
 // const {
 // 	remote: {
@@ -28,7 +29,7 @@ class App extends Component {
 		e.preventDefault();
 	}
 	render() {
-		return RouterContainer;
+		return <AppLayout />;
 	}
 }
 
