@@ -1,18 +1,17 @@
-import React, { Component } from "react";
+import React from "react";
 import { connect } from "react-redux";
-import HomeView from "./HomeView";
-// import * as FoldersActions from '../../modules/folders/foldersAction';
+
 import { selectMaster, selectToScan } from "../../modules/folders/foldersAction";
 import { push } from "../../modules/router/routerActions";
-
 import routes from "../../utils/routes";
 
-const { remote } = window.require("electron");
+import HomeView from "./HomeView";
 
-// const { dialog, app } = remote;
-const { dialog } = remote;
-
-// const { __store: configStore } = app;
+const {
+	remote: {
+		dialog: { showOpenDialog }
+	}
+} = window.require("electron");
 
 /*
 For UI,
@@ -20,70 +19,49 @@ See http://reactdesktop.js.org/docs/windows/window/
 Or https://xel-toolkit.org/ for an alternative to React desktop
 Or https://www.material-ui.com/#/get-started/required-knowledge ???
 */
-class HomeContainer extends Component {
-	constructor(props) {
-		super(props);
-
-		this.isScanPossible = this.isScanPossible.bind(this);
-		this.goToIndex = this.goToIndex.bind(this);
-		this.selectFolder = this.selectFolder.bind(this);
-		this.setFolder = this.setFolder.bind(this);
-		// console.log({ ...app }, app.getPath("userData"));
-	}
-	selectFolder(isMaster) {
-		dialog.showOpenDialog(
+const HomeContainer = ({ masterFolder, toScanFolder, goToIndex, selectMaster, selectToScan }) => {
+	const selectFolder = (defaultPath, actionFunc) => () => {
+		showOpenDialog(
 			{
-				defaultPath: isMaster ? this.props.masterFolder : this.props.toScanFolder,
+				defaultPath,
 				properties: ["openDirectory"]
 			},
-			this.setFolder(isMaster)
+			actionFunc
 		);
-	}
-
-	setFolder(isMaster) {
-		return filePaths => {
-			if (typeof filePaths !== "object" || filePaths.length < 1) {
-				return;
-			}
-			if (isMaster) {
-				this.props.dispatch(selectMaster(filePaths[0]));
-			} else {
-				this.props.dispatch(selectToScan(filePaths[0]));
-			}
-		};
-	}
-
-	isScanPossible() {
-		return (
-			typeof this.props.masterFolder === "string" &&
-			typeof this.props.toScanFolder === "string" &&
-			this.props.masterFolder !== "" &&
-			this.props.toScanFolder !== ""
-		);
-	}
-	goToIndex() {
-		if (this.isScanPossible()) {
-			this.props.dispatch(push(routes.index));
-		}
-	}
-
-	render() {
-		return (
-			<HomeView
-				selectFolder={this.selectFolder}
-				goToIndex={this.goToIndex}
-				masterFolder={this.props.masterFolder}
-				toScanFolder={this.props.toScanFolder}
-			/>
-		);
-	}
-}
-
-function mapStateToProps(state) {
-	return {
-		masterFolder: state.foldersState.masterPath,
-		toScanFolder: state.foldersState.toScanPath
 	};
-}
 
-export default connect(mapStateToProps)(HomeContainer);
+	return (
+		<HomeView
+			onSelectMasterFolder={selectFolder(masterFolder, selectMaster)}
+			onSelectToScanFolder={selectFolder(toScanFolder, selectToScan)}
+			goToIndex={masterFolder && toScanFolder ? goToIndex : null}
+			masterFolder={masterFolder}
+			toScanFolder={toScanFolder}
+		/>
+	);
+};
+
+const mapStateToProps = state => ({
+	masterFolder: state.foldersState.masterPath,
+	toScanFolder: state.foldersState.toScanPath
+});
+const mapDispatchToProps = dispatch => ({
+	goToIndex: () => dispatch(push(routes.index)),
+	selectMaster: filePaths => {
+		if (typeof filePaths !== "object" || filePaths.length < 1) {
+			return;
+		}
+		dispatch(selectMaster(filePaths[0]));
+	},
+	selectToScan: filePaths => {
+		if (typeof filePaths !== "object" || filePaths.length < 1) {
+			return;
+		}
+		dispatch(selectToScan(filePaths[0]));
+	}
+});
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(HomeContainer);
