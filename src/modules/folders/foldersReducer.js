@@ -8,9 +8,9 @@ const defaultValue = {
 export default function foldersReducer(state = defaultValue, action) {
 	switch (action.type) {
 		case SELECT_MASTER_FOLDER:
-			return { ...state, masterPath: action.path };
+			return { ...state, masterPath: action.path || "" };
 		case SELECT_TOSCAN_FOLDER:
-			return { ...state, toScanPath: action.path };
+			return { ...state, toScanPath: action.path || "" };
 		default:
 			return state;
 	}

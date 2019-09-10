@@ -13,7 +13,6 @@ const { remote } = window.require("electron");
 const { dialog } = remote;
 
 // const { __store: configStore } = app;
-const Store = remote.require("electron-store");
 
 /*
 For UI,
@@ -46,13 +45,10 @@ class HomeContainer extends Component {
 			if (typeof filePaths !== "object" || filePaths.length < 1) {
 				return;
 			}
-			const configStore = new Store();
 			if (isMaster) {
 				this.props.dispatch(selectMaster(filePaths[0]));
-				configStore.set("masterFolder", filePaths[0]);
 			} else {
 				this.props.dispatch(selectToScan(filePaths[0]));
-				configStore.set("toScanFolder", filePaths[0]);
 			}
 		};
 	}
