@@ -2,9 +2,10 @@ const baseUrlRouter = "/";
 
 const routes = {
 	base: baseUrlRouter,
-	index: baseUrlRouter + "index",
-	scan: baseUrlRouter + "scan",
-	analyzeDb: baseUrlRouter + "analyzeDb"
+	source: baseUrlRouter + "source",
+	index: baseUrlRouter + "source/index",
+	scan: baseUrlRouter + "source/scan",
+	analyzeDb: baseUrlRouter + "source/analyzeDb"
 };
 
 export default routes;

@@ -11,9 +11,7 @@ import routes from "../../utils/routes";
 import NotFound from "../NotFound";
 // import LoaderCustom from "../shared/LoaderCustom";
 import HomeContainer from "../home/HomeContainer";
-import IndexationContainer from "../indexation/IndexationContainer";
-import AnalyzeContainer from "../analyzeDb/AnalyzeContainer";
-import ScanContainer from "../scan/ScanContainer";
+import SourceContainer from "../home/SourceContainer";
 
 class AppLayout extends Component {
 	// componentDidMount() {
@@ -33,9 +31,7 @@ class AppLayout extends Component {
 			<div style={divBackgroundStyle}>
 				<Container>
 					<Switch>
-						<Route exact path={routes.index} component={IndexationContainer} />
-						<Route exact path={routes.scan} component={ScanContainer} />
-						<Route exact path={routes.analyzeDb} component={AnalyzeContainer} />
+						<Route path={routes.source} component={SourceContainer} />
 						<Route exact path={routes.base} component={HomeContainer} />
 						<Route path={routes.base} component={NotFound} />
 					</Switch>
