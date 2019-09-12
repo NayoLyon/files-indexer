@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 
 import { bindActionCreators } from "redux";
@@ -20,127 +20,70 @@ import routes from "../../utils/routes";
 import LoaderCustom from "../shared/LoaderCustom";
 import IndexationView from "./IndexationView";
 
-class IndexationContainer extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			masterFolder: undefined
-		};
-		this.processFileWithHash = this.processFileWithHash.bind(this);
-		this.startIndex = this.startIndex.bind(this);
-	}
-
-	static getDerivedStateFromProps(nextProps, prevState) {
-		const { masterFolder } = nextProps;
-		if (masterFolder !== prevState.masterFolder) {
-			if (masterFolder) {
-				nextProps.createDatabase(masterFolder);
-			}
-
-			return { masterFolder };
+const IndexationContainer = props => {
+	const {
+		masterFolder,
+		dbSize,
+		indexing,
+		isIndexed,
+		step,
+		progress,
+		folderProgress,
+		duplicates,
+		goToScan,
+		goToAnalyzeDb,
+		goToHome,
+		dbLoaded,
+		createDatabase,
+		startIndexation,
+		indexDuplicate,
+		indexProgress,
+		loadDatabase,
+		endIndexation
+	} = props;
+	useEffect(() => {
+		if (masterFolder) {
+			createDatabase(masterFolder);
+			return () => {};
 		}
-		return null;
+	}, [masterFolder, createDatabase]);
+
+	if (!dbLoaded) {
+		return <LoaderCustom />;
 	}
 
-	// This method returns a function to process a file scanned on the disk.
-	// This method returns either the function to process a file with its hash already computed,
-	// or the function to process a file with its hash NOT YET computed.
-	processFileWithHash(hashComputed = true) {
-		return async fileProps => {
-			const occurences = await findDb(
-				this.props.masterFolder,
-				{ relpath: fileProps.relpath },
-				FilePropsDb
-			);
-			if (occurences.length) {
-				if (occurences.length > 1) {
-					console.error(
-						`More than 1 occurence for relpath ${fileProps.relpath}!! This should never happen! Will only compare to the first one...`
-					);
-					console.error(occurences);
-				}
-
-				// File already indexed... Check that the file is correct in db or update it...
-				let diff = fileProps.compareToSamePath(occurences[0]);
-				if (!hashComputed) {
-					diff.delete("hash");
-				}
-				if (diff.size) {
-					if (!hashComputed) {
-						// There are differences between the files... Recompute the hash and relaunch compare to include the hash
-						await fileProps.computeHash();
-						diff = fileProps.compareToSamePath(occurences[0]);
-					}
-
-					// Then update the db and log
-					this.props.indexDuplicate(occurences[0], fileProps, diff);
-					await updateDb(
-						this.props.masterFolder,
-						occurences[0].cloneFromSamePath(fileProps)
-					);
-				}
-			} else {
-				if (!hashComputed) {
-					await fileProps.computeHash();
-					console.info("Adding new file in db", fileProps);
-					this.props.indexDuplicate(undefined, fileProps, new Set(["new"]));
-				}
-				await insertDb(this.props.masterFolder, fileProps.toFilePropsDb());
-			}
-		};
-	}
-	// This method returns the function to index the db folder.
-	// This method returns either the function to perform a full re-indexation (hash computed, withHash=true)
-	// or the function to perform a quick re-indexation (no hash computed unless file is modified or new, withHash=false)
-	startIndex(withHash = true) {
-		return async () => {
-			this.props.startIndexation();
-			await doScan(
-				this.props.masterFolder,
-				this.processFileWithHash(withHash),
-				this.props.indexProgress,
-				withHash
-			);
-
-			this.props.loadDatabase(this.props.masterFolder);
-
-			this.props.endIndexation();
-		};
-	}
-
-	render() {
-		if (!this.props.dbLoaded) {
-			return <LoaderCustom />;
-		}
-		const {
+	const startIndex = withHash => async () => {
+		startIndexation();
+		await doScan(
 			masterFolder,
-			dbSize,
-			indexing,
-			isIndexed,
-			step,
-			progress,
-			folderProgress,
-			duplicates
-		} = this.props;
-		return (
-			<IndexationView
-				index={this.startIndex(true)}
-				quickIndex={this.startIndex(false)}
-				masterFolder={masterFolder}
-				dbSize={dbSize}
-				indexing={indexing}
-				isIndexed={isIndexed}
-				step={step}
-				progress={progress}
-				folderProgress={folderProgress}
-				duplicates={duplicates}
-				goToScan={this.props.goToScan}
-				goToAnalyzeDb={this.props.goToAnalyzeDb}
-				goToHome={this.props.goToHome}
-			/>
+			processFileWithHash(withHash, masterFolder, indexDuplicate),
+			indexProgress,
+			withHash
 		);
-	}
-}
+
+		loadDatabase(masterFolder);
+
+		endIndexation();
+	};
+
+	return (
+		<IndexationView
+			index={startIndex(true)}
+			quickIndex={startIndex(false)}
+			masterFolder={masterFolder}
+			dbSize={dbSize}
+			indexing={indexing}
+			isIndexed={isIndexed}
+			step={step}
+			progress={progress}
+			folderProgress={folderProgress}
+			duplicates={duplicates}
+			goToScan={goToScan}
+			goToAnalyzeDb={goToAnalyzeDb}
+			goToHome={goToHome}
+		/>
+	);
+};
 
 function mapStateToProps(state) {
 	return {
@@ -155,6 +98,42 @@ function mapStateToProps(state) {
 		duplicates: state.indexationState.duplicates
 	};
 }
+
+const processFileWithHash = (hashComputed, masterFolder, indexDuplicate) => async fileProps => {
+	const occurences = await findDb(masterFolder, { relpath: fileProps.relpath }, FilePropsDb);
+	if (occurences.length) {
+		if (occurences.length > 1) {
+			console.error(
+				`More than 1 occurence for relpath ${fileProps.relpath}!! This should never happen! Will only compare to the first one...`
+			);
+			console.error(occurences);
+		}
+
+		// File already indexed... Check that the file is correct in db or update it...
+		let diff = fileProps.compareToSamePath(occurences[0]);
+		if (!hashComputed) {
+			diff.delete("hash");
+		}
+		if (diff.size) {
+			if (!hashComputed) {
+				// There are differences between the files... Recompute the hash and relaunch compare to include the hash
+				await fileProps.computeHash();
+				diff = fileProps.compareToSamePath(occurences[0]);
+			}
+
+			// Then update the db and log
+			indexDuplicate(occurences[0], fileProps, diff);
+			await updateDb(masterFolder, occurences[0].cloneFromSamePath(fileProps));
+		}
+	} else {
+		if (!hashComputed) {
+			await fileProps.computeHash();
+			console.info("Adding new file in db", fileProps);
+			indexDuplicate(undefined, fileProps, new Set(["new"]));
+		}
+		await insertDb(masterFolder, fileProps.toFilePropsDb());
+	}
+};
 
 function mapDispatchToProps(dispatch) {
 	return bindActionCreators(
