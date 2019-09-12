@@ -55,9 +55,7 @@ class IndexationContainer extends Component {
 			if (occurences.length) {
 				if (occurences.length > 1) {
 					console.error(
-						`More than 1 occurence for relpath ${
-							fileProps.relpath
-						}!! This should never happen! Will only compare to the first one...`
+						`More than 1 occurence for relpath ${fileProps.relpath}!! This should never happen! Will only compare to the first one...`
 					);
 					console.error(occurences);
 				}
@@ -114,10 +112,28 @@ class IndexationContainer extends Component {
 		if (!this.props.dbLoaded) {
 			return <LoaderCustom />;
 		}
+		const {
+			masterFolder,
+			dbSize,
+			indexing,
+			isIndexed,
+			step,
+			progress,
+			folderProgress,
+			duplicates
+		} = this.props;
 		return (
 			<IndexationView
 				index={this.startIndex(true)}
 				quickIndex={this.startIndex(false)}
+				masterFolder={masterFolder}
+				dbSize={dbSize}
+				indexing={indexing}
+				isIndexed={isIndexed}
+				step={step}
+				progress={progress}
+				folderProgress={folderProgress}
+				duplicates={duplicates}
 				goToScan={this.props.goToScan}
 				goToAnalyzeDb={this.props.goToAnalyzeDb}
 				goToHome={this.props.goToHome}
@@ -129,7 +145,14 @@ class IndexationContainer extends Component {
 function mapStateToProps(state) {
 	return {
 		masterFolder: state.foldersState.masterPath,
-		dbLoaded: state.indexationState.dbLoaded
+		dbLoaded: state.indexationState.dbLoaded,
+		dbSize: state.indexationState.dbSize,
+		indexing: state.indexationState.indexing,
+		isIndexed: state.indexationState.isIndexed,
+		step: state.indexationState.step,
+		progress: state.indexationState.progress,
+		folderProgress: state.indexationState.folderProgress,
+		duplicates: state.indexationState.duplicates
 	};
 }
 

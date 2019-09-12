@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
 import { Table } from "semantic-ui-react";
 
 import { printValue } from "../../utils/format";
@@ -69,10 +68,4 @@ class IndexationAnomaliesView extends Component {
 	}
 }
 
-function mapStateToProps(state) {
-	return {
-		duplicates: state.indexationState.duplicates
-	};
-}
-
-export default connect(mapStateToProps)(IndexationAnomaliesView);
+export default IndexationAnomaliesView;

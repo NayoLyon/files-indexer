@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
 import { Grid, Icon, Header, Button, Divider, Progress } from "semantic-ui-react";
 
 import IndexationAnomaliesView from "./IndexationAnomaliesView";
@@ -36,7 +35,7 @@ class IndexationView extends Component {
 					{/* <Link to="/analyseDb"> */}
 					<Button onClick={this.props.goToAnalyzeDb}>Analyse database content</Button>
 					{/* </Link> */}
-					<IndexationAnomaliesView />
+					<IndexationAnomaliesView duplicates={this.props.duplicates} />
 				</div>
 			);
 		}
@@ -59,16 +58,4 @@ class IndexationView extends Component {
 	}
 }
 
-function mapStateToProps(state) {
-	return {
-		masterFolder: state.foldersState.masterPath,
-		dbSize: state.indexationState.dbSize,
-		indexing: state.indexationState.indexing,
-		isIndexed: state.indexationState.isIndexed,
-		step: state.indexationState.step,
-		progress: state.indexationState.progress,
-		folderProgress: state.indexationState.folderProgress
-	};
-}
-
-export default connect(mapStateToProps)(IndexationView);
+export default IndexationView;
