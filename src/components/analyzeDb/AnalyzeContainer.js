@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useEffect, useCallback } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 // import path from "path";
@@ -16,69 +16,94 @@ const electron = window.require("electron");
 const fs = electron.remote.require("fs");
 const path = electron.remote.require("path");
 
-class AnalyzeContainer extends Component {
-	constructor(props) {
-		super(props);
-
-		if (this.props.masterFolder) {
-			this.props.doAnalyze(this.props.masterFolder);
+const AnalyzeContainer = props => {
+	const {
+		masterFolder,
+		loading,
+		isAnalyzed,
+		step,
+		progress,
+		missingList,
+		duplicateList,
+		goToScan,
+		goToIndex,
+		doAnalyze,
+		removeMissing,
+		removeDuplicate
+	} = props;
+	useEffect(() => {
+		if (masterFolder) {
+			doAnalyze(masterFolder);
 		}
+	}, [masterFolder, doAnalyze]);
 
-		this.openDbFolderFor = this.openDbFolderFor.bind(this);
-		this.removeInDb = this.removeInDb.bind(this);
-		this.removeFile = this.removeFile.bind(this);
-	}
-
-	openDbFolderFor(file) {
-		let filePath = path.resolve(this.props.masterFolder, file.relpath);
-		if (fs.existsSync(filePath)) {
-			openExplorerOn(filePath);
-		} else {
-			filePath = path.dirname(filePath);
-			while (!fs.existsSync(filePath)) {
+	const openDbFolderFor = useCallback(
+		file => {
+			let filePath = path.resolve(masterFolder, file.relpath);
+			if (fs.existsSync(filePath)) {
+				openExplorerOn(filePath);
+			} else {
 				filePath = path.dirname(filePath);
+				while (!fs.existsSync(filePath)) {
+					filePath = path.dirname(filePath);
+				}
+				openExplorerFor(filePath);
 			}
-			openExplorerFor(filePath);
-		}
-	}
-	removeInDb(file) {
-		this.props.removeMissing(file);
-	}
-	removeFile(file) {
-		deleteFile(this.props.masterFolder, file.relpath);
-		this.props.removeDuplicate(file);
-	}
+		},
+		[masterFolder]
+	);
 
-	render() {
-		return (
-			<AnalyzeView
-				openDbFolderFor={this.openDbFolderFor}
-				removeInDb={this.removeInDb}
-				removeFile={this.removeFile}
-				goToScan={this.props.goToScan}
-				goToIndex={this.props.goToIndex}
-			/>
-		);
-	}
-}
+	const removeFile = useCallback(
+		file => {
+			deleteFile(masterFolder, file.relpath);
+			removeDuplicate(file);
+		},
+		[masterFolder, removeDuplicate]
+	);
+
+	return (
+		<AnalyzeView
+			masterFolder={masterFolder}
+			loading={loading}
+			isAnalyzed={isAnalyzed}
+			step={step}
+			progress={progress}
+			missingList={missingList}
+			duplicateList={duplicateList}
+			openDbFolderFor={openDbFolderFor}
+			removeInDb={removeMissing}
+			removeFile={removeFile}
+			goToScan={goToScan}
+			goToIndex={goToIndex}
+		/>
+	);
+};
 
 function mapStateToProps(state) {
 	return {
-		masterFolder: state.foldersState.masterPath
+		masterFolder: state.foldersState.masterPath,
+		loading: state.analyzeState.loading,
+		isAnalyzed: state.analyzeState.isAnalyzed,
+		step: state.analyzeState.step,
+		progress: state.analyzeState.progress,
+		missingList: state.analyzeState.missingList,
+		duplicateList: state.analyzeState.duplicateList
 	};
 }
 
 function mapDispatchToProps(dispatch) {
-	return bindActionCreators(
-		{
-			doAnalyze,
-			removeMissing,
-			removeDuplicate,
-			goToScan: () => push(routes.scan),
-			goToIndex: () => push(routes.index)
-		},
-		dispatch
-	);
+	return {
+		...bindActionCreators(
+			{
+				doAnalyze,
+				removeMissing,
+				removeDuplicate
+			},
+			dispatch
+		),
+		goToScan: () => dispatch(push(routes.scan)),
+		goToIndex: () => dispatch(push(routes.index))
+	};
 }
 
 export default connect(
