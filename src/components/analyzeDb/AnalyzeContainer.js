@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useContext } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 // import path from "path";
@@ -9,6 +9,7 @@ import routes from "../../utils/routes";
 
 import { doAnalyze, removeMissing, removeDuplicate } from "../../modules/analyzeDb/analyzeAction";
 import { push } from "../../modules/router/routerActions";
+import SourceContext from "../source/SourceContext";
 
 import AnalyzeView from "./AnalyzeView";
 
@@ -16,30 +17,31 @@ const electron = window.require("electron");
 const fs = electron.remote.require("fs");
 const path = electron.remote.require("path");
 
-const AnalyzeContainer = props => {
-	const {
-		masterFolder,
-		loading,
-		isAnalyzed,
-		step,
-		progress,
-		missingList,
-		duplicateList,
-		goToScan,
-		goToIndex,
-		doAnalyze,
-		removeMissing,
-		removeDuplicate
-	} = props;
+const AnalyzeContainer = ({
+	loading,
+	isAnalyzed,
+	step,
+	progress,
+	missingList,
+	duplicateList,
+	goToScan,
+	goToIndex,
+	doAnalyze,
+	removeMissing,
+	removeDuplicate
+}) => {
+	const db = useContext(SourceContext);
 	useEffect(() => {
-		if (masterFolder) {
-			doAnalyze(masterFolder);
+		if (db) {
+			doAnalyze(db);
 		}
-	}, [masterFolder, doAnalyze]);
+	}, [db, doAnalyze]);
 
 	const openDbFolderFor = useCallback(
 		file => {
-			let filePath = path.resolve(masterFolder, file.relpath);
+			if (!db) return;
+
+			let filePath = path.resolve(db.folder, file.relpath);
 			if (fs.existsSync(filePath)) {
 				openExplorerOn(filePath);
 			} else {
@@ -50,20 +52,22 @@ const AnalyzeContainer = props => {
 				openExplorerFor(filePath);
 			}
 		},
-		[masterFolder]
+		[db]
 	);
 
 	const removeFile = useCallback(
 		file => {
-			deleteFile(masterFolder, file.relpath);
-			removeDuplicate(file);
+			if (!db) return;
+
+			deleteFile(db.folder, file.relpath);
+			removeDuplicate(db, file);
 		},
-		[masterFolder, removeDuplicate]
+		[db, removeDuplicate]
 	);
 
 	return (
 		<AnalyzeView
-			masterFolder={masterFolder}
+			masterFolder={(db && db.folder) || ""}
 			loading={loading}
 			isAnalyzed={isAnalyzed}
 			step={step}
@@ -71,7 +75,7 @@ const AnalyzeContainer = props => {
 			missingList={missingList}
 			duplicateList={duplicateList}
 			openDbFolderFor={openDbFolderFor}
-			removeInDb={removeMissing}
+			removeInDb={dbFile => removeMissing(db, dbFile)}
 			removeFile={removeFile}
 			goToScan={goToScan}
 			goToIndex={goToIndex}
@@ -81,7 +85,6 @@ const AnalyzeContainer = props => {
 
 function mapStateToProps(state) {
 	return {
-		masterFolder: state.foldersState.masterPath,
 		loading: state.analyzeState.loading,
 		isAnalyzed: state.analyzeState.isAnalyzed,
 		step: state.analyzeState.step,

@@ -1,4 +1,3 @@
-import { findDb, deleteDb } from "../../api/database";
 import { FilePropsDb } from "../../api/filesystem";
 
 const electron = window.require("electron");
@@ -6,7 +5,7 @@ const fs = electron.remote.require("fs");
 const path = electron.remote.require("path");
 
 const fsExists = path =>
-	new Promise((resolve, reject) => {
+	new Promise(resolve => {
 		fs.access(path, fs.constants.F_OK, err => {
 			if (err) {
 				resolve(false);
@@ -66,30 +65,30 @@ function analyzeDuplicateRemove(dbFile) {
 	};
 }
 
-export function removeMissing(dbFile) {
+export function removeMissing(db, dbFile) {
 	return async (dispatch, getState) => {
-		deleteDb(getState().foldersState.masterPath, dbFile);
+		db.deleteDb(dbFile);
 		dispatch(analyzeMissingRemove(dbFile));
 	};
 }
-export function removeDuplicate(dbFile) {
+export function removeDuplicate(db, dbFile) {
 	return async (dispatch, getState) => {
-		deleteDb(getState().foldersState.masterPath, dbFile);
+		db.deleteDb(dbFile);
 		dispatch(analyzeDuplicateRemove(dbFile));
 	};
 }
-export function doAnalyze(folder) {
+export function doAnalyze(db) {
 	return async dispatch => {
 		dispatch(startAnalyze());
 
-		const files = await findDb(folder, {}, FilePropsDb);
+		const files = await db.findDb({}, FilePropsDb);
 		const duplicateList = new Map();
 		const filesHash = new Map();
 		dispatch(analyzeProgress("INDEXING", { value: 0, total: files.length }));
 		for (let index = 0; index < files.length; index++) {
 			const file = files[index];
 			dispatch(analyzeProgress("INDEXING", { value: index, total: files.length }));
-			const filePath = path.resolve(folder, file.relpath);
+			const filePath = path.resolve(db.folder, file.relpath);
 			const fileExists = await fsExists(filePath);
 			if (!fileExists) {
 				dispatch(analyzeMissingAdd(file));
