@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 
@@ -7,6 +7,7 @@ import routes from "../../utils/routes";
 
 import { endScan, scanProgress, startScan, scanProcessFile } from "../../modules/scan/scanAction";
 import { push } from "../../modules/router/routerActions";
+import SourceContext from "../source/SourceContext";
 
 import ScanView from "./ScanView";
 
@@ -23,19 +24,35 @@ const ScanContainer = ({
 	endScan,
 	goToIndex
 }) => {
-	const scan = async () => {
-		await startScan();
+	const db = useContext(SourceContext);
+	// Caution: scan is a function, so to update it we have to escape the function mode of setState of Hooks.
+	// See setStartIndexFunc comment in IndexationContainer
+	const [scan, setScan] = useState(() => () => {});
+	useEffect(() => {
+		if (db) {
+			let canceled = false;
+			setScan(() => async () => {
+				if (canceled) return; // Component has changed, stop now...
 
-		await doScan(
-			toScanFolder,
-			scanProcessFile,
-			scanProgress,
-			true
-			// TODO add isCanceled
-		);
+				await startScan();
 
-		endScan();
-	};
+				if (canceled) return; // Component has changed, stop now...
+				await doScan(
+					toScanFolder,
+					fileProps => scanProcessFile(db, fileProps),
+					scanProgress,
+					true,
+					() => canceled
+				);
+
+				if (canceled) return; // Component has changed, stop now...
+				endScan();
+			});
+			return () => (canceled = true);
+		} else {
+			setScan(() => () => {});
+		}
+	}, [db, startScan, toScanFolder, scanProcessFile, scanProgress, endScan]);
 
 	return (
 		<ScanView

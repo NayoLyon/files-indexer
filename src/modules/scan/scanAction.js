@@ -105,21 +105,15 @@ async function scanRemove(fileProps) {
 	);
 	// console.log(`'${deleteQuery}' dbFilesRef removed...`);
 }
-export function scanProcessFile(fileProps) {
+export function scanProcessFile(db, fileProps) {
 	return async (dispatch, getState) => {
-		const { masterPath } = getState().foldersState;
+		if (!db) return; // Should not happen, protected on call
 
 		const newFileProps = fileProps.clone();
-		let occurences = await findDb(masterPath, { hash: newFileProps.hash }, FilePropsDb);
+		let occurences = await db.findDb({ hash: newFileProps.hash }, FilePropsDb);
 		if (occurences.length === 0) {
 			// File not found in db... Search for files with similar properties
-			occurences = await findDb(
-				masterPath,
-				{
-					name: newFileProps.name
-				},
-				FilePropsDb
-			);
+			occurences = await db.findDb({ name: newFileProps.name }, FilePropsDb);
 			if (occurences.length === 0) {
 				newFileProps.setCompareType(CONST_SCAN_TYPE_NEW);
 			} else {
