@@ -3,6 +3,8 @@ import { Grid, Icon, Header, Button, Progress } from "semantic-ui-react";
 
 import AnalyzeViewContentAnomalies from "./AnalyzeViewContentAnomalies";
 
+export const buttonGroupStyle = { marginRight: "1rem" };
+
 const AnalyzeViewContent = ({ isAnalyzed, loading, progress, step, goToScan, ...props }) => {
 	return !isAnalyzed && !loading ? null : loading ? (
 		<Progress {...progress} progress={progress.total ? "ratio" : "percent"}>

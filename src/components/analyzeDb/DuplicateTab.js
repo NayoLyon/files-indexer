@@ -3,11 +3,10 @@ import { Tab, Table, Button } from "semantic-ui-react";
 
 import { printValue } from "../../utils/format";
 
-import AnalyzeView from "./AnalyzeView";
+import { buttonGroupStyle } from "./AnalyzeView";
 
 export default class DuplicateTab extends Component {
 	renderFiles() {
-		const { buttonGroupStyle } = AnalyzeView.getStyles();
 		const rows = [];
 		const addMatchRow = file => {
 			rows.push(

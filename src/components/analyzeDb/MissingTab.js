@@ -1,11 +1,10 @@
 import React, { Component } from "react";
 import { Tab, List, Button } from "semantic-ui-react";
 
-import AnalyzeView from "./AnalyzeView";
+import { buttonGroupStyle } from "./AnalyzeView";
 
 export default class MissingTab extends Component {
 	renderFiles() {
-		const { buttonGroupStyle } = AnalyzeView.getStyles();
 		const res = [];
 		for (let i = 0; i < this.props.files.length; i += 1) {
 			const file = this.props.files[i];
