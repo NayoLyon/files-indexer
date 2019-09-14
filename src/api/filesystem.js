@@ -192,20 +192,29 @@ export class FileProps {
 	}
 }
 
-export async function doScan(folder, fileCallback, progressCallback, hashRequired) {
+export async function doScan(
+	folder,
+	fileCallback,
+	progressCallback,
+	hashRequired,
+	isCanceled = () => false
+) {
 	progressCallback("LISTING", { percent: 0 }, folder);
 	let files;
 	try {
-		files = await walkDir(folder, 0, 100, progressCallback);
+		files = await walkDir(folder, 0, 100, progressCallback, isCanceled);
 	} catch (error) {
 		console.log("Error listing folder!", error);
 		return;
 	}
 
+	if (isCanceled()) return;
+
 	// Now scanning files to store in DB
 	const { length: total } = files;
 	console.log(`Found ${total} files...`);
 	for (let i = 0; i < total; i += 1) {
+		if (isCanceled()) return;
 		const file = files[i];
 		progressCallback("INDEXING", { value: i, total }, file);
 
@@ -242,7 +251,7 @@ function computeHashForFile(fn) {
 	});
 }
 
-async function walkDir(folder, progressStart, progressEnd, progressCallback) {
+async function walkDir(folder, progressStart, progressEnd, progressCallback, isCanceled) {
 	const [fileList, subFolders] = await readDir(folder);
 
 	const progressStep = (progressEnd - progressStart) / (subFolders.length + 1);
@@ -253,6 +262,7 @@ async function walkDir(folder, progressStart, progressEnd, progressCallback) {
 	);
 
 	for (let i = 0; i < subFolders.length; i += 1) {
+		if (isCanceled()) return [];
 		const subFolder = subFolders[i];
 		const subFolderProgressOffset = (i + 1) * progressStep;
 		const subFolderProgress = progressStart + subFolderProgressOffset;
@@ -260,7 +270,8 @@ async function walkDir(folder, progressStart, progressEnd, progressCallback) {
 			subFolder,
 			subFolderProgress,
 			subFolderProgress + progressStep,
-			progressCallback
+			progressCallback,
+			isCanceled
 		);
 		subFolderContent.forEach(elt => {
 			fileList.push(elt);
