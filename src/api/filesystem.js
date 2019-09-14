@@ -203,10 +203,11 @@ export async function doScan(folder, fileCallback, progressCallback, hashRequire
 	}
 
 	// Now scanning files to store in DB
-	console.log(`Found ${files.length} files...`);
-	for (let i = 0; i < files.length; i += 1) {
+	const { length: total } = files;
+	console.log(`Found ${total} files...`);
+	for (let i = 0; i < total; i += 1) {
 		const file = files[i];
-		progressCallback("INDEXING", { value: i, total: files.length }, file);
+		progressCallback("INDEXING", { value: i, total }, file);
 
 		const stats = fs.statSync(file);
 
@@ -218,9 +219,10 @@ export async function doScan(folder, fileCallback, progressCallback, hashRequire
 				console.error(`Could not compute hash for ${file}. Skip it...`, error);
 			}
 		}
-		console.log(`Hash for file ${file} is ${fileProps.hash}`, fileProps);
+		// console.log(`Hash for file ${file} is ${fileProps.hash}`, fileProps);
 		await fileCallback(fileProps);
 	}
+	progressCallback("INDEXING", { value: total, total });
 }
 function computeHashForFile(fn) {
 	return new Promise((resolve, reject) => {
