@@ -1,14 +1,12 @@
-import React, { Component } from "react";
+import React, { useEffect, useContext } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-// import fs from 'fs';
-// import path from 'path';
 
-import { updateDb } from "../../api/database";
 import { openExplorerOn } from "../../utils/filesystem";
 
 import { removeFile, removeAllFiles, dbFilePropUpdated } from "../../modules/scan/scanAction";
 import { loadResult, resultSetTabActive } from "../../modules/result/resultAction";
+import SourceContext from "../source/SourceContext";
 
 import ResultView from "./ResultView";
 
@@ -16,44 +14,35 @@ const electron = window.require("electron");
 const fs = electron.remote.require("fs");
 const path = electron.remote.require("path");
 
-class ResultContainer extends Component {
-	static wait(ms) {
-		return new Promise(resolve => setTimeout(resolve, ms));
+const ResultContainer = ({
+	toScanFolder,
+	loadResult,
+	dbFilePropUpdated,
+	removeFile,
+	removeAllFiles,
+	resultSetTabActive
+}) => {
+	const db = useContext(SourceContext);
+
+	useEffect(() => {
+		loadResult();
+	}, [loadResult]);
+
+	if (!db) {
+		// Should not happen...
+		return null;
 	}
 
-	static async promisifyFunc(func, ...args) {
-		await func(...args);
-		await ResultContainer.wait(1);
-	}
+	const openDbFolderFor = file => openExplorerOn(path.resolve(db.folder, file.relpath));
+	const openFolderFor = file => openExplorerOn(path.resolve(toScanFolder, file.relpath));
 
-	constructor(props) {
-		super(props);
-		this.copyModifiedAttributeTo = this.copyModifiedAttributeTo.bind(this);
-		this.openDbFolderFor = this.openDbFolderFor.bind(this);
-		this.openFolderFor = this.openFolderFor.bind(this);
-		this.copyNameAttributeTo = this.copyNameAttributeTo.bind(this);
-
-		props.loadResult();
-	}
-
-	openDbFolderFor(file) {
-		const { masterFolder } = this.props;
-		openExplorerOn(path.resolve(masterFolder, file.relpath));
-	}
-
-	openFolderFor(file) {
-		const { toScanFolder } = this.props;
-		openExplorerOn(path.resolve(toScanFolder, file.relpath));
-	}
-
-	async copyModifiedAttributeTo(file, dbFile) {
-		const { masterFolder, dbFilePropUpdated } = this.props;
-		const dbFilePath = path.resolve(masterFolder, dbFile.relpath);
+	const copyModifiedAttributeTo = async (file, dbFile) => {
+		const dbFilePath = path.resolve(db.folder, dbFile.relpath);
 		const newDbFile = dbFile.clone();
 		newDbFile.modified = new Date(file.modified);
 		fs.utimesSync(dbFilePath, fs.statSync(dbFilePath).atime, newDbFile.modified);
 		try {
-			const updatedDoc = await updateDb(masterFolder, newDbFile);
+			const updatedDoc = await db.updateDb(newDbFile);
 			if (updatedDoc[0] !== 1) {
 				console.error(updatedDoc, newDbFile);
 				throw Error(`Document ${newDbFile.relpath} not updated!!`);
@@ -61,19 +50,18 @@ class ResultContainer extends Component {
 				console.error(updatedDoc, newDbFile);
 				throw Error(`Wrong document ${newDbFile.relpath} not updated!!`);
 			}
-			dbFilePropUpdated(dbFile);
+			dbFilePropUpdated(db, dbFile);
 		} catch (err) {
 			console.warn("Error while updating doc", err);
 			// TODO propagate an error...
 		}
-	}
+	};
 
-	async copyNameAttributeTo(file, dbFile) {
-		const { masterFolder, dbFilePropUpdated } = this.props;
-		const dbFilePath = path.resolve(masterFolder, dbFile.relpath);
+	const copyNameAttributeTo = async (file, dbFile) => {
+		const dbFilePath = path.resolve(db.folder, dbFile.relpath);
 		const newDbFile = dbFile.clone();
 		newDbFile.setNewName(file.name);
-		const dbFileNewPath = path.resolve(masterFolder, newDbFile.relpath);
+		const dbFileNewPath = path.resolve(db.folder, newDbFile.relpath);
 		if (fs.existsSync(dbFileNewPath)) {
 			const err = new Error(`File '${newDbFile.relpath}' already exists!`);
 			console.log(err);
@@ -81,7 +69,7 @@ class ResultContainer extends Component {
 		}
 		fs.renameSync(dbFilePath, dbFileNewPath);
 		try {
-			const updatedDoc = await updateDb(masterFolder, newDbFile);
+			const updatedDoc = await db.updateDb(newDbFile);
 			if (updatedDoc[0] !== 1) {
 				console.error(updatedDoc, newDbFile);
 				throw Error(`Document ${newDbFile.relpath} not updated!!`);
@@ -89,38 +77,32 @@ class ResultContainer extends Component {
 				console.error(updatedDoc, newDbFile);
 				throw Error(`Wrong document ${newDbFile.relpath} not updated!!`);
 			}
-			dbFilePropUpdated(dbFile);
+			dbFilePropUpdated(db, dbFile);
 		} catch (err) {
 			console.warn("Error while updating doc", err);
 			// TODO propagate an error...
 		}
-	}
-
-	render() {
-		const { removeFile, removeAllFiles, resultSetTabActive } = this.props;
-		return (
-			<ResultView
-				openDbFolderFor={this.openDbFolderFor}
-				openFolderFor={this.openFolderFor}
-				copyModifiedAttributeTo={this.copyModifiedAttributeTo}
-				removeFile={removeFile}
-				removeAllFiles={removeAllFiles}
-				copyNameAttributeTo={this.copyNameAttributeTo}
-				setTabActive={resultSetTabActive}
-			/>
-		);
-	}
-}
-
-function mapStateToProps(state) {
-	return {
-		masterFolder: state.foldersState.masterPath,
-		toScanFolder: state.foldersState.toScanPath
 	};
-}
 
-function mapDispatchToProps(dispatch) {
-	return bindActionCreators(
+	return (
+		<ResultView
+			openDbFolderFor={openDbFolderFor}
+			openFolderFor={openFolderFor}
+			copyModifiedAttributeTo={copyModifiedAttributeTo}
+			removeFile={removeFile}
+			removeAllFiles={removeAllFiles}
+			copyNameAttributeTo={copyNameAttributeTo}
+			setTabActive={resultSetTabActive}
+		/>
+	);
+};
+
+const mapStateToProps = state => ({
+	toScanFolder: state.foldersState.toScanPath
+});
+
+const mapDispatchToProps = dispatch =>
+	bindActionCreators(
 		{
 			loadResult,
 			resultSetTabActive,
@@ -130,7 +112,6 @@ function mapDispatchToProps(dispatch) {
 		},
 		dispatch
 	);
-}
 
 export default connect(
 	mapStateToProps,

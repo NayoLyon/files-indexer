@@ -168,7 +168,7 @@ export function removeFile(file) {
 		dispatch(endScan());
 	};
 }
-export function dbFilePropUpdated(dbFile) {
+export function dbFilePropUpdated(db, dbFile) {
 	return async dispatch => {
 		dispatch(startScanAction());
 
@@ -200,7 +200,7 @@ export function dbFilePropUpdated(dbFile) {
 				scanProgress("INDEXING", { value: index, total: filesToRescan.length }, elt.relpath)
 			);
 			/* eslint-disable-next-line no-await-in-loop */
-			await dispatch(scanProcessFile(elt));
+			await dispatch(scanProcessFile(db, elt));
 		}
 
 		dispatch(endScan());
