@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 
@@ -10,28 +10,55 @@ import { push } from "../../modules/router/routerActions";
 
 import ScanView from "./ScanView";
 
-class ScanContainer extends Component {
-	async scan() {
-		await this.props.startScan();
+const ScanContainer = ({
+	toScanFolder,
+	indexing,
+	isScanned,
+	step,
+	progress,
+	fileProgress,
+	startScan,
+	scanProcessFile,
+	scanProgress,
+	endScan,
+	goToIndex
+}) => {
+	const scan = async () => {
+		await startScan();
 
 		await doScan(
-			this.props.toScanFolder,
-			this.props.scanProcessFile,
-			this.props.scanProgress,
+			toScanFolder,
+			scanProcessFile,
+			scanProgress,
 			true
+			// TODO add isCanceled
 		);
 
-		this.props.endScan();
-	}
+		endScan();
+	};
 
-	render() {
-		return <ScanView scan={this.scan.bind(this)} goToIndex={this.props.goToIndex} />;
-	}
-}
+	return (
+		<ScanView
+			toScanFolder={toScanFolder}
+			indexing={indexing}
+			isScanned={isScanned}
+			step={step}
+			progress={progress}
+			fileProgress={fileProgress}
+			scan={scan}
+			goToIndex={goToIndex}
+		/>
+	);
+};
 
 function mapStateToProps(state) {
 	return {
-		toScanFolder: state.foldersState.toScanPath
+		toScanFolder: state.foldersState.toScanPath,
+		indexing: state.scanState.indexing,
+		isScanned: state.scanState.isScanned,
+		step: state.scanState.step,
+		progress: state.scanState.progress,
+		fileProgress: state.scanState.fileProgress
 	};
 }
 
