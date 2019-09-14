@@ -11,7 +11,7 @@ import routes from "../../utils/routes";
 import NotFound from "../NotFound";
 // import LoaderCustom from "../shared/LoaderCustom";
 import HomeContainer from "../home/HomeContainer";
-import SourceContainer from "../home/SourceContainer";
+import SourceContainer from "../source/SourceContainer";
 
 class AppLayout extends Component {
 	// componentDidMount() {
