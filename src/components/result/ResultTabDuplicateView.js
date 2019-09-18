@@ -34,7 +34,7 @@ export default class ResultTabDuplicateView extends Component {
 					</Table.Cell>
 					<Table.Cell textAlign="center">In folder</Table.Cell>
 					<Table.Cell textAlign="center">{printValue(file, "size")}</Table.Cell>
-					<Table.Cell textAlign="center">{printValue(file, "modified")}</Table.Cell>
+					<Table.Cell textAlign="center">{printValue(file, "modifiedMs")}</Table.Cell>
 					<Table.Cell textAlign="center">
 						{printValue(file, "relpath")}
 						<Button.Group>
@@ -63,7 +63,7 @@ export default class ResultTabDuplicateView extends Component {
 							{printValue(file.dbFiles[m], "size")}
 						</Table.Cell>
 						<Table.Cell textAlign="center">
-							{printValue(file.dbFiles[m], "modified")}
+							{printValue(file.dbFiles[m], "modifiedMs")}
 						</Table.Cell>
 						<Table.Cell textAlign="center">
 							{printValue(file.dbFiles[m], "relpath")}

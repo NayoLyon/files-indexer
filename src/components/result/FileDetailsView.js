@@ -67,9 +67,9 @@ export default class FileDetailsView extends Component {
 					</Card.Description>
 					<Card.Meta>
 						Modified on&nbsp;
-						<span className="date">{this.getProp("modified")}</span>
+						<span className="date">{this.getProp("modifiedMs")}</span>
 					</Card.Meta>
-					<Card.Description>Created on&nbsp;{this.getProp("created")}</Card.Description>
+					<Card.Description>Created on&nbsp;{this.getProp("createdMs")}</Card.Description>
 				</Card.Content>
 				<Card.Content
 					extra

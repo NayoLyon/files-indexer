@@ -39,8 +39,8 @@ const ResultContainer = ({
 	const copyModifiedAttributeTo = async (file, dbFile) => {
 		const dbFilePath = path.resolve(db.folder, dbFile.relpath);
 		const newDbFile = dbFile.clone();
-		newDbFile.modified = new Date(file.modified);
-		fs.utimesSync(dbFilePath, fs.statSync(dbFilePath).atime, newDbFile.modified);
+		newDbFile.modifiedMs = file.modifiedMs;
+		fs.utimesSync(dbFilePath, fs.statSync(dbFilePath).atime, new Date(newDbFile.modifiedMs));
 		try {
 			const updatedDoc = await db.updateDb(newDbFile);
 			if (updatedDoc[0] !== 1) {

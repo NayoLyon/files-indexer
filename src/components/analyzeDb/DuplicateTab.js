@@ -29,7 +29,7 @@ export default class DuplicateTab extends Component {
 						{printValue(file, "relpath")}
 					</Table.Cell>
 					<Table.Cell textAlign="center">{printValue(file, "size")}</Table.Cell>
-					<Table.Cell textAlign="center">{printValue(file, "modified")}</Table.Cell>
+					<Table.Cell textAlign="center">{printValue(file, "modifiedMs")}</Table.Cell>
 				</Table.Row>
 			);
 		};
@@ -60,7 +60,9 @@ export default class DuplicateTab extends Component {
 						{printValue(firstFile, "relpath")}
 					</Table.Cell>
 					<Table.Cell textAlign="center">{printValue(firstFile, "size")}</Table.Cell>
-					<Table.Cell textAlign="center">{printValue(firstFile, "modified")}</Table.Cell>
+					<Table.Cell textAlign="center">
+						{printValue(firstFile, "modifiedMs")}
+					</Table.Cell>
 					<Table.Cell textAlign="center" />
 				</Table.Row>
 			);

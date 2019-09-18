@@ -11,16 +11,10 @@ export default class ResultTabModifiedView extends Component {
 		return file.diff.includes("name");
 	}
 	static filterModifiedLess(file) {
-		return (
-			file.diff.includes("modified") &&
-			file.modified.getTime() < file.dbFiles[0].modified.getTime()
-		);
+		return file.diff.includes("modifiedMs") && file.modifiedMs < file.dbFiles[0].modifiedMs;
 	}
 	static filterModifiedGreater(file) {
-		return (
-			file.diff.includes("modified") &&
-			file.modified.getTime() > file.dbFiles[0].modified.getTime()
-		);
+		return file.diff.includes("modifiedMs") && file.modifiedMs > file.dbFiles[0].modifiedMs;
 	}
 
 	constructor(props) {
@@ -76,7 +70,7 @@ export default class ResultTabModifiedView extends Component {
 		);
 		headers.push(
 			columnsName.reduce((res, elt) => {
-				const sortStyle = elt === "modified" ? "" : "alphabet";
+				const sortStyle = elt === "modifiedMs" ? "" : "alphabet";
 				res.push({
 					key: `db_${elt}`,
 					label: "In DB",
@@ -160,9 +154,8 @@ export default class ResultTabModifiedView extends Component {
 						/>
 					</Button.Group>
 				);
-			} else if (prop === "modified") {
-				const buttonColor =
-					row.modified.getTime() < dbFile.modified.getTime() ? "green" : "orange";
+			} else if (prop === "modifiedMs") {
+				const buttonColor = row.modifiedMs < dbFile.modifiedMs ? "green" : "orange";
 				actionsFolder = (
 					<Button
 						icon="long arrow alternate left"

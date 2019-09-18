@@ -19,9 +19,9 @@ const crypto = electron.remote.require("crypto");
 //   relpath: string,
 //   hash: string,
 //   size: number,
-//   modified: Date,
-//   changed: Date,
-//   created: Date
+//   modifiedMs: number,
+//   changedMs: number,
+//   createdMs: number
 // };
 
 export class FilePropsDb {
@@ -34,9 +34,9 @@ export class FilePropsDb {
 		this.relpath = file.relpath;
 		this.hash = file.hash;
 		this.size = file.size;
-		this.modified = file.modified;
-		this.changed = file.changed;
-		this.created = file.created;
+		this.modifiedMs = file.modifiedMs;
+		this.changedMs = file.changedMs;
+		this.createdMs = file.createdMs;
 	}
 	get id() {
 		return this._id;
@@ -57,7 +57,7 @@ export class FilePropsDb {
 	}
 	cloneFromSamePath(file) {
 		const newFile = new FilePropsDb(this);
-		["hash", "size", "modified", "changed", "created"].forEach(prop => {
+		["hash", "size", "modifiedMs", "changedMs", "createdMs"].forEach(prop => {
 			newFile[prop] = file[prop];
 		});
 		return newFile;
@@ -87,9 +87,9 @@ export class FileProps {
 		this.relpath = file.relpath; // Relative to the database... More usefull
 		this._id = file.relpath;
 		this.size = file.size;
-		this.modified = file.modified;
-		this.changed = file.changed;
-		this.created = file.created;
+		this.modifiedMs = file.modifiedMs;
+		this.changedMs = file.changedMs;
+		this.createdMs = file.createdMs;
 		this.hash = file.hash || null;
 		this.scanType = file.scanType || null;
 		if (file.matches) {
@@ -107,9 +107,9 @@ export class FileProps {
 			path: file,
 			relpath: path.relative(rootPath, file),
 			size: stats.size,
-			modified: stats.mtime,
-			changed: stats.ctime,
-			created: stats.birthtime
+			modifiedMs: stats.mtimeMs,
+			changedMs: stats.ctimeMs,
+			createdMs: stats.birthtimeMs
 		});
 	}
 	get id() {
@@ -164,22 +164,22 @@ export class FileProps {
 		if (dbFile.size !== this.size) {
 			result.push("size");
 		}
-		if (dbFile.modified.getTime() !== this.modified.getTime()) {
-			result.push("modified");
+		if (dbFile.modifiedMs !== this.modifiedMs) {
+			result.push("modifiedMs");
 		}
-		// Ignore changed and created... They only depend on when the file was copied.
-		// The correct date to check is the modified data.
-		// if (dbFile.changed.getTime() !== this.changed.getTime()) {
-		//   result.push('changed');
+		// Ignore changedMs and createdMs... They only depend on when the file was copied.
+		// The correct date to check is the modifiedMs data.
+		// if (dbFile.changedMs !== this.changedMs) {
+		//   result.push('changedMs');
 		// }
-		// if (dbFile.created.getTime() !== this.created.getTime()) {
-		//   result.push('created');
+		// if (dbFile.createdMs !== this.createdMs) {
+		//   result.push('createdMs');
 		// }
 		return result;
 	}
 	compareToSamePath(dbFile) {
 		const result = new Set();
-		["hash", "size", "modified", "changed", "created"].forEach(prop => {
+		["hash", "size", "modifiedMs", "changedMs", "createdMs"].forEach(prop => {
 			if (dbFile[prop] instanceof Date) {
 				if (dbFile[prop].getTime() !== this[prop].getTime()) {
 					result.add(prop);

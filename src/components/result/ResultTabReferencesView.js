@@ -39,9 +39,9 @@ class ResultTabReferencesView extends Component {
 				colProps: { key: "size" }
 			},
 			{
-				key: "modified",
+				key: "modifiedMs",
 				label: "Modified date",
-				colProps: { key: "modified" }
+				colProps: { key: "modifiedMs" }
 			},
 			{
 				key: "relpath",
@@ -100,7 +100,9 @@ class ResultTabReferencesView extends Component {
 						{label} {counter}
 					</Table.Cell>
 					<Table.Cell textAlign="center">{printValue(fileProps, "size")}</Table.Cell>
-					<Table.Cell textAlign="center">{printValue(fileProps, "modified")}</Table.Cell>
+					<Table.Cell textAlign="center">
+						{printValue(fileProps, "modifiedMs")}
+					</Table.Cell>
 					<Table.Cell textAlign="center">{printValue(fileProps, "relpath")}</Table.Cell>
 					<Table.Cell textAlign="center">
 						<Button
@@ -139,7 +141,7 @@ class ResultTabReferencesView extends Component {
 					In DB
 				</Table.Cell>
 				<Table.Cell textAlign="center">{printValue(row, "size")}</Table.Cell>
-				<Table.Cell textAlign="center">{printValue(row, "modified")}</Table.Cell>
+				<Table.Cell textAlign="center">{printValue(row, "modifiedMs")}</Table.Cell>
 				<Table.Cell textAlign="center">{printValue(row, "relpath")}</Table.Cell>
 				<Table.Cell textAlign="center" />
 			</As>
