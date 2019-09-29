@@ -81,7 +81,7 @@ export function doAnalyze(db) {
 	return async dispatch => {
 		dispatch(startAnalyze());
 
-		const files = await db.findDb({}, FilePropsDb);
+		const files = await db.allDocs(FilePropsDb);
 		const duplicateList = new Map();
 		const filesHash = new Map();
 		dispatch(analyzeProgress("INDEXING", { value: 0, total: files.length }));

@@ -3,6 +3,7 @@ import {
 	initDatabase,
 	closeDatabase,
 	findDb,
+	get,
 	insertDb,
 	deleteDb,
 	updateDbQuery,
@@ -69,13 +70,9 @@ async function scanAdd(fileProps) {
 	);
 }
 async function scanRemove(fileProps) {
-	const occurence = await findDb("scan", { _id: fileProps.id }, FileProps);
-	if (occurence.length !== 1) {
-		console.error(
-			`Invalid number of scan found [${occurence.length}] for`,
-			fileProps,
-			occurence
-		);
+	const occurence = await get("scan", fileProps.id, FileProps);
+	if (!occurence) {
+		console.error(`Scan not found for`, fileProps, occurence);
 		return;
 	}
 	const deleteFileProps = await deleteDb("scan", fileProps);
@@ -88,12 +85,12 @@ async function scanRemove(fileProps) {
 		{ type: "FILEPROPSDB", filesMatching: fileProps.id },
 		{ $pull: { filesMatching: fileProps.id } }
 	);
-	if (updatedDoc[0] !== occurence[0].dbFiles.length) {
+	if (updatedDoc[0] !== occurence.dbFiles.length) {
 		console.error(
 			`Incorrect dbFilesRef updated (${updatedDoc[0]}), expected (${
-				occurence[0].dbFiles.length
+				occurence.dbFiles.length
 			})`,
-			occurence[0],
+			occurence,
 			updatedDoc[1]
 		);
 	}
@@ -110,10 +107,10 @@ export function scanProcessFile(db, fileProps) {
 		if (!db) return; // Should not happen, protected on call
 
 		const newFileProps = fileProps.clone();
-		let occurences = await db.findDb({ hash: newFileProps.hash }, FilePropsDb);
+		let occurences = await db.find({ hash: newFileProps.hash }, FilePropsDb);
 		if (occurences.length === 0) {
 			// File not found in db... Search for files with similar properties
-			occurences = await db.findDb({ name: newFileProps.name }, FilePropsDb);
+			occurences = await db.find({ name: newFileProps.name }, FilePropsDb);
 			if (occurences.length === 0) {
 				newFileProps.setCompareType(CONST_SCAN_TYPE_NEW);
 			} else {

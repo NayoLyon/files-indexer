@@ -69,15 +69,39 @@ export class Db {
 		}
 	}
 
-	async findDb(what, toClass) {
+	async get(id, toClass) {
+		try {
+			const result = await this._db.findOne({ _id: id });
+			if (result && toClass != null) {
+				return toClass.fromDb(result);
+			}
+			return result;
+		} catch (err) {
+			if (err.status === 404) {
+				return null;
+			}
+			throw err;
+		}
+	}
+	async allDocs(toClass) {
+		try {
+			const occurences = await this._db.find({});
+
+			if (toClass != null) {
+				return occurences.map(toClass.fromDb);
+			}
+			return occurences;
+		} catch (err) {
+			console.error("Error in DB allDocs", err);
+			throw err;
+		}
+	}
+	async find(what, toClass) {
 		try {
 			const occurences = await this._db.find(what);
+
 			if (toClass != null) {
-				const res = [];
-				occurences.forEach(elt => {
-					res.push(toClass.fromDb(elt));
-				});
-				return res;
+				return occurences.map(toClass.fromDb);
 			}
 			return occurences;
 		} catch (err) {
@@ -148,9 +172,17 @@ export async function initDatabase(folder, isInMemory) {
 	}
 }
 
+export async function get(folder, id, toClass) {
+	const db = getDb(folder);
+	return await db.get(id, toClass);
+}
+export async function allDocs(folder, toClass) {
+	const db = getDb(folder);
+	return await db.allDocs(toClass);
+}
 export async function findDb(folder, what, toClass) {
 	const db = getDb(folder);
-	return await db.findDb(what, toClass);
+	return await db.find(what, toClass);
 }
 
 export async function insertDb(folder, obj) {

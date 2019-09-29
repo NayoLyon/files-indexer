@@ -151,7 +151,7 @@ const processFileWithHash = (db, hashComputed, indexDuplicate) => async fileProp
 		// Should not happen...
 		throw new Error("Cannot process file when db not opened!!");
 	}
-	const occurences = await db.findDb({ relpath: fileProps.relpath }, FilePropsDb);
+	const occurences = await db.find({ relpath: fileProps.relpath }, FilePropsDb);
 	if (occurences.length) {
 		if (occurences.length > 1) {
 			console.error(
