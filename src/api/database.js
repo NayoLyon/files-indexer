@@ -30,6 +30,7 @@ export class Db {
 				db._db = new Datastore({ filename: getDbFile(folder), autoload: true });
 				await db._db.ensureIndex({ fieldName: "relpath", unique: true });
 				await db._db.ensureIndex({ fieldName: "hash" });
+				await db._db.ensureIndex({ fieldName: "name" });
 			}
 			// Load the db
 			// await db.getSize();
