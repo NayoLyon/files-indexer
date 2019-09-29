@@ -9,7 +9,7 @@ import { Db } from "../../api/database";
 import NotFound from "../NotFound";
 import IndexationContainer from "../indexation/IndexationContainer";
 import AnalyzeContainer from "../analyzeDb/AnalyzeContainer";
-import ScanContainer from "../scan/ScanContainer";
+import ScanContextContainer from "../scan/ScanContextContainer";
 
 import SourceContext from "./SourceContext";
 
@@ -45,7 +45,7 @@ const SourceContainer = ({ masterFolder, goHome }) => {
 		<SourceContext.Provider value={sourceContext}>
 			<Switch>
 				<Route exact path={routes.index} component={IndexationContainer} />
-				<Route exact path={routes.scan} component={ScanContainer} />
+				<Route exact path={routes.scan} component={ScanContextContainer} />
 				<Route exact path={routes.analyzeDb} component={AnalyzeContainer} />
 				<Route path={routes.base} component={NotFound} />
 			</Switch>

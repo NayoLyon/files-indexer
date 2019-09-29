@@ -1,26 +1,16 @@
 import { FileProps, FilePropsDb, FilePropsDbDuplicates } from "../../api/filesystem";
-import {
-	initDatabase,
-	closeDatabase,
-	findDb,
-	get,
-	insertDb,
-	updateDb,
-	deleteDb,
-	updateDbQuery,
-	deleteDbQuery
-} from "../../api/database";
 import { deleteFile } from "../../utils/filesystem";
 
 export const SCAN_START = "SCAN_START";
 export const SCAN_END = "SCAN_END";
 export const SCAN_PROGRESS = "SCAN_PROGRESS";
+export const SCAN_RESET = "SCAN_RESET";
 export const CONST_SCAN_TYPE_DUPLICATE = "duplicate";
 export const CONST_SCAN_TYPE_MODIFIED = "modified";
 export const CONST_SCAN_TYPE_IDENTICAL = "identical";
 export const CONST_SCAN_TYPE_NEW = "new";
 
-function startScanAction() {
+export function startScan() {
 	return {
 		type: SCAN_START
 	};
@@ -29,6 +19,12 @@ function startScanAction() {
 export function endScan() {
 	return {
 		type: SCAN_END
+	};
+}
+
+export function resetScan() {
+	return {
+		type: SCAN_RESET
 	};
 }
 
@@ -41,47 +37,35 @@ export function scanProgress(step, progress, file) {
 	};
 }
 
-export function startScan() {
-	return async dispatch => {
-		dispatch(startScanAction());
-		// Close a previous database
-		await closeDatabase("scan");
-
-		// Initialize database
-		await initDatabase("scan", true);
-	};
-}
-
-async function scanAdd(fileProps) {
-	await insertDb("scan", fileProps);
+async function scanAdd(dbScan, fileProps) {
+	await dbScan.insertDb(fileProps);
 
 	await Promise.all(
 		fileProps.dbFiles.map(async filePropsDb => {
-			const existingDoc = await get("scan", filePropsDb.id, FilePropsDbDuplicates);
+			const existingDoc = await dbScan.get(filePropsDb.id, FilePropsDbDuplicates);
 			if (!existingDoc) {
 				const newFilePropsDbDuplicate = new FilePropsDbDuplicates(filePropsDb);
 				newFilePropsDbDuplicate.addFileRef(fileProps);
-				await insertDb("scan", newFilePropsDbDuplicate);
+				await dbScan.insertDb(newFilePropsDbDuplicate);
 			} else {
 				existingDoc.addFileRef(fileProps);
-				await updateDb("scan", existingDoc);
+				await dbScan.updateDb(existingDoc);
 			}
 		})
 	);
 }
-async function scanRemove(fileProps) {
-	const occurence = await get("scan", fileProps.id, FileProps);
+async function scanRemove(dbScan, fileProps) {
+	const occurence = await dbScan.get(fileProps.id, FileProps);
 	if (!occurence) {
 		console.error(`Scan not found for`, fileProps, occurence);
 		return;
 	}
-	const deleteFileProps = await deleteDb("scan", fileProps);
+	const deleteFileProps = await dbScan.deleteDb(fileProps);
 	if (deleteFileProps !== 1) {
 		console.error(`Could not delete fileProps ??? (${deleteFileProps})`, fileProps);
 	}
 
-	const updatedDoc = await updateDbQuery(
-		"scan",
+	const updatedDoc = await dbScan.updateDbQuery(
 		{ type: "FILEPROPSDB", filesMatching: fileProps.id },
 		{ $pull: { filesMatching: fileProps.id } }
 	);
@@ -95,14 +79,13 @@ async function scanRemove(fileProps) {
 		);
 	}
 	/* const deleteQuery = */
-	await deleteDbQuery(
-		"scan",
+	await dbScan.deleteDbQuery(
 		{ type: "FILEPROPSDB", filesMatching: { $size: 0 } },
 		{ multi: true }
 	);
 	// console.log(`'${deleteQuery}' dbFilesRef removed...`);
 }
-export function scanProcessFile(db, fileProps) {
+export function scanProcessFile(db, dbScan, fileProps) {
 	return async (dispatch, getState) => {
 		if (!db) return; // Should not happen, protected on call
 
@@ -133,23 +116,23 @@ export function scanProcessFile(db, fileProps) {
 				newFileProps.setCompareType(CONST_SCAN_TYPE_IDENTICAL);
 			}
 		}
-		await scanAdd(newFileProps);
+		await scanAdd(dbScan, newFileProps);
 	};
 }
 
-export function removeAllFiles(scanType) {
+export function removeAllFiles(dbScan, scanType) {
 	return async (dispatch, getState) => {
-		dispatch(startScanAction());
+		dispatch(startScan());
 		if (scanType === CONST_SCAN_TYPE_IDENTICAL) {
-			const identicals = await findDb("scan", { scanType }, FileProps);
+			const identicals = await dbScan.find({ scanType }, FileProps);
 			for (let i = 0; i < identicals.length; i += 1) {
 				const file = identicals[i];
 				dispatch(
 					scanProgress("REMOVING", { value: i, total: identicals.length }, file.relpath)
 				);
-				deleteFile(getState().foldersState.toScanPath, file.relpath);
+				deleteFile(dbScan.folder, file.relpath);
 				/* eslint-disable-next-line no-await-in-loop */
-				await scanRemove(file);
+				await scanRemove(dbScan, file);
 			}
 		} else {
 			console.error(`Unexpected scanType '${scanType}' for removeAllFiles. Skip action...`);
@@ -157,20 +140,19 @@ export function removeAllFiles(scanType) {
 		dispatch(endScan());
 	};
 }
-export function removeFile(file) {
+export function removeFile(dbScan, file) {
 	return async (dispatch, getState) => {
-		dispatch(startScanAction());
-		deleteFile(getState().foldersState.toScanPath, file.relpath);
-		await scanRemove(file);
+		dispatch(startScan());
+		deleteFile(dbScan.folder, file.relpath);
+		await scanRemove(dbScan, file);
 		dispatch(endScan());
 	};
 }
-export function dbFilePropUpdated(db, dbFile) {
+export function dbFilePropUpdated(db, dbScan, dbFile) {
 	return async dispatch => {
-		dispatch(startScanAction());
+		dispatch(startScan());
 
-		const filesToRescan = await findDb(
-			"scan",
+		const filesToRescan = await dbScan.find(
 			{
 				$or: [
 					{ scanType: CONST_SCAN_TYPE_NEW },
@@ -187,7 +169,7 @@ export function dbFilePropUpdated(db, dbFile) {
 				scanProgress("LISTING", { value: i, total: nbFilesToRescan }, fileProps.relpath)
 			);
 			/* eslint-disable-next-line no-await-in-loop */
-			await scanRemove(fileProps);
+			await scanRemove(dbScan, fileProps);
 		}
 
 		// Rescan them all
@@ -197,7 +179,7 @@ export function dbFilePropUpdated(db, dbFile) {
 				scanProgress("INDEXING", { value: index, total: filesToRescan.length }, elt.relpath)
 			);
 			/* eslint-disable-next-line no-await-in-loop */
-			await dispatch(scanProcessFile(db, elt));
+			await dispatch(scanProcessFile(db, dbScan, elt));
 		}
 
 		dispatch(endScan());

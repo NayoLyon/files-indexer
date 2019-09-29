@@ -1,5 +1,4 @@
 import { FileProps, FilePropsDbDuplicates } from "../../api/filesystem";
-import { findDb } from "../../api/database";
 
 import {
 	CONST_SCAN_TYPE_DUPLICATE,
@@ -43,7 +42,7 @@ export function resultSetTabActive(activeTab) {
 	};
 }
 
-export function loadResult() {
+export function loadResult(dbScan) {
 	return async dispatch => {
 		try {
 			dispatch(loadResultStart());
@@ -51,28 +50,21 @@ export function loadResult() {
 			const insertIntoMap = fileProps => {
 				filesProps.set(fileProps.id, fileProps);
 			};
-			const identicals = await findDb(
-				"scan",
+			const identicals = await dbScan.find(
 				{ scanType: CONST_SCAN_TYPE_IDENTICAL },
 				FileProps
 			);
 			identicals.forEach(insertIntoMap);
-			const newFiles = await findDb("scan", { scanType: CONST_SCAN_TYPE_NEW }, FileProps);
+			const newFiles = await dbScan.find({ scanType: CONST_SCAN_TYPE_NEW }, FileProps);
 			newFiles.forEach(insertIntoMap);
-			const modified = await findDb(
-				"scan",
-				{ scanType: CONST_SCAN_TYPE_MODIFIED },
-				FileProps
-			);
+			const modified = await dbScan.find({ scanType: CONST_SCAN_TYPE_MODIFIED }, FileProps);
 			modified.forEach(insertIntoMap);
-			const duplicates = await findDb(
-				"scan",
+			const duplicates = await dbScan.find(
 				{ scanType: CONST_SCAN_TYPE_DUPLICATE },
 				FileProps
 			);
 			duplicates.forEach(insertIntoMap);
-			const dbFilesRef = await findDb(
-				"scan",
+			const dbFilesRef = await dbScan.find(
 				{ type: "FILEPROPSDB", $not: { filesMatching: { $size: 1 } } },
 				FilePropsDbDuplicates
 			);

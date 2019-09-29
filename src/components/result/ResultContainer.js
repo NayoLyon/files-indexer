@@ -7,6 +7,7 @@ import { openExplorerOn } from "../../utils/filesystem";
 import { removeFile, removeAllFiles, dbFilePropUpdated } from "../../modules/scan/scanAction";
 import { loadResult, resultSetTabActive } from "../../modules/result/resultAction";
 import SourceContext from "../source/SourceContext";
+import ScanContext from "../scan/ScanContext";
 
 import ResultView from "./ResultView";
 
@@ -15,7 +16,6 @@ const fs = electron.remote.require("fs");
 const path = electron.remote.require("path");
 
 const ResultContainer = ({
-	toScanFolder,
 	loadResult,
 	dbFilePropUpdated,
 	removeFile,
@@ -23,18 +23,21 @@ const ResultContainer = ({
 	resultSetTabActive
 }) => {
 	const db = useContext(SourceContext);
+	const dbScan = useContext(ScanContext);
 
 	useEffect(() => {
-		loadResult();
-	}, [loadResult]);
+		if (dbScan) {
+			loadResult(dbScan);
+		}
+	}, [loadResult, dbScan]);
 
-	if (!db) {
+	if (!db || !dbScan) {
 		// Should not happen...
 		return null;
 	}
 
 	const openDbFolderFor = file => openExplorerOn(path.resolve(db.folder, file.relpath));
-	const openFolderFor = file => openExplorerOn(path.resolve(toScanFolder, file.relpath));
+	const openFolderFor = file => openExplorerOn(path.resolve(dbScan.folder, file.relpath));
 
 	const copyModifiedAttributeTo = async (file, dbFile) => {
 		const dbFilePath = path.resolve(db.folder, dbFile.relpath);
@@ -50,7 +53,7 @@ const ResultContainer = ({
 				console.error(updatedDoc, newDbFile);
 				throw Error(`Wrong document ${newDbFile.relpath} not updated!!`);
 			}
-			dbFilePropUpdated(db, dbFile);
+			dbFilePropUpdated(db, dbScan, dbFile);
 		} catch (err) {
 			console.warn("Error while updating doc", err);
 			// TODO propagate an error...
@@ -77,7 +80,7 @@ const ResultContainer = ({
 				console.error(updatedDoc, newDbFile);
 				throw Error(`Wrong document ${newDbFile.relpath} not updated!!`);
 			}
-			dbFilePropUpdated(db, dbFile);
+			dbFilePropUpdated(db, dbScan, dbFile);
 		} catch (err) {
 			console.warn("Error while updating doc", err);
 			// TODO propagate an error...
@@ -89,17 +92,13 @@ const ResultContainer = ({
 			openDbFolderFor={openDbFolderFor}
 			openFolderFor={openFolderFor}
 			copyModifiedAttributeTo={copyModifiedAttributeTo}
-			removeFile={removeFile}
-			removeAllFiles={removeAllFiles}
+			removeFile={file => removeFile(dbScan, file)}
+			removeAllFiles={scanType => removeAllFiles(dbScan, scanType)}
 			copyNameAttributeTo={copyNameAttributeTo}
 			setTabActive={resultSetTabActive}
 		/>
 	);
 };
-
-const mapStateToProps = state => ({
-	toScanFolder: state.foldersState.toScanPath
-});
 
 const mapDispatchToProps = dispatch =>
 	bindActionCreators(
@@ -114,6 +113,6 @@ const mapDispatchToProps = dispatch =>
 	);
 
 export default connect(
-	mapStateToProps,
+	null,
 	mapDispatchToProps
 )(ResultContainer);

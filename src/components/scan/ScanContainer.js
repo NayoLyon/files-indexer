@@ -5,19 +5,26 @@ import { connect } from "react-redux";
 import { doScan } from "../../api/filesystem";
 import routes from "../../utils/routes";
 
-import { endScan, scanProgress, startScan, scanProcessFile } from "../../modules/scan/scanAction";
+import {
+	resetScan,
+	endScan,
+	scanProgress,
+	startScan,
+	scanProcessFile
+} from "../../modules/scan/scanAction";
 import { push } from "../../modules/router/routerActions";
 import SourceContext from "../source/SourceContext";
+import ScanContext from "./ScanContext";
 
 import ScanView from "./ScanView";
 
 const ScanContainer = ({
-	toScanFolder,
 	indexing,
 	isScanned,
 	step,
 	progress,
 	fileProgress,
+	resetScan,
 	startScan,
 	scanProcessFile,
 	scanProgress,
@@ -25,11 +32,13 @@ const ScanContainer = ({
 	goToIndex
 }) => {
 	const db = useContext(SourceContext);
+	const dbScan = useContext(ScanContext);
 	// Caution: scan is a function, so to update it we have to escape the function mode of setState of Hooks.
 	// See setStartIndexFunc comment in IndexationContainer
 	const [scan, setScan] = useState(() => null);
 	useEffect(() => {
-		if (db) {
+		if (db && dbScan) {
+			resetScan();
 			let canceled = false;
 			setScan(() => async () => {
 				if (canceled) return; // Component has changed, stop now...
@@ -38,8 +47,8 @@ const ScanContainer = ({
 
 				if (canceled) return; // Component has changed, stop now...
 				await doScan(
-					toScanFolder,
-					fileProps => scanProcessFile(db, fileProps),
+					dbScan.folder,
+					fileProps => scanProcessFile(db, dbScan, fileProps),
 					scanProgress,
 					true,
 					() => canceled
@@ -52,11 +61,11 @@ const ScanContainer = ({
 		} else {
 			setScan(null);
 		}
-	}, [db, startScan, toScanFolder, scanProcessFile, scanProgress, endScan]);
+	}, [db, dbScan, resetScan, startScan, scanProcessFile, scanProgress, endScan]);
 
 	return (
 		<ScanView
-			toScanFolder={toScanFolder}
+			toScanFolder={dbScan ? dbScan.folder : ""}
 			indexing={indexing}
 			isScanned={isScanned}
 			step={step}
@@ -70,7 +79,6 @@ const ScanContainer = ({
 
 function mapStateToProps(state) {
 	return {
-		toScanFolder: state.foldersState.toScanPath,
 		indexing: state.scanState.indexing,
 		isScanned: state.scanState.isScanned,
 		step: state.scanState.step,
@@ -81,7 +89,14 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
 	return bindActionCreators(
-		{ endScan, scanProgress, startScan, scanProcessFile, goToIndex: () => push(routes.index) },
+		{
+			resetScan,
+			endScan,
+			scanProgress,
+			startScan,
+			scanProcessFile,
+			goToIndex: () => push(routes.index)
+		},
 		dispatch
 	);
 }

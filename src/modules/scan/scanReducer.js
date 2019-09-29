@@ -1,4 +1,4 @@
-import { SCAN_START, SCAN_END, SCAN_PROGRESS } from "./scanAction";
+import { SCAN_START, SCAN_END, SCAN_PROGRESS, SCAN_RESET } from "./scanAction";
 import { SELECT_MASTER_FOLDER, SELECT_TOSCAN_FOLDER } from "../folders/foldersAction";
 
 const defaultValue = {
@@ -13,6 +13,7 @@ export default function scanReducer(state = defaultValue, action) {
 	switch (action.type) {
 		case SELECT_MASTER_FOLDER:
 		case SELECT_TOSCAN_FOLDER:
+		case SCAN_RESET:
 			// When we change the folder, we re-initialize scan state...
 			return defaultValue;
 		case SCAN_START:
