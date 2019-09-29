@@ -5,15 +5,8 @@ import { connect } from "react-redux";
 import { doScan } from "../../api/filesystem";
 import routes from "../../utils/routes";
 
-import {
-	resetScan,
-	endScan,
-	scanProgress,
-	startScan,
-	scanProcessFile
-} from "../../modules/scan/scanAction";
+import { resetScan, endScan, scanProgress, startScan } from "../../modules/scan/scanAction";
 import { push } from "../../modules/router/routerActions";
-import SourceContext from "../source/SourceContext";
 import ScanContext from "./ScanContext";
 
 import ScanView from "./ScanView";
@@ -26,18 +19,16 @@ const ScanContainer = ({
 	fileProgress,
 	resetScan,
 	startScan,
-	scanProcessFile,
 	scanProgress,
 	endScan,
 	goToIndex
 }) => {
-	const db = useContext(SourceContext);
 	const dbScan = useContext(ScanContext);
 	// Caution: scan is a function, so to update it we have to escape the function mode of setState of Hooks.
 	// See setStartIndexFunc comment in IndexationContainer
 	const [scan, setScan] = useState(() => null);
 	useEffect(() => {
-		if (db && dbScan) {
+		if (dbScan) {
 			resetScan();
 			let canceled = false;
 			setScan(() => async () => {
@@ -48,7 +39,7 @@ const ScanContainer = ({
 				if (canceled) return; // Component has changed, stop now...
 				await doScan(
 					dbScan.folder,
-					fileProps => scanProcessFile(db, dbScan, fileProps),
+					dbScan.scanProcessFile,
 					scanProgress,
 					true,
 					() => canceled
@@ -61,7 +52,7 @@ const ScanContainer = ({
 		} else {
 			setScan(null);
 		}
-	}, [db, dbScan, resetScan, startScan, scanProcessFile, scanProgress, endScan]);
+	}, [dbScan, resetScan, startScan, scanProgress, endScan]);
 
 	return (
 		<ScanView
@@ -94,7 +85,6 @@ function mapDispatchToProps(dispatch) {
 			endScan,
 			scanProgress,
 			startScan,
-			scanProcessFile,
 			goToIndex: () => push(routes.index)
 		},
 		dispatch

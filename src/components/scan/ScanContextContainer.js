@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 
 import { push } from "../../modules/router/routerActions";
+import { startScan, scanProgress, endScan } from "../../modules/scan/scanAction";
 import routes from "../../utils/routes";
-import { Db } from "../../api/database";
+import SourceContext from "../source/SourceContext";
 
 import ScanContainer from "./ScanContainer";
 
 import ScanContext from "./ScanContext";
+import { newScanner } from "./Scanner";
 
-const SourceContainer = ({ scanFolder, goHome }) => {
+const ScanContextContainer = ({ scanFolder, goHome, startScan, scanProgress, endScan }) => {
+	const sourceDb = useContext(SourceContext);
 	useEffect(() => {
 		if (!scanFolder) {
 			goHome();
@@ -18,9 +22,13 @@ const SourceContainer = ({ scanFolder, goHome }) => {
 	const [scanContext, setScanContext] = useState(null);
 	useEffect(() => {
 		let canceled = false;
-		let db = null;
+		let db = newScanner(sourceDb, {
+			startScan,
+			scanProgress,
+			endScan
+		});
 		const loadDb = async () => {
-			db = await Db.load(scanFolder, true);
+			await db.load(scanFolder);
 			if (!canceled) {
 				setScanContext(db);
 			} else {
@@ -31,11 +39,9 @@ const SourceContainer = ({ scanFolder, goHome }) => {
 
 		return () => {
 			canceled = false;
-			if (db) {
-				db.close();
-			}
+			db.close();
 		};
-	}, [scanFolder]);
+	}, [scanFolder, sourceDb, startScan, scanProgress, endScan]);
 
 	return (
 		<ScanContext.Provider value={scanContext}>
@@ -47,11 +53,18 @@ const SourceContainer = ({ scanFolder, goHome }) => {
 const mapStateToProps = store => ({
 	scanFolder: store.foldersState.toScanPath
 });
-const mapDispatchToProps = dispatch => ({
-	goHome: () => dispatch(push(routes.base))
-});
+const mapDispatchToProps = dispatch =>
+	bindActionCreators(
+		{
+			startScan,
+			scanProgress,
+			endScan,
+			goHome: () => push(routes.base)
+		},
+		dispatch
+	);
 
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(SourceContainer);
+)(ScanContextContainer);

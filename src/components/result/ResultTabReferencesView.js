@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Tab, Table, Button } from "semantic-ui-react";
 
-import { CONST_SCAN_TYPE_DUPLICATE } from "../../modules/scan/scanAction";
+import { CONST_SCAN_TYPE_DUPLICATE } from "../scan/Scanner";
 import { printValue } from "../../utils/format";
 
 import TableContainer from "../shared/table/TableContainer";

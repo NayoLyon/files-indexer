@@ -2,8 +2,6 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Tab, Menu, Button } from "semantic-ui-react";
 
-import { CONST_SCAN_TYPE_IDENTICAL } from "../../modules/scan/scanAction";
-
 import ResultTabNewView from "./ResultTabNewView";
 import ResultTabModifiedView from "./ResultTabModifiedView";
 import ResultTabDuplicateView from "./ResultTabDuplicateView";
@@ -44,9 +42,7 @@ class ResultView extends Component {
 			const duplicatefileRefs = this.props.dbFilesRef;
 			if (duplicatefileRefs.length > 0) {
 				panes.push({
-					menuItem: `Caution: several files refers to the same db file!! (${
-						duplicatefileRefs.length
-					})`,
+					menuItem: `Caution: several files refers to the same db file!! (${duplicatefileRefs.length})`,
 					key: "references",
 					render: () => (
 						<ResultTabReferencesView
@@ -67,9 +63,7 @@ class ResultView extends Component {
 						<Button
 							icon="trash"
 							style={inlineStyles.trashButtonStyle}
-							onClick={() => {
-								this.props.removeAllFiles(CONST_SCAN_TYPE_IDENTICAL);
-							}}
+							onClick={this.props.removeAllIdenticals}
 						/>
 					</Menu.Item>
 				),
