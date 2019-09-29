@@ -25,7 +25,7 @@ export class Db {
 			let db = new Db(folder, isInMemory);
 			if (isInMemory) {
 				db._db = new Datastore({ inMemoryOnly: true, autoload: true });
-				await this._db.ensureIndex({ fieldName: "relpath" });
+				await db._db.ensureIndex({ fieldName: "relpath" });
 			} else {
 				db._db = new Datastore({ filename: getDbFile(folder), autoload: true });
 				await db._db.ensureIndex({ fieldName: "relpath", unique: true });
@@ -46,8 +46,8 @@ export class Db {
 		if (!this._db || !this._folder) {
 			throw new Error("Missing mandatory parameter db or folder");
 		}
-		const { nedb } = this._db;
-		if (!nedb.inMemoryOnly) {
+		if (!this._inMemory) {
+			const { nedb } = this._db;
 			const dbPath = getDbFile(this._folder);
 			const doCompactAsync = new Promise(resolve => {
 				nedb.on("compaction.done", () => {
@@ -109,10 +109,9 @@ export function onClose() {
 	// On close, set all dbFiles to hidden on Windows...
 	// We cannot do it on the fly as NeDB always create a new file and does not allow callback on write...
 	// Force this file to hidden, for windows...
-	dbStore.forEach((db, folder) => {
-		if (!db.nedb.inMemoryOnly) {
-			const dbPath = getDbFile(folder);
-			setSync(dbPath, { hidden: true });
+	dbStore.forEach(db => {
+		if (!db._inMemory) {
+			db.close();
 		}
 	});
 }
@@ -128,13 +127,7 @@ export async function closeDatabase(folder) {
 	const db = dbStore.get(folder);
 	if (typeof db !== "undefined") {
 		dbStore.delete(folder);
-		if (!db.nedb.inMemoryOnly) {
-			db.on("compaction.done", () => {
-				const dbPath = getDbFile(folder);
-				setSync(dbPath, { hidden: true });
-			});
-			db.persistence.compactDatafile();
-		}
+		db.close();
 	}
 }
 export async function initDatabase(folder, isInMemory) {
@@ -146,14 +139,7 @@ export async function initDatabase(folder, isInMemory) {
 		try {
 			db = getDb(folder);
 		} catch (err) {
-			if (isInMemory) {
-				db = new Datastore({ inMemoryOnly: true, autoload: true });
-				await db.ensureIndex({ fieldName: "relpath" });
-			} else {
-				db = new Datastore({ filename: getDbFile(folder), autoload: true });
-				await db.ensureIndex({ fieldName: "relpath", unique: true });
-				await db.ensureIndex({ fieldName: "hash" });
-			}
+			db = await Db.load(folder, isInMemory);
 			dbStore.set(folder, db);
 		}
 	} catch (error) {
@@ -165,15 +151,7 @@ export async function initDatabase(folder, isInMemory) {
 export async function findDb(folder, what, toClass) {
 	const db = getDb(folder);
 	try {
-		const occurences = await db.find(what);
-		if (toClass != null) {
-			const res = [];
-			occurences.forEach(elt => {
-				res.push(toClass.fromDb(elt));
-			});
-			return res;
-		}
-		return occurences;
+		return await db.findDb(what, toClass);
 	} catch (err) {
 		console.error("Error in DB find", err);
 		throw err;
@@ -182,23 +160,23 @@ export async function findDb(folder, what, toClass) {
 
 export function insertDb(folder, obj) {
 	const db = getDb(folder);
-	return db.insert(obj);
+	return db.insertDb(obj);
 }
 
 export function updateDb(folder, obj) {
 	const db = getDb(folder);
-	return db.update({ _id: obj.id }, obj, { returnUpdatedDocs: true });
+	return db.updateDb(obj);
 }
 export function updateDbQuery(folder, query, obj) {
 	const db = getDb(folder);
-	return db.update(query, obj, { returnUpdatedDocs: true });
+	return db.updateDbQuery(query, obj);
 }
 
 export function deleteDb(folder, obj) {
 	const db = getDb(folder);
-	return db.remove({ _id: obj.id }, {});
+	return db.deleteDb(obj);
 }
 export function deleteDbQuery(folder, query, options) {
 	const db = getDb(folder);
-	return db.remove(query, options);
+	return db.deleteDbQuery(query, options);
 }
