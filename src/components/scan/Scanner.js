@@ -23,9 +23,9 @@ class Scanner {
 	load = async scanFolder => {
 		this._dbScan = await Db.load(scanFolder, true);
 	};
-	close = () => {
+	close = async () => {
 		if (this._dbScan) {
-			this._dbScan.close();
+			await this._dbScan.close();
 		}
 	};
 	get folder() {
