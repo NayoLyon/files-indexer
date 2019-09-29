@@ -22,24 +22,24 @@ const ScanContextContainer = ({ scanFolder, goHome, startScan, scanProgress, end
 	const [scanContext, setScanContext] = useState(null);
 	useEffect(() => {
 		let canceled = false;
-		let db = newScanner(sourceDb, {
+		let scanner = newScanner(sourceDb, {
 			startScan,
 			scanProgress,
 			endScan
 		});
 		const loadDb = async () => {
-			await db.load(scanFolder);
+			await scanner.load(scanFolder);
 			if (!canceled) {
-				setScanContext(db);
+				setScanContext(scanner);
 			} else {
-				db.close();
+				scanner.close();
 			}
 		};
 		loadDb();
 
 		return () => {
 			canceled = false;
-			db.close();
+			scanner.close();
 		};
 	}, [scanFolder, sourceDb, startScan, scanProgress, endScan]);
 
