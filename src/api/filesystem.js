@@ -146,7 +146,7 @@ export class FileProps {
 			return 0;
 		}
 		let resultMin = this.compareSameHashFile(this.matches[0]);
-		for (let i = 1; i < this.matches; i += 1) {
+		for (let i = 1; i < this.matches.length; i += 1) {
 			const result = this.compareSameHashFile(this.matches[i]);
 			if (result.length < resultMin.length) {
 				resultMin = result;
