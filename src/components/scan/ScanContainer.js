@@ -27,7 +27,7 @@ const ScanContainer = ({
 	const db = useContext(SourceContext);
 	// Caution: scan is a function, so to update it we have to escape the function mode of setState of Hooks.
 	// See setStartIndexFunc comment in IndexationContainer
-	const [scan, setScan] = useState(() => () => {});
+	const [scan, setScan] = useState(() => null);
 	useEffect(() => {
 		if (db) {
 			let canceled = false;
@@ -50,7 +50,7 @@ const ScanContainer = ({
 			});
 			return () => (canceled = true);
 		} else {
-			setScan(() => () => {});
+			setScan(null);
 		}
 	}, [db, startScan, toScanFolder, scanProcessFile, scanProgress, endScan]);
 

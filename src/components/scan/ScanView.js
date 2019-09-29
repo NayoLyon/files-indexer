@@ -26,7 +26,9 @@ const ScanView = ({
 			</Grid.Row>
 			<Grid.Row style={{ flex: "1 1 10%", height: "10%" }}>
 				{!isScanned && !indexing ? (
-					<Button onClick={scan}>Start Scan</Button>
+					<Button disabled={Boolean(scan)} onClick={scan}>
+						Start Scan
+					</Button>
 				) : indexing ? (
 					<React.Fragment>
 						<Progress {...progress} progress={progress.total ? "ratio" : "percent"}>
