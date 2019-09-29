@@ -26,7 +26,7 @@ const ScanView = ({
 			</Grid.Row>
 			<Grid.Row style={{ flex: "1 1 10%", height: "10%" }}>
 				{!isScanned && !indexing ? (
-					<Button disabled={Boolean(scan)} onClick={scan}>
+					<Button disabled={!scan} onClick={scan}>
 						Start Scan
 					</Button>
 				) : indexing ? (
