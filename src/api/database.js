@@ -1,14 +1,18 @@
 const { remote } = window.require("electron");
 
-const Datastore = remote.require("nedb-promise");
+const PouchDB = require("pouchdb-browser").default;
+PouchDB.plugin(require("pouchdb-adapter-memory").default);
+PouchDB.plugin(require("pouchdb-find").default);
+const ndjson = remote.require("ndjson");
 const { setSync } = remote.require("winattr");
 const path = remote.require("path");
+const fs = remote.require("fs");
 // const { setSync } = app.__utils;
 
 const dbStore = new Map();
 
 function getDbFile(folder) {
-	return path.join(folder, ".index.db");
+	return path.join(folder, ".index.idb");
 }
 
 export class Db {
@@ -24,18 +28,60 @@ export class Db {
 		}
 		try {
 			let db = new Db(folder, isInMemory);
+			db._nbIndexes = 0;
+			const createIndex = (fields, name) =>
+				++db._nbIndexes && db._db.createIndex({ index: { fields, name } });
 			if (isInMemory) {
 				// For scan only
-				db._db = new Datastore({ inMemoryOnly: true, autoload: true });
-				await db._db.ensureIndex({ fieldName: "relpath" });
+				db._db = new PouchDB(folder, { adapter: "memory" });
+				await createIndex(["relpath"], "relpath");
+				await createIndex(["scanType"], "scanType");
+				await createIndex(["type", "filesMatching"], "duplicates");
+				await createIndex(["hash"], "hash");
+				await createIndex(["name"], "name");
 			} else {
-				db._db = new Datastore({ filename: getDbFile(folder), autoload: true });
-				await db._db.ensureIndex({ fieldName: "relpath", unique: true });
-				await db._db.ensureIndex({ fieldName: "hash" });
-				await db._db.ensureIndex({ fieldName: "name" });
+				// Reserve file ~, to avoid several concurrent modifications on the db...
+				// Do it first, so in case of error we have nothing to cleanup...
+				const dbFile = getDbFile(folder);
+				// TODO check perm access on file. Should be read and write.
+
+				// Create the target tmp database.
+				// Will throw an error if it cannot do it (already in use or no write perm on folder)
+				db._ws = fs.createWriteStream(dbFile + "~", { flags: "wx" });
+
+				// For source only
+				db._db = new PouchDB(folder);
+				await createIndex(["relpath"], "relpath"); // TODO Should be unique...
+				await createIndex(["hash"], "hash");
+				await createIndex(["name"], "name");
+
+				// Load from existing db file
+				if (fs.existsSync(dbFile)) {
+					console.log("Load existing database", dbFile);
+					const doLoadDb = new Promise((resolve, reject) => {
+						const rows = [];
+						const rs = fs.createReadStream(dbFile).on("error", reject);
+						const through = remote.require("through2").obj;
+
+						rs.pipe(ndjson.parse())
+							.on("error", reject)
+							.pipe(
+								through(
+									function(doc, _, next) {
+										rows.push(doc);
+										next();
+									},
+									function(next) {
+										resolve(rows);
+										next();
+									}
+								)
+							);
+					});
+					const rows = await doLoadDb;
+					db._db.bulkDocs(rows, { new_edits: false });
+				}
 			}
-			// Load the db
-			// await db.getSize();
 			return db;
 		} catch (error) {
 			console.error(error);
@@ -50,17 +96,90 @@ export class Db {
 		if (!this._db || !this._folder) {
 			throw new Error("Missing mandatory parameter db or folder");
 		}
-		if (!this._inMemory) {
-			const { nedb } = this._db;
-			const dbPath = getDbFile(this._folder);
-			const doCompactAsync = new Promise(resolve => {
-				nedb.on("compaction.done", () => {
-					setSync(dbPath, { hidden: true });
-					resolve();
+		if (this._inMemory) {
+			this.closed = true;
+			try {
+				await this._db.destroy();
+			} catch (error) {
+				console.error(
+					"Could not destroy db... Ignore the error as the db is in memor",
+					error
+				);
+			}
+		} else {
+			try {
+				await this._db.viewCleanup();
+			} catch (error) {
+				console.error("Compaction of indexes failed.", error);
+			}
+			try {
+				await this._db.compact();
+			} catch (error) {
+				console.error("Compaction of database failed.", error);
+			}
+
+			// Get all rows
+			console.log("Exporting data");
+			const rows = await this.allDocs();
+
+			// Close db
+			console.log("Closing db", rows);
+			this.closed = true;
+			try {
+				await this._db.destroy();
+			} catch (error) {
+				console.error(
+					"Could not destroy db... Ignore the error as the db is in memor",
+					error
+				);
+			}
+
+			// Now save to file
+			const dbFile = getDbFile(this._folder);
+			if (rows.length > 0) {
+				console.log("Saving data to file");
+				const doSaveToFile = new Promise((resolve, reject) => {
+					const transformStream = ndjson.serialize();
+					transformStream
+						.pipe(this._ws)
+						.on("error", reject)
+						.on(
+							"finish",
+							// Once ndjson has flushed all data to the output stream, let's indicate done.
+							resolve
+						);
+
+					rows.forEach(doc => transformStream.write(doc.doc));
+
+					// Once we've written each record in the record-set, we have to end the stream so that
+					// the TRANSFORM stream knows to flush and close the file output stream.
+					transformStream.end();
 				});
-				nedb.persistence.compactDatafile();
-			});
-			await doCompactAsync;
+
+				await doSaveToFile;
+				console.log("Save complete!");
+
+				// Now, move to final file
+				let dbFileBak = null;
+				if (fs.existsSync(dbFile)) {
+					dbFileBak = dbFile + ".";
+					let bakIncr = 1;
+					while (fs.existsSync(dbFileBak + bakIncr)) {
+						bakIncr++;
+					}
+					fs.renameSync(dbFile, dbFileBak);
+				}
+				fs.renameSync(dbFile + "~", dbFile);
+				if (dbFileBak) {
+					fs.unlinkSync(dbFileBak);
+				}
+				// Force this file to hidden, for windows...
+				setSync(dbFile, { hidden: true });
+			} else {
+				console.log("Nothing to save...");
+				this._ws.end();
+				fs.unlinkSync(dbFile + "~");
+			}
 		}
 	}
 
@@ -69,7 +188,8 @@ export class Db {
 			throw Error("Database is closed");
 		}
 		try {
-			return await this._db.count({});
+			const result = await this._db.info();
+			return result.doc_count - this._nbIndexes;
 		} catch (error) {
 			console.error(error);
 			return -1;
@@ -81,7 +201,7 @@ export class Db {
 			throw Error("Database is closed");
 		}
 		try {
-			const result = await this._db.findOne({ _id: id });
+			const result = await this._db.get(id, { latest: true });
 			if (result && toClass != null) {
 				return toClass.fromDb(result);
 			}
@@ -98,10 +218,20 @@ export class Db {
 			throw Error("Database is closed");
 		}
 		try {
-			const occurences = await this._db.find({});
+			const { rows: occurences1 } = await this._db.allDocs({
+				include_docs: true,
+				attachments: true,
+				startkey: "_design\uffff"
+			});
+			const { rows: occurences2 } = await this._db.allDocs({
+				include_docs: true,
+				attachments: true,
+				endkey: "_design"
+			});
+			const occurences = occurences1.concat(occurences2);
 
 			if (toClass != null) {
-				return occurences.map(toClass.fromDb);
+				return occurences.map(({ doc: elt }) => toClass.fromDb(elt));
 			}
 			return occurences;
 		} catch (err) {
@@ -114,7 +244,9 @@ export class Db {
 			throw Error("Database is closed");
 		}
 		try {
-			const occurences = await this._db.find(what);
+			const { docs: occurences } = await this._db.find({
+				selector: what
+			});
 
 			if (toClass != null) {
 				return occurences.map(toClass.fromDb);
@@ -130,33 +262,53 @@ export class Db {
 		if (this.closed) {
 			throw Error("Database is closed");
 		}
-		return await this._db.insert(obj);
+		if (obj._id) {
+			return await this._db.put(obj);
+		}
+		return await this._db.post(obj);
 	}
 
 	async updateDb(obj) {
 		if (this.closed) {
 			throw Error("Database is closed");
 		}
-		return await this._db.update({ _id: obj.id }, obj, { returnUpdatedDocs: true });
+		var doc = await this._db.get(obj._id);
+		if (!doc) {
+			console.error("Could not update object", obj);
+			throw new Error("Unknown obj " + obj._id);
+		}
+		const res = await this._db.put({
+			...obj,
+			_rev: doc._rev
+		});
+		return [res.ok && res.id === obj._id ? 1 : 0, { ...obj, _rev: res.rev }, res];
 	}
-	async updateDbQuery(query, obj) {
+	async updateBulk(objList) {
 		if (this.closed) {
 			throw Error("Database is closed");
 		}
-		return await this._db.update(query, obj, { multi: true, returnUpdatedDocs: true });
+		const result = await this._db.bulkDocs(objList);
+		let error = 0;
+		result.forEach((res, index) => {
+			if (!res.ok) {
+				console.error("Error updating document", objList[index], "Cause is ", res);
+				error++;
+			}
+		});
+
+		if (error === objList.length) {
+			throw new Error("Could not update the documents");
+		} else if (error > 0) {
+			throw new Error("Some documents were not updated");
+		}
 	}
 
 	async deleteDb(obj) {
 		if (this.closed) {
 			throw Error("Database is closed");
 		}
-		return await this._db.remove({ _id: obj.id }, {});
-	}
-	async deleteDbQuery(query, options) {
-		if (this.closed) {
-			throw Error("Database is closed");
-		}
-		return await this._db.remove(query, options);
+		const res = await this._db.remove(obj);
+		return res.ok && res.id === obj._id ? 1 : 0;
 	}
 }
 
@@ -225,16 +377,12 @@ export async function updateDb(folder, obj) {
 	const db = getDb(folder);
 	return await db.updateDb(obj);
 }
-export async function updateDbQuery(folder, query, obj) {
+export async function updateBulk(folder, objList) {
 	const db = getDb(folder);
-	return await db.updateDbQuery(query, obj);
+	return await db.updateBulk(objList);
 }
 
 export async function deleteDb(folder, obj) {
 	const db = getDb(folder);
 	return await db.deleteDb(obj);
-}
-export async function deleteDbQuery(folder, query, options) {
-	const db = getDb(folder);
-	return await db.deleteDbQuery(query, options);
 }

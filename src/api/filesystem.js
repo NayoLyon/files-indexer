@@ -1,5 +1,5 @@
 /* eslint no-await-in-loop: "off" */
-/* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
+/* eslint no-underscore-dangle: ["error", { "allow": ["_id", "_rev"] }] */
 // import fs from 'fs';
 // import path from 'path';
 // import crypto from 'crypto';
@@ -27,6 +27,7 @@ const crypto = electron.remote.require("crypto");
 export class FilePropsDb {
 	constructor(file) {
 		this._id = file._id;
+		this._rev = file._rev;
 		this.name = file.name;
 		this.ext = file.ext;
 		this.folder = file.folder;
@@ -72,6 +73,7 @@ export class FileProps {
 		this.path = file.path; // Useless ??
 		this.relpath = file.relpath; // Relative to the database... More usefull
 		this._id = file.relpath;
+		this._rev = file._rev;
 		this.size = file.size;
 		this.modifiedMs = file.modifiedMs;
 		this.changedMs = file.changedMs;

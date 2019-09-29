@@ -43,5 +43,5 @@ function tryDeleteFolder(rootFolder, relFolder) {
 // }
 
 export function isEligibleFile(file) {
-	return ![".index.db", "Thumbs.db"].includes(file);
+	return ![".index.db", ".index.idb", ".index.idb~", "Thumbs.db"].includes(file);
 }

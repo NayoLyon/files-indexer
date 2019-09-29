@@ -149,6 +149,7 @@ class Scanner {
 		if (deleteFileProps !== 1) {
 			console.error(`Could not delete fileProps ??? (${deleteFileProps})`, fileProps);
 		}
+		delete fileProps._rev;
 
 		const affected = [];
 		this._dbDuplicates.forEach(({ filesMatching, filePropsDb }, id, currentMap) => {
@@ -297,13 +298,9 @@ class Scanner {
 		}
 
 		// Rescan them all
-		for (let index = 0; index < filesToRescan.length; index += 1) {
+		for (let index = 0; index < nbFilesToRescan; index += 1) {
 			const elt = filesToRescan[index];
-			this._scanProgress(
-				"INDEXING",
-				{ value: index, total: filesToRescan.length },
-				elt.relpath
-			);
+			this._scanProgress("INDEXING", { value: index, total: nbFilesToRescan }, elt.relpath);
 			/* eslint-disable-next-line no-await-in-loop */
 			await this.scanProcessFile(elt);
 		}
@@ -316,7 +313,7 @@ class Scanner {
 				$or: [
 					{ scanType: CONST_SCAN_TYPE_NEW },
 					{ scanType: CONST_SCAN_TYPE_DUPLICATE },
-					{ matches: dbFileId }
+					{ matches: { $in: [dbFileId] } }
 				]
 			},
 			FilePropsScan
