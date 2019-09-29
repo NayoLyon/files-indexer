@@ -5,6 +5,7 @@ import {
 	findDb,
 	get,
 	insertDb,
+	updateDb,
 	deleteDb,
 	updateDbQuery,
 	deleteDbQuery
@@ -56,15 +57,14 @@ async function scanAdd(fileProps) {
 
 	await Promise.all(
 		fileProps.dbFiles.map(async filePropsDb => {
-			const updatedDoc = await updateDbQuery(
-				"scan",
-				{ type: "FILEPROPSDB", _id: filePropsDb.id },
-				{ $push: { filesMatching: fileProps.id } }
-			);
-			if (updatedDoc[0] === 0) {
+			const existingDoc = await get("scan", filePropsDb.id, FilePropsDbDuplicates);
+			if (!existingDoc) {
 				const newFilePropsDbDuplicate = new FilePropsDbDuplicates(filePropsDb);
 				newFilePropsDbDuplicate.addFileRef(fileProps);
 				await insertDb("scan", newFilePropsDbDuplicate);
+			} else {
+				existingDoc.addFileRef(fileProps);
+				await updateDb("scan", existingDoc);
 			}
 		})
 	);
