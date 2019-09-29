@@ -64,20 +64,6 @@ export class FilePropsDb {
 	}
 }
 
-export class FilePropsDbDuplicates extends FilePropsDb {
-	constructor(file) {
-		super(file);
-		this.type = "FILEPROPSDB";
-		this.filesMatching = file.filesMatching || [];
-	}
-	addFileRef(fileProps) {
-		this.filesMatching.push(fileProps.id);
-	}
-	static fromDb(file) {
-		return new FilePropsDbDuplicates(file);
-	}
-}
-
 export class FileProps {
 	constructor(file) {
 		this.name = file.name;

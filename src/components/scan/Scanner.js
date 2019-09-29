@@ -1,5 +1,5 @@
 import { Db } from "../../api/database";
-import { FileProps, FilePropsDb, FilePropsDbDuplicates } from "../../api/filesystem";
+import { FileProps, FilePropsDb } from "../../api/filesystem";
 import { openExplorerOn, deleteFile } from "../../utils/filesystem";
 
 export const CONST_SCAN_TYPE_DUPLICATE = "duplicate";
@@ -15,13 +15,16 @@ class Scanner {
 	constructor(sourceDb, { startScan, scanProgress, endScan }) {
 		this._sourceDb = sourceDb;
 		this._dbScan = undefined;
+		this._folder = undefined;
 		this._startScan = startScan;
 		this._scanProgress = scanProgress;
 		this._endScan = endScan;
+		this._dbDuplicates = new Map();
 	}
 
 	load = async scanFolder => {
 		this._dbScan = await Db.load(scanFolder, true);
+		this._folder = scanFolder;
 	};
 	close = async () => {
 		if (this._dbScan) {
@@ -29,11 +32,11 @@ class Scanner {
 		}
 	};
 	get folder() {
-		return this._dbScan ? this._dbScan.folder : "";
+		return this._folder ? this._folder : "";
 	}
 	assertLoaded = () => {
-		if (!this._dbScan) {
-			throw new Error("DB is not loaded!!");
+		if (!this._folder) {
+			throw new Error("Scanner is not initialized!!");
 		}
 	};
 
@@ -70,19 +73,17 @@ class Scanner {
 		}
 		await this._dbScan.insertDb(newFileProps);
 
-		await Promise.all(
-			newFileProps.dbFiles.map(async filePropsDb => {
-				const existingDoc = await this._dbScan.get(filePropsDb.id, FilePropsDbDuplicates);
-				if (!existingDoc) {
-					const newFilePropsDbDuplicate = new FilePropsDbDuplicates(filePropsDb);
-					newFilePropsDbDuplicate.addFileRef(newFileProps);
-					await this._dbScan.insertDb(newFilePropsDbDuplicate);
-				} else {
-					existingDoc.addFileRef(newFileProps);
-					await this._dbScan.updateDb(existingDoc);
-				}
-			})
-		);
+		newFileProps.dbFiles.map(async filePropsDb => {
+			const existingDoc = this._dbDuplicates.get(filePropsDb.id);
+			if (!existingDoc) {
+				this._dbDuplicates.set(filePropsDb.id, {
+					filePropsDb,
+					filesMatching: new Set([newFileProps.id])
+				});
+			} else {
+				existingDoc.filesMatching.add(newFileProps.id);
+			}
+		});
 	};
 	scanRemove = async fileProps => {
 		this.assertLoaded();
@@ -96,25 +97,23 @@ class Scanner {
 			console.error(`Could not delete fileProps ??? (${deleteFileProps})`, fileProps);
 		}
 
-		const updatedDoc = await this._dbScan.updateDbQuery(
-			{ type: "FILEPROPSDB", filesMatching: fileProps.id },
-			{ $pull: { filesMatching: fileProps.id } }
-		);
-		if (updatedDoc[0] !== occurence.dbFiles.length) {
+		const affected = [];
+		this._dbDuplicates.forEach(({ filesMatching, filePropsDb }, id, currentMap) => {
+			if (filesMatching.delete(fileProps.id)) {
+				// Delete filePropsDb not having any matching files...
+				if (filesMatching.size === 0) {
+					currentMap.delete(id);
+				}
+				affected.push({ filesMatching, filePropsDb, deleted: filesMatching.size === 0 });
+			}
+		});
+		if (affected.length !== occurence.dbFiles.length) {
 			console.error(
-				`Incorrect dbFilesRef updated (${updatedDoc[0]}), expected (${
-					occurence.dbFiles.length
-				})`,
+				`Incorrect dbFilesRef updated (${affected.length}), expected (${occurence.dbFiles.length})`,
 				occurence,
-				updatedDoc[1]
+				affected
 			);
 		}
-		/* const deleteQuery = */
-		await this._dbScan.deleteDbQuery(
-			{ type: "FILEPROPSDB", filesMatching: { $size: 0 } },
-			{ multi: true }
-		);
-		// console.log(`'${deleteQuery}' dbFilesRef removed...`);
 	};
 
 	// Results:
@@ -137,10 +136,13 @@ class Scanner {
 	// We have filesProps which is a Map of all the above files (having scanType...)
 	async getDbFilesRefs() {
 		this.assertLoaded();
-		return await this._dbScan.find(
-			{ type: "FILEPROPSDB", $not: { filesMatching: { $size: 1 } } },
-			FilePropsDbDuplicates
-		);
+		const res = [];
+		this._dbDuplicates.forEach(({ filesMatching, filePropsDb }) => {
+			if (filesMatching.size > 1) {
+				res.push({ ...filePropsDb, filesMatching });
+			}
+		});
+		return res;
 	}
 	// Results actions:
 	openDbFolderFor = file => {
@@ -149,7 +151,7 @@ class Scanner {
 	};
 	openFolderFor = file => {
 		this.assertLoaded();
-		return openExplorerOn(path.resolve(this._dbScan.folder, file.relpath));
+		return openExplorerOn(path.resolve(this.folder, file.relpath));
 	};
 	copyModifiedAttributeTo = async (file, dbFile) => {
 		this.assertLoaded();
@@ -203,7 +205,7 @@ class Scanner {
 		this.assertLoaded();
 
 		this._startScan();
-		deleteFile(this._dbScan.folder, file.relpath);
+		deleteFile(this.folder, file.relpath);
 		await this.scanRemove(file);
 		this._endScan();
 	};
@@ -215,7 +217,7 @@ class Scanner {
 		for (let i = 0; i < identicals.length; i += 1) {
 			const file = identicals[i];
 			this._scanProgress("REMOVING", { value: i, total: identicals.length }, file.relpath);
-			deleteFile(this._dbScan.folder, file.relpath);
+			deleteFile(this.folder, file.relpath);
 			/* eslint-disable-next-line no-await-in-loop */
 			await this.scanRemove(file);
 		}

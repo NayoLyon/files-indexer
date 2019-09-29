@@ -72,7 +72,7 @@ class ResultTabReferencesView extends Component {
 
 	show(filesId, dbFile) {
 		const { filesProps } = this.props;
-		const files = filesId.map(fileId => filesProps.get(fileId));
+		const files = Array.from(filesId).map(fileId => filesProps.get(fileId));
 		return () => this.setState({ files, dbFile, open: true });
 	}
 
@@ -127,7 +127,7 @@ class ResultTabReferencesView extends Component {
 
 		const rows = [
 			<As key={`db_${relpath}`}>
-				<Table.Cell textAlign="center" rowSpan={filesMatching.length + 1}>
+				<Table.Cell textAlign="center" rowSpan={filesMatching.size + 1}>
 					<Button icon="search" onClick={this.show(filesMatching, row)} />
 					{name}
 				</Table.Cell>
