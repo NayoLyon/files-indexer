@@ -25,6 +25,7 @@ export class Db {
 		try {
 			let db = new Db(folder, isInMemory);
 			if (isInMemory) {
+				// For scan only
 				db._db = new Datastore({ inMemoryOnly: true, autoload: true });
 				await db._db.ensureIndex({ fieldName: "relpath" });
 			} else {
@@ -142,7 +143,7 @@ export class Db {
 		if (this.closed) {
 			throw Error("Database is closed");
 		}
-		return await this._db.update(query, obj, { returnUpdatedDocs: true });
+		return await this._db.update(query, obj, { multi: true, returnUpdatedDocs: true });
 	}
 
 	async deleteDb(obj) {
