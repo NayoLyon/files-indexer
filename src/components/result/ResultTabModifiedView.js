@@ -11,10 +11,10 @@ export default class ResultTabModifiedView extends Component {
 		return file.diff.includes("name");
 	}
 	static filterModifiedLess(file) {
-		return file.diff.includes("modifiedMs") && file.modifiedMs < file.dbFiles[0].modifiedMs;
+		return file.diff.includes("modifiedMs") && file.modifiedMs < file.dbMatches[0].modifiedMs;
 	}
 	static filterModifiedGreater(file) {
-		return file.diff.includes("modifiedMs") && file.modifiedMs > file.dbFiles[0].modifiedMs;
+		return file.diff.includes("modifiedMs") && file.modifiedMs > file.dbMatches[0].modifiedMs;
 	}
 
 	constructor(props) {
@@ -30,7 +30,7 @@ export default class ResultTabModifiedView extends Component {
 		this.setState({ open: false });
 	}
 	show(file) {
-		return () => this.setState({ file, dbFile: file.dbFiles[0], open: true });
+		return () => this.setState({ file, dbFile: file.dbMatches[0], open: true });
 	}
 
 	computeHeader() {
@@ -76,7 +76,7 @@ export default class ResultTabModifiedView extends Component {
 					label: "In DB",
 					colProps: { key: `db_${elt}`, textAlign: "left", verticalAlign: "middle" },
 					sortStyle,
-					sortKey: `file.dbFiles[0].${elt}`
+					sortKey: `file.dbMatches[0].${elt}`
 				});
 				res.push({
 					key: `folder_${elt}`,
@@ -111,7 +111,7 @@ export default class ResultTabModifiedView extends Component {
 	}
 	renderDbFile(As, row, prop, columnAttributes) {
 		const { diff } = row;
-		const dbFile = row.dbFiles[0];
+		const dbFile = row.dbMatches[0];
 		if (diff.includes(prop) || prop === "relpath") {
 			const actionsDb =
 				prop === "relpath" ? (
@@ -134,7 +134,7 @@ export default class ResultTabModifiedView extends Component {
 	}
 	renderFile(As, row, prop, columnAttributes) {
 		const { diff } = row;
-		const dbFile = row.dbFiles[0];
+		const dbFile = row.dbMatches[0];
 		if (diff.includes(prop) || prop === "relpath") {
 			let actionsFolder = null;
 			if (prop === "relpath") {
@@ -211,6 +211,11 @@ export default class ResultTabModifiedView extends Component {
 				filterFunc: ResultTabModifiedView.filterModifiedGreater
 			}
 		];
+		const { files, dbFiles } = this.props;
+		const filesExtended = files.map(file => ({
+			...file,
+			dbMatches: file.dbMatches.map(filePropsDbId => dbFiles.get(filePropsDbId))
+		}));
 		return (
 			<Tab.Pane key="scan_result_modified" style={{ height: "calc(100% - 3.5rem)" }}>
 				<CompareDialogView
@@ -223,7 +228,7 @@ export default class ResultTabModifiedView extends Component {
 					dbFilesFirst
 				/>
 				<TableContainer
-					data={this.props.files}
+					data={filesExtended}
 					headers={headers}
 					rowKey="relpath"
 					cellRenderer={this.cellRenderer.bind(this)}

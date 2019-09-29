@@ -77,13 +77,6 @@ export class FileProps {
 		this.changedMs = file.changedMs;
 		this.createdMs = file.createdMs;
 		this.hash = file.hash || null;
-		this.scanType = file.scanType || null;
-		if (file.matches) {
-			this.matches = file.matches.map(filePropsDb => FilePropsDb.fromDb(filePropsDb));
-		} else {
-			this.matches = [];
-		}
-		this.diff = file.diff || [];
 	}
 	static fromScan(file, stats, rootPath) {
 		return new FileProps({
@@ -104,64 +97,12 @@ export class FileProps {
 	static fromDb(file) {
 		return new FileProps(file);
 	}
-	clone() {
-		return new FileProps({ ...this, scanType: null, matches: null, diff: null });
-	}
 	toFilePropsDb() {
 		return new FilePropsDb({ ...this, _id: undefined });
 	}
 	async computeHash() {
 		/* Manage readCallback ? Need to send the size and the callback to computeHashForFile, to know how much reading, and how long it will be... */
 		this.hash = await computeHashForFile(this.path);
-	}
-	setCompareType(scanType) {
-		this.scanType = scanType;
-	}
-	get dbFiles() {
-		return this.matches;
-	}
-	setDbMatches(dbFiles) {
-		if (Array.isArray(dbFiles)) {
-			this.matches = this.matches.concat(dbFiles);
-		} else {
-			this.matches.push(dbFiles);
-		}
-	}
-	compareSameHash() {
-		if (this.matches == null || this.matches.length === 0) {
-			return 0;
-		}
-		let resultMin = this.compareSameHashFile(this.matches[0]);
-		for (let i = 1; i < this.matches.length; i += 1) {
-			const result = this.compareSameHashFile(this.matches[i]);
-			if (result.length < resultMin.length) {
-				resultMin = result;
-				this.matches.splice(0, 0, this.matches.splice(i, 1)[0]);
-			}
-		}
-		this.diff = resultMin;
-		return this.diff;
-	}
-	compareSameHashFile(dbFile) {
-		const result = [];
-		if (dbFile.name !== this.name) {
-			result.push("name");
-		}
-		if (dbFile.size !== this.size) {
-			result.push("size");
-		}
-		if (dbFile.modifiedMs !== this.modifiedMs) {
-			result.push("modifiedMs");
-		}
-		// Ignore changedMs and createdMs... They only depend on when the file was copied.
-		// The correct date to check is the modifiedMs data.
-		// if (dbFile.changedMs !== this.changedMs) {
-		//   result.push('changedMs');
-		// }
-		// if (dbFile.createdMs !== this.createdMs) {
-		//   result.push('createdMs');
-		// }
-		return result;
 	}
 	compareToSamePath(dbFile) {
 		const result = new Set();

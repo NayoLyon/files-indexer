@@ -14,7 +14,8 @@ const defaultValue = {
 	newFiles: [],
 	modified: [],
 	duplicates: [],
-	dbFilesRef: []
+	dbFilesRef: [],
+	dbFiles: []
 };
 
 export default function resultReducer(state = defaultValue, action) {
@@ -34,6 +35,7 @@ export default function resultReducer(state = defaultValue, action) {
 				modified: action.modified,
 				duplicates: action.duplicates,
 				dbFilesRef: action.dbFilesRef,
+				dbFiles: action.dbFiles,
 				filesProps: action.filesProps
 			};
 		}

@@ -71,6 +71,7 @@ class ResultView extends Component {
 				render: () => (
 					<ResultTabIdenticalView
 						files={this.props.identicals}
+						dbFiles={this.props.dbFiles}
 						removeFile={this.props.removeFile}
 						openDbFolderFor={this.props.openDbFolderFor}
 						openFolderFor={this.props.openFolderFor}
@@ -98,6 +99,7 @@ class ResultView extends Component {
 				render: () => (
 					<ResultTabModifiedView
 						files={this.props.modified}
+						dbFiles={this.props.dbFiles}
 						copyModifiedAttributeTo={this.props.copyModifiedAttributeTo}
 						openDbFolderFor={this.props.openDbFolderFor}
 						openFolderFor={this.props.openFolderFor}
@@ -114,6 +116,7 @@ class ResultView extends Component {
 				render: () => (
 					<ResultTabDuplicateView
 						files={this.props.duplicates}
+						dbFiles={this.props.dbFiles}
 						removeFile={this.props.removeFile}
 						openDbFolderFor={this.props.openDbFolderFor}
 						openFolderFor={this.props.openFolderFor}
@@ -144,7 +147,8 @@ function mapStateToProps(state) {
 		newFiles: state.resultState.newFiles,
 		modified: state.resultState.modified,
 		duplicates: state.resultState.duplicates,
-		dbFilesRef: state.resultState.dbFilesRef
+		dbFilesRef: state.resultState.dbFilesRef,
+		dbFiles: state.resultState.dbFiles
 	};
 }
 

@@ -22,14 +22,16 @@ export default class ResultTabDuplicateView extends Component {
 	}
 
 	renderFiles() {
+		const { dbFiles } = this.props;
 		const rows = [];
 		for (let i = 0; i < this.props.files.length; i += 1) {
 			const file = this.props.files[i];
+			const dbMatches = file.dbMatches.map(filePropsDbId => dbFiles.get(filePropsDbId));
 
 			rows.push(
 				<Table.Row key={`folder_${file.relpath}`}>
-					<Table.Cell textAlign="center" rowSpan={file.dbFiles.length + 1}>
-						<Button icon="search" onClick={this.show(file, file.dbFiles)} />
+					<Table.Cell textAlign="center" rowSpan={dbMatches.length + 1}>
+						<Button icon="search" onClick={this.show(file, dbMatches)} />
 						{file.name}
 					</Table.Cell>
 					<Table.Cell textAlign="center">In folder</Table.Cell>
@@ -55,22 +57,22 @@ export default class ResultTabDuplicateView extends Component {
 				</Table.Row>
 			);
 
-			for (let m = 0; m < file.dbFiles.length; m += 1) {
+			for (let m = 0; m < dbMatches.length; m += 1) {
 				rows.push(
-					<Table.Row key={`db_${file.relpath}_${file.dbFiles[m].relpath}`}>
+					<Table.Row key={`db_${file.relpath}_${dbMatches[m].relpath}`}>
 						<Table.Cell textAlign="center">Possible match {m + 1}</Table.Cell>
 						<Table.Cell textAlign="center">
-							{printValue(file.dbFiles[m], "size")}
+							{printValue(dbMatches[m], "size")}
 						</Table.Cell>
 						<Table.Cell textAlign="center">
-							{printValue(file.dbFiles[m], "modifiedMs")}
+							{printValue(dbMatches[m], "modifiedMs")}
 						</Table.Cell>
 						<Table.Cell textAlign="center">
-							{printValue(file.dbFiles[m], "relpath")}
+							{printValue(dbMatches[m], "relpath")}
 							<Button
 								icon="external"
 								onClick={() => {
-									this.props.openDbFolderFor(file.dbFiles[m]);
+									this.props.openDbFolderFor(dbMatches[m]);
 								}}
 							/>
 						</Table.Cell>

@@ -14,18 +14,6 @@ function loadResultError() {
 	};
 }
 
-function loadResultSuccess(identicals, newFiles, modified, duplicates, dbFilesRef, filesProps) {
-	return {
-		type: RESULT_LOAD_SUCCESS,
-		identicals,
-		newFiles,
-		modified,
-		duplicates,
-		dbFilesRef,
-		filesProps
-	};
-}
-
 export function resultSetTabActive(activeTab) {
 	return {
 		type: RESULT_SET_ACTIVETAB,
@@ -49,18 +37,18 @@ export function loadResult(dbScan) {
 			modified.forEach(insertIntoMap);
 			const duplicates = await dbScan.getDuplicates();
 			duplicates.forEach(insertIntoMap);
-			const dbFilesRef = await dbScan.getDbFilesRefs();
-			console.log("dbFilesRef: ", dbFilesRef);
-			dispatch(
-				loadResultSuccess(
-					identicals,
-					newFiles,
-					modified,
-					duplicates,
-					dbFilesRef,
-					filesProps
-				)
-			);
+			const dbFilesRef = dbScan.getDbFilesRefs();
+			const dbFiles = dbScan.getDbFilesMap();
+			dispatch({
+				type: RESULT_LOAD_SUCCESS,
+				identicals,
+				newFiles,
+				modified,
+				duplicates,
+				dbFilesRef,
+				dbFiles,
+				filesProps
+			});
 		} catch (error) {
 			console.log(error);
 			dispatch(loadResultError());

@@ -21,10 +21,12 @@ export default class ResultTabIdenticalView extends Component {
 	}
 
 	renderFiles() {
+		const { dbFiles } = this.props;
 		const { buttonGroupStyle } = ResultView.getStyles();
 		const res = [];
 		for (let i = 0; i < this.props.files.length; i += 1) {
 			const file = this.props.files[i];
+			const dbMatches = file.dbMatches.map(filePropsDbId => dbFiles.get(filePropsDbId));
 			res.push(
 				<List.Item key={`file_${file.relpath}`}>
 					<List.Content>
@@ -35,7 +37,7 @@ export default class ResultTabIdenticalView extends Component {
 									this.props.removeFile(file);
 								}}
 							/>
-							<Button icon="search" onClick={this.show(file, file.dbFiles)} />
+							<Button icon="search" onClick={this.show(file, dbMatches)} />
 						</Button.Group>
 						{file.relpath}
 					</List.Content>
