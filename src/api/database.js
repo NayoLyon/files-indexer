@@ -86,22 +86,22 @@ export class Db {
 		}
 	}
 
-	insertDb(obj) {
-		return this._db.insert(obj);
+	async insertDb(obj) {
+		return await this._db.insert(obj);
 	}
 
-	updateDb(obj) {
-		return this._db.update({ _id: obj.id }, obj, { returnUpdatedDocs: true });
+	async updateDb(obj) {
+		return await this._db.update({ _id: obj.id }, obj, { returnUpdatedDocs: true });
 	}
-	updateDbQuery(query, obj) {
-		return this._db.update(query, obj, { returnUpdatedDocs: true });
+	async updateDbQuery(query, obj) {
+		return await this._db.update(query, obj, { returnUpdatedDocs: true });
 	}
 
-	deleteDb(obj) {
-		return this._db.remove({ _id: obj.id }, {});
+	async deleteDb(obj) {
+		return await this._db.remove({ _id: obj.id }, {});
 	}
-	deleteDbQuery(query, options) {
-		return this._db.remove(query, options);
+	async deleteDbQuery(query, options) {
+		return await this._db.remove(query, options);
 	}
 }
 
@@ -150,33 +150,28 @@ export async function initDatabase(folder, isInMemory) {
 
 export async function findDb(folder, what, toClass) {
 	const db = getDb(folder);
-	try {
-		return await db.findDb(what, toClass);
-	} catch (err) {
-		console.error("Error in DB find", err);
-		throw err;
-	}
+	return await db.findDb(what, toClass);
 }
 
-export function insertDb(folder, obj) {
+export async function insertDb(folder, obj) {
 	const db = getDb(folder);
-	return db.insertDb(obj);
+	return await db.insertDb(obj);
 }
 
-export function updateDb(folder, obj) {
+export async function updateDb(folder, obj) {
 	const db = getDb(folder);
-	return db.updateDb(obj);
+	return await db.updateDb(obj);
 }
-export function updateDbQuery(folder, query, obj) {
+export async function updateDbQuery(folder, query, obj) {
 	const db = getDb(folder);
-	return db.updateDbQuery(query, obj);
+	return await db.updateDbQuery(query, obj);
 }
 
-export function deleteDb(folder, obj) {
+export async function deleteDb(folder, obj) {
 	const db = getDb(folder);
-	return db.deleteDb(obj);
+	return await db.deleteDb(obj);
 }
-export function deleteDbQuery(folder, query, options) {
+export async function deleteDbQuery(folder, query, options) {
 	const db = getDb(folder);
-	return db.deleteDbQuery(query, options);
+	return await db.deleteDbQuery(query, options);
 }
