@@ -16,6 +16,7 @@ export class Db {
 		this._folder = folder;
 		this._inMemory = isInMemory;
 		this._db = null;
+		this.closed = false;
 	}
 	static async load(folder, isInMemory = false) {
 		if (!folder) {
@@ -44,6 +45,7 @@ export class Db {
 		return this._folder;
 	}
 	async close() {
+		if (this.closed) return; // Already closed
 		if (!this._db || !this._folder) {
 			throw new Error("Missing mandatory parameter db or folder");
 		}
@@ -62,6 +64,9 @@ export class Db {
 	}
 
 	async getSize() {
+		if (this.closed) {
+			throw Error("Database is closed");
+		}
 		try {
 			return await this._db.count({});
 		} catch (error) {
@@ -71,6 +76,9 @@ export class Db {
 	}
 
 	async get(id, toClass) {
+		if (this.closed) {
+			throw Error("Database is closed");
+		}
 		try {
 			const result = await this._db.findOne({ _id: id });
 			if (result && toClass != null) {
@@ -85,6 +93,9 @@ export class Db {
 		}
 	}
 	async allDocs(toClass) {
+		if (this.closed) {
+			throw Error("Database is closed");
+		}
 		try {
 			const occurences = await this._db.find({});
 
@@ -98,6 +109,9 @@ export class Db {
 		}
 	}
 	async find(what, toClass) {
+		if (this.closed) {
+			throw Error("Database is closed");
+		}
 		try {
 			const occurences = await this._db.find(what);
 
@@ -112,20 +126,35 @@ export class Db {
 	}
 
 	async insertDb(obj) {
+		if (this.closed) {
+			throw Error("Database is closed");
+		}
 		return await this._db.insert(obj);
 	}
 
 	async updateDb(obj) {
+		if (this.closed) {
+			throw Error("Database is closed");
+		}
 		return await this._db.update({ _id: obj.id }, obj, { returnUpdatedDocs: true });
 	}
 	async updateDbQuery(query, obj) {
+		if (this.closed) {
+			throw Error("Database is closed");
+		}
 		return await this._db.update(query, obj, { returnUpdatedDocs: true });
 	}
 
 	async deleteDb(obj) {
+		if (this.closed) {
+			throw Error("Database is closed");
+		}
 		return await this._db.remove({ _id: obj.id }, {});
 	}
 	async deleteDbQuery(query, options) {
+		if (this.closed) {
+			throw Error("Database is closed");
+		}
 		return await this._db.remove(query, options);
 	}
 }
