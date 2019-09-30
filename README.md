@@ -10,7 +10,6 @@ TODO:
 - do not consider files times (modified, created...) different if the difference is a matter of seconds ??
 - alternative to NeDB: https://github.com/nylas/electron-RxDB
 - remove all static methods from api/database.
-- Remove path and folder from db (for space, useless)
 - Remove import CONST_SCAN_TYPE_DUPLICATE from ResultTabReferencesView... The object scanType should not be checked... Add a method to the FileProps class ?
 - Move FileProps class to Scanner ? They are deeply linked... But not that much, they are mostly the return of doScan, which is used everywhere... Create a FilePropsScan class that inherits from FileProps ??
 - Fix Blinking of render after attribute is modified. The old screen is first rendered, then updated with updated elements...

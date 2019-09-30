@@ -153,14 +153,12 @@ class ResultTabReferencesView extends Component {
 	render() {
 		const headers = ResultTabReferencesView.computeHeader();
 		const { open, files, dbFile } = this.state;
-		const { openDbFolderFor, openFolderFor, removeFile, files: filesFromProps } = this.props;
+		const { removeFile, files: filesFromProps } = this.props;
 		return (
 			<Tab.Pane key="scan_result_references" style={{ height: "calc(100% - 3.5rem)" }}>
 				<CompareDialogView
 					open={open}
 					close={this.close}
-					openDbFolderFor={openDbFolderFor}
-					openFolderFor={openFolderFor}
 					removeFile={removeFile}
 					files={files}
 					dbFiles={dbFile}

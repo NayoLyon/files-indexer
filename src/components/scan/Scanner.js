@@ -98,6 +98,9 @@ class Scanner {
 	get folder() {
 		return this._folder ? this._folder : "";
 	}
+	get dbRootPath() {
+		return this._sourceDb.folder;
+	}
 	assertLoaded = () => {
 		if (!this._folder) {
 			throw new Error("Scanner is not initialized!!");

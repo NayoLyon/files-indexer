@@ -168,7 +168,7 @@ const processFileWithHash = (db, hashComputed, indexDuplicate) => async fileProp
 		if (diff.size) {
 			if (!hashComputed) {
 				// There are differences between the files... Recompute the hash and relaunch compare to include the hash
-				await fileProps.computeHash();
+				await fileProps.computeHash(db.folder);
 				diff = fileProps.compareToSamePath(occurences[0]);
 			}
 
@@ -178,7 +178,7 @@ const processFileWithHash = (db, hashComputed, indexDuplicate) => async fileProp
 		}
 	} else {
 		if (!hashComputed) {
-			await fileProps.computeHash();
+			await fileProps.computeHash(db.folder);
 			console.info("Adding new file in db", fileProps);
 			indexDuplicate(undefined, fileProps, new Set(["new"]));
 		}

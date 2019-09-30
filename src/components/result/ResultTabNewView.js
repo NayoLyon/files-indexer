@@ -62,7 +62,6 @@ export default class ResultTabNewView extends Component {
 				<CompareDialogView
 					open={this.state.open}
 					close={this.close}
-					openFolderFor={this.props.openFolderFor}
 					files={this.state.file}
 				/>
 				<List selection verticalAlign="middle">

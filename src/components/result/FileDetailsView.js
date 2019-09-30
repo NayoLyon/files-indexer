@@ -4,6 +4,9 @@ import { lookup } from "mime-types";
 
 import { printValue } from "../../utils/format";
 
+const electron = window.require("electron");
+const path = electron.remote.require("path");
+
 export default class FileDetailsView extends Component {
 	static inlineStyles = {
 		card: {
@@ -25,13 +28,20 @@ export default class FileDetailsView extends Component {
 		return this.props.file ? printValue(this.props.file, prop) : "";
 	}
 	computePreview() {
-		const mimeType = lookup(this.getProp("path"));
+		const { rootPath } = this.props;
+		const mimeType = lookup(this.getProp("name"));
 		const adjustStyle = {
 			objectFit: "contain",
 			maxHeight: "50vh"
 		};
 		if (mimeType.match("^image/")) {
-			return <Image style={adjustStyle} size="huge" src={this.getProp("path")} />;
+			return (
+				<Image
+					style={adjustStyle}
+					size="huge"
+					src={path.resolve(rootPath, this.getProp("relpath"))}
+				/>
+			);
 		}
 		return (
 			<Card.Header style={FileDetailsView.inlineStyles.genericHeaderStyles}>

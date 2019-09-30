@@ -13,9 +13,6 @@ const crypto = electron.remote.require("crypto");
 // export type FilePropsType = {
 //   _id: string | void,
 //   name: string,
-//   ext: string,
-//   folder: string,
-//   path: string,
 //   relpath: string,
 //   hash: string,
 //   size: number,
@@ -29,9 +26,6 @@ export class FilePropsDb {
 		this._id = file._id;
 		this._rev = file._rev;
 		this.name = file.name;
-		this.ext = file.ext;
-		this.folder = file.folder;
-		this.path = file.path;
 		this.relpath = file.relpath;
 		this.hash = file.hash;
 		this.size = file.size;
@@ -49,12 +43,8 @@ export class FilePropsDb {
 		return new FilePropsDb(this);
 	}
 	setNewName(name) {
-		// const rootPath = getRootPath(this.path, this.relpath);
 		this.name = name;
-		this.ext = path.extname(name);
-		this.path = path.resolve(path.dirname(this.path), name);
 		this.relpath = path.join(path.dirname(this.relpath), name);
-		// this.relpath = path.relative(rootPath, this.path);
 	}
 	cloneFromSamePath(file) {
 		const newFile = new FilePropsDb(this);
@@ -68,9 +58,6 @@ export class FilePropsDb {
 export class FileProps {
 	constructor(file) {
 		this.name = file.name;
-		this.ext = file.ext;
-		this.folder = file.folder; // Useless ??
-		this.path = file.path; // Useless ??
 		this.relpath = file.relpath; // Relative to the database... More usefull
 		this._id = file.relpath;
 		this._rev = file._rev;
@@ -83,9 +70,6 @@ export class FileProps {
 	static fromScan(file, stats, rootPath) {
 		return new FileProps({
 			name: path.basename(file),
-			ext: path.extname(file),
-			folder: path.dirname(file),
-			path: file,
 			relpath: path.relative(rootPath, file),
 			size: stats.size,
 			modifiedMs: stats.mtimeMs,
@@ -102,9 +86,9 @@ export class FileProps {
 	toFilePropsDb() {
 		return new FilePropsDb({ ...this, _id: undefined });
 	}
-	async computeHash() {
+	async computeHash(rootFolder) {
 		/* Manage readCallback ? Need to send the size and the callback to computeHashForFile, to know how much reading, and how long it will be... */
-		this.hash = await computeHashForFile(this.path);
+		this.hash = await computeHashForFile(path.resolve(rootFolder, this.relpath));
 	}
 	compareToSamePath(dbFile) {
 		const result = new Set();
@@ -152,7 +136,7 @@ export async function doScan(
 		const fileProps = FileProps.fromScan(file, stats, folder);
 		if (hashRequired) {
 			try {
-				await fileProps.computeHash();
+				await fileProps.computeHash(folder);
 			} catch (error) {
 				console.error(`Could not compute hash for ${file}. Skip it...`, error);
 			}

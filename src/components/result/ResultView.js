@@ -73,8 +73,6 @@ class ResultView extends Component {
 						files={this.props.identicals}
 						dbFiles={this.props.dbFiles}
 						removeFile={this.props.removeFile}
-						openDbFolderFor={this.props.openDbFolderFor}
-						openFolderFor={this.props.openFolderFor}
 					/>
 				)
 			});

@@ -1,40 +1,43 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Modal, Button } from "semantic-ui-react";
+
+import ScanContext from "../scan/ScanContext";
 
 import FileDetailsView from "./FileDetailsView";
 import CompareDialogViewDivider from "./CompareDialogViewDivider";
 
-const CompareFiles = ({ files, openFolderFunc, removeFile }) => {
+const CompareFiles = ({ files, rootPath, openFolderFunc, removeFile }) => {
 	const filesList = Array.isArray(files) ? files : [files];
 	return filesList.map(file => (
 		<FileDetailsView
 			key={file.relpath}
 			file={file}
+			rootPath={rootPath}
 			openFolderFor={openFolderFunc}
 			removeFile={removeFile}
 		/>
 	));
 };
 
-const CompareDialogView = ({
-	files,
-	dbFiles,
-	dbFilesFirst,
-	open,
-	close,
-	openFolderFor,
-	removeFile,
-	openDbFolderFor
-}) => {
+const CompareDialogView = ({ files, dbFiles, dbFilesFirst, open, close, removeFile }) => {
+	const dbScan = useContext(ScanContext);
+
 	if (!files && !dbFiles) {
 		return null;
 	}
 
+	const { folder: rootPath, dbRootPath, openDbFolderFor, openFolderFor } = dbScan;
+
 	const filesRender = files ? (
-		<CompareFiles files={files} openFolderFunc={openFolderFor} removeFile={removeFile} />
+		<CompareFiles
+			files={files}
+			rootPath={rootPath}
+			openFolderFunc={openFolderFor}
+			removeFile={removeFile}
+		/>
 	) : null;
 	const dbFilesRender = dbFiles ? (
-		<CompareFiles files={dbFiles} openFolderFunc={openDbFolderFor} />
+		<CompareFiles files={dbFiles} rootPath={dbRootPath} openFolderFunc={openDbFolderFor} />
 	) : null;
 
 	// Display the files in the given order

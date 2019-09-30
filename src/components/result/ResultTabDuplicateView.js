@@ -91,8 +91,6 @@ export default class ResultTabDuplicateView extends Component {
 				<CompareDialogView
 					open={this.state.open}
 					close={this.close}
-					openDbFolderFor={this.props.openDbFolderFor}
-					openFolderFor={this.props.openFolderFor}
 					files={this.state.file}
 					dbFiles={this.state.dbFiles}
 				/>
