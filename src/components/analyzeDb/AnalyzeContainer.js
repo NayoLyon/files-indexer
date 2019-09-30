@@ -46,10 +46,12 @@ const AnalyzeContainer = ({
 				openExplorerOn(filePath);
 			} else {
 				filePath = path.dirname(filePath);
-				while (!fs.existsSync(filePath)) {
+				while (filePath && !fs.existsSync(filePath)) {
 					filePath = path.dirname(filePath);
 				}
-				openExplorerFor(filePath);
+				if (filePath) {
+					openExplorerFor(filePath);
+				}
 			}
 		},
 		[db]
