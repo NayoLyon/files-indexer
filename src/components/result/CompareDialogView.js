@@ -1,9 +1,10 @@
 import React, { Component } from "react";
-import { Modal, Button, Label } from "semantic-ui-react";
+import { Modal, Button } from "semantic-ui-react";
 
 import { FileProps, FilePropsDb } from "../../api/filesystem";
 
 import FileDetailsView from "./FileDetailsView";
+import CompareDialogViewDivider from "./CompareDialogViewDivider";
 
 export default class CompareDialogView extends Component {
 	static renderFiles(files, openFolderFunc, removeFile) {
@@ -37,44 +38,6 @@ export default class CompareDialogView extends Component {
 		}
 		return "unknown";
 	}
-	static getDivider(topLabel, bottomLabel) {
-		const inlineStyle = {
-			divider: {
-				flex: "0 1",
-				margin: "1rem auto",
-				textAlign: "center"
-			},
-			dividerLine: {
-				borderLeft: "1px solid rgba(34, 36, 38, 0.15)",
-				borderRight: "1px solid rgba(255, 255, 255, 0.1)",
-				height: "calc(50% - 2.5em)",
-				width: 0,
-				display: "inline-block"
-			},
-			dividerLabel: {
-				display: "block",
-				margin: "0.4em"
-			}
-		};
-
-		return (
-			<div key="divider" style={{ ...inlineStyle.divider, color: "black" }}>
-				<div style={inlineStyle.dividerLine} />
-				<Label
-					basic
-					color="grey"
-					pointing="left"
-					style={{ ...inlineStyle.dividerLabel, marginTop: 0 }}
-				>
-					{topLabel}
-				</Label>
-				<Label basic color="grey" pointing="right" style={inlineStyle.dividerLabel}>
-					{bottomLabel}
-				</Label>
-				<div style={inlineStyle.dividerLine} />
-			</div>
-		);
-	}
 
 	render() {
 		const inlineStyle = {
@@ -105,7 +68,9 @@ export default class CompareDialogView extends Component {
 				this.props.openDbFolderFor
 			);
 			if (this.props.files) {
-				filesDetails.push(CompareDialogView.getDivider("Db", "Folder"));
+				filesDetails.push(
+					<CompareDialogViewDivider key="divider" topLabel="Db" bottomLabel="Folder" />
+				);
 				filesDetails = filesDetails.concat(
 					CompareDialogView.renderFiles(
 						this.props.files,
@@ -121,7 +86,9 @@ export default class CompareDialogView extends Component {
 				this.props.removeFile
 			);
 			if (this.props.dbFiles) {
-				filesDetails.push(CompareDialogView.getDivider("Folder", "Db"));
+				filesDetails.push(
+					<CompareDialogViewDivider key="divider" topLabel="Folder" bottomLabel="Db" />
+				);
 				filesDetails = filesDetails.concat(
 					CompareDialogView.renderFiles(this.props.dbFiles, this.props.openDbFolderFor)
 				);
