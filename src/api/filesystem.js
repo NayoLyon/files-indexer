@@ -72,9 +72,9 @@ export class FileProps {
 			name: path.basename(file),
 			relpath: path.relative(rootPath, file),
 			size: stats.size,
-			modifiedMs: stats.mtimeMs,
-			changedMs: stats.ctimeMs,
-			createdMs: stats.birthtimeMs
+			modifiedMs: stats.mtime.getTime(),
+			changedMs: stats.ctime.getTime(),
+			createdMs: stats.birthtime.getTime()
 		});
 	}
 	get id() {
