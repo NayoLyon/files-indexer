@@ -1,109 +1,86 @@
-import React, { Component } from "react";
+import React from "react";
 import { Modal, Button } from "semantic-ui-react";
-
-import { FileProps, FilePropsDb } from "../../api/filesystem";
 
 import FileDetailsView from "./FileDetailsView";
 import CompareDialogViewDivider from "./CompareDialogViewDivider";
 
-export default class CompareDialogView extends Component {
-	static renderFiles(files, openFolderFunc, removeFile) {
-		const res = [];
-		if (files instanceof Array) {
-			const type = CompareDialogView.getType(files[0]);
-			files.forEach(file => {
-				res.push(CompareDialogView.renderFile(file, type, openFolderFunc, removeFile));
-			});
-		} else {
-			const type = CompareDialogView.getType(files);
-			res.push(CompareDialogView.renderFile(files, type, openFolderFunc, removeFile));
-		}
-		return res;
+const CompareFiles = ({ files, openFolderFunc, removeFile }) => {
+	const filesList = Array.isArray(files) ? files : [files];
+	return filesList.map(file => (
+		<FileDetailsView
+			key={file.relpath}
+			file={file}
+			openFolderFor={openFolderFunc}
+			removeFile={removeFile}
+		/>
+	));
+};
+
+const CompareDialogView = ({
+	files,
+	dbFiles,
+	dbFilesFirst,
+	open,
+	close,
+	openFolderFor,
+	removeFile,
+	openDbFolderFor
+}) => {
+	if (!files && !dbFiles) {
+		return null;
 	}
-	static renderFile(file, type, openFolderFunc, removeFile) {
-		return (
-			<FileDetailsView
-				key={`${type}_${file.relpath}`}
-				file={file}
-				openFolderFor={openFolderFunc}
-				removeFile={removeFile}
-			/>
+
+	const filesRender = files ? (
+		<CompareFiles files={files} openFolderFunc={openFolderFor} removeFile={removeFile} />
+	) : null;
+	const dbFilesRender = dbFiles ? (
+		<CompareFiles files={dbFiles} openFolderFunc={openDbFolderFor} />
+	) : null;
+
+	// Display the files in the given order
+	let filesDetails;
+	if ((dbFilesFirst && dbFilesRender) || !filesRender) {
+		filesDetails = (
+			<React.Fragment>
+				{dbFilesRender}
+				{filesRender && <CompareDialogViewDivider topLabel="Db" bottomLabel="Folder" />}
+				{filesRender}
+			</React.Fragment>
+		);
+	} else {
+		filesDetails = (
+			<React.Fragment>
+				{filesRender}
+				{dbFilesRender && <CompareDialogViewDivider topLabel="Folder" bottomLabel="Db" />}
+				{dbFilesRender}
+			</React.Fragment>
 		);
 	}
-	static getType(file) {
-		if (file instanceof FileProps) {
-			return "scan";
-		} else if (file instanceof FilePropsDb) {
-			return "db";
-		}
-		return "unknown";
+	return (
+		<Modal open={open} onClose={close} style={inlineStyle.modal}>
+			{/* <Modal.Header>Select a Photo</Modal.Header> */}
+			<Modal.Content image style={inlineStyle.content}>
+				{filesDetails}
+			</Modal.Content>
+			<Modal.Actions>
+				<Button icon="close" onClick={close} />
+			</Modal.Actions>
+		</Modal>
+	);
+};
+const inlineStyle = {
+	modal: {
+		marginTop: "auto !important",
+		marginLeft: "auto",
+		marginRight: "auto",
+		paddingLeft: "1rem",
+		paddingRight: "1rem"
+	},
+	content: {
+		overflowX: "auto",
+		padding: 0,
+		paddingTop: "1rem"
 	}
+};
 
-	render() {
-		const inlineStyle = {
-			modal: {
-				marginTop: "auto !important",
-				marginLeft: "auto",
-				marginRight: "auto",
-				paddingLeft: "1rem",
-				paddingRight: "1rem"
-			},
-			content: {
-				overflowX: "auto",
-				padding: 0,
-				paddingTop: "1rem"
-			}
-		};
-		if (!this.props.files && !this.props.dbFiles) {
-			return null;
-		}
-		const dbFilesFirst = (this.props.dbFilesFirst && this.props.dbFiles) || !this.props.files;
-
-		let filesDetails;
-
-		// Display the files in the given order
-		if (dbFilesFirst) {
-			filesDetails = CompareDialogView.renderFiles(
-				this.props.dbFiles,
-				this.props.openDbFolderFor
-			);
-			if (this.props.files) {
-				filesDetails.push(
-					<CompareDialogViewDivider key="divider" topLabel="Db" bottomLabel="Folder" />
-				);
-				filesDetails = filesDetails.concat(
-					CompareDialogView.renderFiles(
-						this.props.files,
-						this.props.openFolderFor,
-						this.props.removeFile
-					)
-				);
-			}
-		} else {
-			filesDetails = CompareDialogView.renderFiles(
-				this.props.files,
-				this.props.openFolderFor,
-				this.props.removeFile
-			);
-			if (this.props.dbFiles) {
-				filesDetails.push(
-					<CompareDialogViewDivider key="divider" topLabel="Folder" bottomLabel="Db" />
-				);
-				filesDetails = filesDetails.concat(
-					CompareDialogView.renderFiles(this.props.dbFiles, this.props.openDbFolderFor)
-				);
-			}
-		}
-		return (
-			<Modal open={this.props.open} onClose={this.props.close} style={inlineStyle.modal}>
-				{/* <Modal.Header>Select a Photo</Modal.Header> */}
-				<Modal.Content image style={inlineStyle.content}>
-					{filesDetails}
-				</Modal.Content>
-				<Modal.Actions>
-					<Button icon="close" onClick={this.props.close} />
-				</Modal.Actions>
-			</Modal>
-		);
-	}
-}
+export default CompareDialogView;
