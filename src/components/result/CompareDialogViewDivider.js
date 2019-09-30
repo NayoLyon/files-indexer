@@ -1,7 +1,7 @@
 import React from "react";
 import { Label } from "semantic-ui-react";
 
-const CompareDialogView = ({ topLabel, bottomLabel }) => (
+const CompareDialogViewDivider = ({ topLabel, bottomLabel }) => (
 	<div style={inlineStyle.divider}>
 		<div style={inlineStyle.dividerLine} />
 		<Label basic color="grey" pointing="left" style={inlineStyle.dividerLabelTop}>
@@ -39,4 +39,4 @@ const inlineStyle = {
 	}
 };
 
-export default CompareDialogView;
+export default CompareDialogViewDivider;
