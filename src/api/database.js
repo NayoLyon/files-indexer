@@ -1,3 +1,5 @@
+import { FilePropsDb } from "./filesystem";
+
 const { remote } = window.require("electron");
 
 const PouchDB = require("pouchdb-browser").default;
@@ -79,7 +81,52 @@ export class Db {
 							);
 					});
 					const rows = await doLoadDb;
-					db._db.bulkDocs(rows, { new_edits: false });
+					console.log("Database file loaded");
+					await db._db.bulkDocs(rows, { new_edits: false });
+					console.log("DB loaded");
+				} else {
+					const oldDbFile = path.join(folder, ".index.db");
+					if (fs.existsSync(oldDbFile)) {
+						// Read and convert...
+						console.log("Load and convert from existing old database NeDB", oldDbFile);
+						const doLoadDb = new Promise((resolve, reject) => {
+							const rows = [];
+							const rs = fs.createReadStream(oldDbFile).on("error", reject);
+							const through = remote.require("through2").obj;
+							let rowIndex = 0;
+
+							rs.pipe(ndjson.parse())
+								.on("error", reject)
+								.pipe(
+									through(
+										function(doc, _, next) {
+											if (doc._id) {
+												console.log(`Found [${rowIndex++}]`, doc);
+												rows.push(
+													FilePropsDb.fromDb({
+														...doc,
+														relpath: doc.relpath.replace(/\\/, "/"),
+														modifiedMs: doc.modified["$$date"],
+														changedMs: doc.changed["$$date"],
+														createdMs: doc.created["$$date"]
+													})
+												);
+											}
+											next();
+										},
+										function(next) {
+											resolve(rows);
+											next();
+										}
+									)
+								);
+						});
+						const rows = await doLoadDb;
+						// console.log("Debug loaded rows", rows);
+						console.log("Database file loaded");
+						await db._db.bulkDocs(rows, { new_edits: true });
+						console.log("DB loaded");
+					}
 				}
 			}
 			return db;
@@ -107,11 +154,13 @@ export class Db {
 				);
 			}
 		} else {
+			console.log("Cleanup DB Views");
 			try {
 				await this._db.viewCleanup();
 			} catch (error) {
 				console.error("Compaction of indexes failed.", error);
 			}
+			console.log("Compacting db...");
 			try {
 				await this._db.compact();
 			} catch (error) {
