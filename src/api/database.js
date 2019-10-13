@@ -1,11 +1,11 @@
 import { FilePropsDb } from "./filesystem";
+import { readNDJsonFile, writeNDJsonFile } from "./ndjson";
 
 const { remote } = window.require("electron");
 
 const PouchDB = require("pouchdb-browser").default;
 PouchDB.plugin(require("pouchdb-adapter-memory").default);
 PouchDB.plugin(require("pouchdb-find").default);
-const ndjson = remote.require("ndjson");
 const { setSync } = remote.require("winattr");
 const path = remote.require("path");
 const fs = remote.require("fs");
@@ -52,7 +52,7 @@ export class Db {
 
 				// Create the target tmp database.
 				// Will throw an error if it cannot do it (already in use or no write perm on folder)
-				db._ws = fs.createWriteStream(dbFile + "~", { flags: "wx" });
+				db._ws = fs.openSync(dbFile + "~", "wx");
 
 				console.log("Init PouchDB", folder);
 				// For source only
@@ -64,27 +64,7 @@ export class Db {
 				// Load from existing db file
 				if (fs.existsSync(dbFile)) {
 					console.log("Load existing database", dbFile);
-					const doLoadDb = new Promise((resolve, reject) => {
-						const rows = [];
-						const rs = fs.createReadStream(dbFile).on("error", reject);
-						const through = remote.require("through2").obj;
-
-						rs.pipe(ndjson.parse())
-							.on("error", reject)
-							.pipe(
-								through(
-									function(doc, _, next) {
-										rows.push(doc);
-										next();
-									},
-									function(next) {
-										resolve(rows);
-										next();
-									}
-								)
-							);
-					});
-					const rows = await doLoadDb;
+					const rows = await readNDJsonFile(dbFile);
 					console.log("Database file loaded");
 					await db._db.bulkDocs(rows, { new_edits: false });
 					console.log("DB loaded");
@@ -93,40 +73,21 @@ export class Db {
 					if (fs.existsSync(oldDbFile)) {
 						// Read and convert...
 						console.log("Load and convert from existing old database NeDB", oldDbFile);
-						const doLoadDb = new Promise((resolve, reject) => {
-							const rows = [];
-							const rs = fs.createReadStream(oldDbFile).on("error", reject);
-							const through = remote.require("through2").obj;
-							let rowIndex = 0;
-
-							rs.pipe(ndjson.parse())
-								.on("error", reject)
-								.pipe(
-									through(
-										function(doc, _, next) {
-											if (doc._id) {
-												console.log(`Found [${rowIndex++}]`, doc);
-												rows.push(
-													FilePropsDb.fromDb({
-														...doc,
-														relpath: doc.relpath.replace(/\\/g, "/"),
-														modifiedMs: doc.modified["$$date"],
-														changedMs: doc.changed["$$date"],
-														createdMs: doc.created["$$date"]
-													})
-												);
-											}
-											next();
-										},
-										function(next) {
-											resolve(rows);
-											next();
-										}
-									)
+						const fileContent = await readNDJsonFile(oldDbFile);
+						const rows = [];
+						fileContent.forEach(doc => {
+							if (doc._id) {
+								rows.push(
+									FilePropsDb.fromDb({
+										...doc,
+										relpath: doc.relpath.replace(/\\/g, "/"),
+										modifiedMs: doc.modified["$$date"],
+										changedMs: doc.changed["$$date"],
+										createdMs: doc.created["$$date"]
+									})
 								);
+							}
 						});
-						const rows = await doLoadDb;
-						// console.log("Debug loaded rows", rows);
 						console.log("Database file loaded");
 						await db._db.bulkDocs(rows, { new_edits: true });
 						console.log("DB loaded");
@@ -158,80 +119,72 @@ export class Db {
 				);
 			}
 		} else {
-			console.log("Cleanup DB Views");
 			try {
-				await this._db.viewCleanup();
-			} catch (error) {
-				console.error("Compaction of indexes failed.", error);
-			}
-			console.log("Compacting db...");
-			try {
-				await this._db.compact();
-			} catch (error) {
-				console.error("Compaction of database failed.", error);
-			}
+				console.log("Cleanup DB Views");
+				try {
+					await this._db.viewCleanup();
+				} catch (error) {
+					console.error("Compaction of indexes failed.", error);
+				}
+				console.log("Compacting db...");
+				try {
+					await this._db.compact();
+				} catch (error) {
+					console.error("Compaction of database failed.", error);
+				}
 
-			// Get all rows
-			console.log("Exporting data");
-			const rows = await this.allDocs();
+				// Get all rows
+				console.log("Exporting data");
+				const rows = await this.allDocs();
 
-			// Close db
-			console.log("Closing db", rows);
-			this.closed = true;
-			try {
-				await this._db.destroy();
-			} catch (error) {
-				console.error(
-					"Could not destroy db... Ignore the error as the db is in memor",
-					error
-				);
-			}
+				// Close db
+				console.log("Closing db", rows);
+				this.closed = true;
+				try {
+					await this._db.destroy();
+				} catch (error) {
+					console.error(
+						"Could not destroy db... Ignore the error as the db is in memor",
+						error
+					);
+				}
 
-			// Now save to file
-			const dbFile = getDbFile(this._folder);
-			if (rows.length > 0) {
-				console.log("Saving data to file");
-				const doSaveToFile = new Promise((resolve, reject) => {
-					const transformStream = ndjson.serialize();
-					transformStream
-						.pipe(this._ws)
-						.on("error", reject)
-						.on(
-							"finish",
-							// Once ndjson has flushed all data to the output stream, let's indicate done.
-							resolve
-						);
+				// Now save to file
+				const dbFile = getDbFile(this._folder);
+				if (rows.length > 0) {
+					console.log("Saving data to file");
+					writeNDJsonFile(rows.map(({ doc }) => doc), this._ws);
+					fs.closeSync(this._ws);
+					delete this._ws;
+					console.log("Save complete!");
 
-					rows.forEach(doc => transformStream.write(doc.doc));
-
-					// Once we've written each record in the record-set, we have to end the stream so that
-					// the TRANSFORM stream knows to flush and close the file output stream.
-					transformStream.end();
-				});
-
-				await doSaveToFile;
-				console.log("Save complete!");
-
-				// Now, move to final file
-				let dbFileBak = null;
-				if (fs.existsSync(dbFile)) {
-					dbFileBak = dbFile + ".";
-					let bakIncr = 1;
-					while (fs.existsSync(dbFileBak + bakIncr)) {
-						bakIncr++;
+					// Now, move to final file
+					let dbFileBak = null;
+					if (fs.existsSync(dbFile)) {
+						dbFileBak = dbFile + ".";
+						let bakIncr = 1;
+						while (fs.existsSync(dbFileBak + bakIncr)) {
+							bakIncr++;
+						}
+						fs.renameSync(dbFile, dbFileBak);
 					}
-					fs.renameSync(dbFile, dbFileBak);
+					fs.renameSync(dbFile + "~", dbFile);
+					if (dbFileBak) {
+						fs.unlinkSync(dbFileBak);
+					}
+					// Force this file to hidden, for windows...
+					setSync(dbFile, { hidden: true });
+				} else {
+					console.log("Nothing to save...");
+					fs.closeSync(this._ws);
+					delete this._ws;
+					fs.unlinkSync(dbFile + "~");
 				}
-				fs.renameSync(dbFile + "~", dbFile);
-				if (dbFileBak) {
-					fs.unlinkSync(dbFileBak);
+			} finally {
+				if (this._ws) {
+					fs.closeSync(this._ws);
+					delete this._ws;
 				}
-				// Force this file to hidden, for windows...
-				setSync(dbFile, { hidden: true });
-			} else {
-				console.log("Nothing to save...");
-				this._ws.end();
-				fs.unlinkSync(dbFile + "~");
 			}
 		}
 	}
