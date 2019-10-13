@@ -25,16 +25,18 @@ export async function initializeDatabase(folder) {
 		// TODO check perm access on file. Should be read and write.
 
 		// Load from existing db file
-		let loadedDb = [];
+		let db = null;
 		if (fs.existsSync(dbFile)) {
 			console.log("Load existing database", dbFile);
-			loadedDb = await readNDJsonFile(dbFile);
+			const loadedDb = await readNDJsonFile(dbFile);
 			console.log("Database file loaded");
+			db = new Db(folder, dbFile, loadedDb);
 		} else {
 			const oldDbFile = path.join(folder, ".index.db");
 			if (fs.existsSync(oldDbFile)) {
 				// Read and convert...
 				console.log("Load and convert from existing old database NeDB", oldDbFile);
+				const loadedDb = [];
 				const fileContent = await readNDJsonFile(oldDbFile);
 				fileContent.forEach(doc => {
 					if (doc._id) {
@@ -50,9 +52,13 @@ export async function initializeDatabase(folder) {
 					}
 				});
 				console.log("Database file loaded");
+				db = new Db(folder, dbFile, loadedDb);
+				db._modified = true;
+			} else {
+				db = new Db(folder, dbFile, []);
 			}
 		}
-		return new Db(folder, dbFile, loadedDb);
+		return db;
 	} catch (error) {
 		console.error(error);
 		throw error;
@@ -109,6 +115,7 @@ class Db {
 		loadedDb.forEach(obj => {
 			this.insertFile(obj);
 		});
+		this._modified = false; // Set after load since insertFile internally sets it to true
 	}
 	get folder() {
 		return this._folder;
@@ -119,12 +126,21 @@ class Db {
 			if (!this._folder) {
 				throw new Error("Missing mandatory parameter db or folder");
 			}
+			const dbFile = this._dbFile;
 			try {
+				if (!this._modified) {
+					console.log("DB not modified, close without saving...");
+
+					// Now close reserved file
+					console.log("Closing reserved file");
+					fs.unlinkSync(dbFile + "~");
+					return;
+				}
+
 				// Get all rows
 				console.log("Exporting data");
 
 				// Now save to file
-				const dbFile = this._dbFile;
 				if (this._data.size > 0) {
 					console.log("Saving data to file");
 					const dataToSave = [];
@@ -132,8 +148,6 @@ class Db {
 						dataToSave.push({ ...props });
 					});
 					writeNDJsonFile(dataToSave, this._ws);
-					fs.closeSync(this._ws);
-					delete this._ws;
 					console.log("Write complete!");
 
 					// Now, move to final file
@@ -156,8 +170,6 @@ class Db {
 					console.log("Save complete!");
 				} else {
 					console.log("Nothing to save...");
-					fs.closeSync(this._ws);
-					delete this._ws;
 					fs.unlinkSync(dbFile + "~");
 				}
 			} finally {
@@ -227,6 +239,7 @@ class Db {
 			}
 		}
 
+		this._modified = true;
 		const rawObj = { _id: id, name, relpath, hash, size, modifiedMs, changedMs, createdMs };
 		this._data.set(rawObj._id, rawObj);
 		this._indexName.add(rawObj);
@@ -240,6 +253,7 @@ class Db {
 			return false;
 		}
 
+		this._modified = true;
 		this._indexName.delete(existingFile);
 		this._indexRelpath.delete(existingFile);
 		this._indexHash.delete(existingFile);
