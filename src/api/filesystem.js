@@ -44,7 +44,7 @@ export class FilePropsDb {
 	}
 	setNewName(name) {
 		this.name = name;
-		this.relpath = path.join(path.dirname(this.relpath), name);
+		this.relpath = path.join(path.dirname(this.relpath), name).replace(/\\/g, "/");
 	}
 	cloneFromSamePath(file) {
 		const newFile = new FilePropsDb(this);
