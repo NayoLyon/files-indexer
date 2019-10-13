@@ -112,13 +112,11 @@ class Scanner {
 		this.assertLoaded();
 
 		const newFileProps = new FilePropsScan(fileProps);
-		const occurences = fileProps.hash
-			? await this._sourceDb.getMatchingHash(fileProps.hash)
-			: [];
+		let occurences = fileProps.hash ? await this._sourceDb.getMatchingHash(fileProps.hash) : [];
 		if (occurences.length === 0) {
 			// File not found in db... Search for files with similar properties
-			const matchingNames = await this._sourceDb.getMatchingName(fileProps.name);
-			newFileProps.setDbMatches(matchingNames);
+			occurences = await this._sourceDb.getMatchingName(fileProps.name);
+			newFileProps.setDbMatches(occurences);
 		} else {
 			if (occurences.length > 1) {
 				console.error(`Multiple occurences from hash ${fileProps.hash}!!`, occurences);
