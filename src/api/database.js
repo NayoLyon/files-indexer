@@ -11,8 +11,6 @@ const path = remote.require("path");
 const fs = remote.require("fs");
 // const { setSync } = app.__utils;
 
-const dbStore = new Map();
-
 function getDbFile(folder) {
 	return path.join(folder, ".index.idb");
 }
@@ -316,79 +314,4 @@ export class Db {
 		const res = await this._db.remove(obj);
 		return res.ok && res.id === obj._id ? 1 : 0;
 	}
-}
-
-export function onClose() {
-	// On close, set all dbFiles to hidden on Windows...
-	// We cannot do it on the fly as NeDB always create a new file and does not allow callback on write...
-	// Force this file to hidden, for windows...
-	dbStore.forEach(db => {
-		if (!db._inMemory) {
-			db.close();
-		}
-	});
-}
-function getDb(folder) {
-	const db = dbStore.get(folder);
-	if (typeof db === "undefined") {
-		throw new Error(`No database opened for ${folder}.`);
-	}
-	return db;
-}
-
-export async function closeDatabase(folder) {
-	const db = dbStore.get(folder);
-	if (typeof db !== "undefined") {
-		dbStore.delete(folder);
-		db.close();
-	}
-}
-export async function initDatabase(folder, isInMemory) {
-	try {
-		if (folder === "") {
-			return;
-		}
-		let db = null;
-		try {
-			db = getDb(folder);
-		} catch (err) {
-			db = await Db.load(folder, isInMemory);
-			dbStore.set(folder, db);
-		}
-	} catch (error) {
-		console.error(error);
-		throw error;
-	}
-}
-
-export async function get(folder, id, toClass) {
-	const db = getDb(folder);
-	return await db.get(id, toClass);
-}
-export async function allDocs(folder, toClass) {
-	const db = getDb(folder);
-	return await db.allDocs(toClass);
-}
-export async function findDb(folder, what, toClass) {
-	const db = getDb(folder);
-	return await db.find(what, toClass);
-}
-
-export async function insertDb(folder, obj) {
-	const db = getDb(folder);
-	return await db.insertDb(obj);
-}
-
-export async function updateDb(folder, obj) {
-	const db = getDb(folder);
-	return await db.updateDb(obj);
-}
-export async function updateBulk(folder, objList) {
-	const db = getDb(folder);
-	return await db.updateBulk(objList);
-}
-
-export async function deleteDb(folder, obj) {
-	const db = getDb(folder);
-	return await db.deleteDb(obj);
 }
