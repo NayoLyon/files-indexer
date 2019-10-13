@@ -29,18 +29,21 @@ export class Db {
 			throw Error("Missing mandatory parameter folder");
 		}
 		try {
+			console.log("Loading database", folder, isInMemory);
 			let db = new Db(folder, isInMemory);
 			db._nbIndexes = 0;
 			const createIndex = (fields, name) =>
 				++db._nbIndexes && db._db.createIndex({ index: { fields, name } });
 			if (isInMemory) {
 				// For scan only
+				console.log("Init PouchDB", folder);
 				db._db = new PouchDB(folder, { adapter: "memory" });
 				await createIndex(["relpath"], "relpath");
 				await createIndex(["scanType"], "scanType");
 				await createIndex(["type", "filesMatching"], "duplicates");
 				await createIndex(["hash"], "hash");
 				await createIndex(["name"], "name");
+				console.log("DB loaded");
 			} else {
 				// Reserve file ~, to avoid several concurrent modifications on the db...
 				// Do it first, so in case of error we have nothing to cleanup...
@@ -51,6 +54,7 @@ export class Db {
 				// Will throw an error if it cannot do it (already in use or no write perm on folder)
 				db._ws = fs.createWriteStream(dbFile + "~", { flags: "wx" });
 
+				console.log("Init PouchDB", folder);
 				// For source only
 				db._db = new PouchDB(folder);
 				await createIndex(["relpath"], "relpath"); // TODO Should be unique...
@@ -105,7 +109,7 @@ export class Db {
 												rows.push(
 													FilePropsDb.fromDb({
 														...doc,
-														relpath: doc.relpath.replace(/\\/, "/"),
+														relpath: doc.relpath.replace(/\\/g, "/"),
 														modifiedMs: doc.modified["$$date"],
 														changedMs: doc.changed["$$date"],
 														createdMs: doc.created["$$date"]
