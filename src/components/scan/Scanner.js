@@ -87,7 +87,7 @@ class Scanner {
 	}
 
 	load = async scanFolder => {
-		this._dbScan = await Db.load(scanFolder, true);
+		this._dbScan = await Db.load(scanFolder);
 		this._folder = scanFolder;
 	};
 	close = async () => {
