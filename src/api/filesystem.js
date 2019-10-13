@@ -70,7 +70,7 @@ export class FileProps {
 	static fromScan(file, stats, rootPath) {
 		return new FileProps({
 			name: path.basename(file),
-			relpath: path.relative(rootPath, file),
+			relpath: path.relative(rootPath, file).replace(/\\/, "/"),
 			size: stats.size,
 			modifiedMs: stats.mtime.getTime(),
 			changedMs: stats.ctime.getTime(),
