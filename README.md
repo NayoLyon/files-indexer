@@ -6,19 +6,18 @@ This application uses Electron, React, React Router, Webpack, React Hot Loader, 
 This application has been initialized with https://github.com/chentsulin/electron-react-boilerplate
 
 TODO:
+- Fix a in a React error when opening CompareDialogView
+- Fix Blinking of render after attribute is modified. The old screen is first rendered, then updated with updated elements...
+- Duplicates popup: allow to remove possible matches
 - Hints for table pagination, see https://stackoverflow.com/questions/17067294/html-table-with-100-width-with-vertical-scroll-inside-tbody ?? or https://react-table.js.org/#/story/simple-table (https://www.npmjs.com/package/react-table) or https://datatables.net/examples/styling/semanticui https://datatables.net/download/npm
 - do not consider files times (modified, created...) different if the difference is a matter of seconds ??
-- alternative to NeDB: https://github.com/nylas/electron-RxDB
 - Remove import CONST_SCAN_TYPE_DUPLICATE from ResultTabReferencesView... The object scanType should not be checked... Add a method to the FileProps class ?
 - Move FileProps class to Scanner ? They are deeply linked... But not that much, they are mostly the return of doScan, which is used everywhere... Create a FilePropsScan class that inherits from FileProps ??
-- Fix Blinking of render after attribute is modified. The old screen is first rendered, then updated with updated elements...
 - Remove resultState reducer, should be states in ResultContainer...
 - Move scan state of ScanContainer into Scanner.scan function ? We would need to way to make cancelable...
-- Fix a in a React error when opening CompareDialogView
 - Add method to save Db before coming back + indicator in interface that it needs to be saved...
-- Duplicates popup: allow to remove possible matches
-- Allow to compress database file
 - Take .index.idb~ file only for writing (or when start modifying ?). Save as soon as possible, to reload or brutal shutdown of the window will not be an issue... Also, when taking the file, try to force taking it if it already exists. Check that 2 concurrent windows cannot (on windows at least...)...
+- Allow to compress database file
 - Add onIgnore management, and display list of ignored files/folders...
 
 
