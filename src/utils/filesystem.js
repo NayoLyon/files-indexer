@@ -27,7 +27,16 @@ function tryDeleteFolder(rootFolder, relFolder) {
 	}
 	const folder = path.resolve(rootFolder, relFolder);
 	const files = fs.readdirSync(folder);
-	const eligibleFiles = files.filter(file => isEligibleFile(file));
+	const eligibleFiles = files.filter(file => {
+		const fileStats = fs.statSync(path.join(folder, file));
+		const isDir = fileStats.isDirectory();
+		const isFile = fileStats.isFile();
+		return (
+			(isDir && isEligibleFolder(path.basename(folder))) ||
+			(isFile && isEligibleFile(file)) ||
+			(!isDir && !isFile)
+		);
+	});
 	if (eligibleFiles.length === 0) {
 		shell.moveItemToTrash(folder);
 		tryDeleteFolder(rootFolder, path.dirname(relFolder));
@@ -44,4 +53,7 @@ function tryDeleteFolder(rootFolder, relFolder) {
 
 export function isEligibleFile(file) {
 	return ![".index.db", ".index.idb", ".index.idb~", "Thumbs.db"].includes(file);
+}
+export function isEligibleFolder(folder) {
+	return ![".svn"].includes(folder);
 }

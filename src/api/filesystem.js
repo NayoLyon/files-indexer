@@ -3,7 +3,7 @@
 // import fs from 'fs';
 // import path from 'path';
 // import crypto from 'crypto';
-import { isEligibleFile } from "../utils/filesystem";
+import { isEligibleFile, isEligibleFolder } from "../utils/filesystem";
 
 const electron = window.require("electron");
 const fs = electron.remote.require("fs");
@@ -164,8 +164,15 @@ function computeHashForFile(fn) {
 	});
 }
 
-async function walkDir(folder, progressStart, progressEnd, progressCallback, isCanceled) {
-	const [fileList, subFolders] = await readDir(folder);
+async function walkDir(
+	folder,
+	progressStart,
+	progressEnd,
+	progressCallback,
+	isCanceled,
+	onIgnored
+) {
+	const [fileList, subFolders] = await readDir(folder, onIgnored);
 
 	const progressStep = (progressEnd - progressStart) / (subFolders.length + 1);
 	progressCallback(
@@ -184,7 +191,8 @@ async function walkDir(folder, progressStart, progressEnd, progressCallback, isC
 			subFolderProgress,
 			subFolderProgress + progressStep,
 			progressCallback,
-			isCanceled
+			isCanceled,
+			onIgnored
 		);
 		subFolderContent.forEach(elt => {
 			fileList.push(elt);
@@ -200,7 +208,7 @@ const fsReadDir = (path, opts) =>
 			else resolve(data);
 		});
 	});
-async function readDir(folder) {
+async function readDir(folder, onIgnored) {
 	const content = await fsReadDir(folder);
 	// const content = fs.readdirSync(folder);
 
@@ -208,10 +216,22 @@ async function readDir(folder) {
 	const subFolders = [];
 	for (let i = 0; i < content.length; i += 1) {
 		const file = content[i];
-		if (fs.statSync(path.join(folder, file)).isDirectory()) {
-			subFolders.push(path.join(folder, file));
-		} else if (isEligibleFile(file)) {
-			fileList.push(path.join(folder, file));
+		const filePath = path.join(folder, file);
+		const fileStats = fs.statSync(filePath);
+		if (fileStats.isDirectory()) {
+			if (isEligibleFolder(file)) {
+				subFolders.push(path.join(folder, file));
+			} else {
+				onIgnored && onIgnored(filePath, fileStats);
+			}
+		} else if (fileStats.isFile()) {
+			if (isEligibleFile(file)) {
+				fileList.push(path.join(folder, file));
+			} else {
+				onIgnored && onIgnored(filePath, fileStats);
+			}
+		} else {
+			onIgnored && onIgnored(filePath, fileStats);
 		}
 	}
 	subFolders.sort((a, b) => a.localeCompare(b));

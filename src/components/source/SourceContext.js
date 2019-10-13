@@ -39,7 +39,7 @@ export async function initializeDatabase(folder) {
 				const loadedDb = [];
 				const fileContent = await readNDJsonFile(oldDbFile);
 				fileContent.forEach(doc => {
-					if (doc._id) {
+					if (doc._id && !doc.relpath.match(/.*(\\|\/)\.svn(\\|\/).*/)) {
 						loadedDb.push(
 							FilePropsDb.fromDb({
 								...doc,
