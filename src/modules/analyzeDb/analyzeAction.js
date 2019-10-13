@@ -1,5 +1,3 @@
-import { FilePropsDb } from "../../api/filesystem";
-
 const electron = window.require("electron");
 const fs = electron.remote.require("fs");
 const path = electron.remote.require("path");
@@ -67,13 +65,13 @@ function analyzeDuplicateRemove(dbFile) {
 
 export function removeMissing(sourceDb, dbFile) {
 	return async (dispatch, getState) => {
-		sourceDb.deleteDb(dbFile);
+		sourceDb.deleteFile(dbFile);
 		dispatch(analyzeMissingRemove(dbFile));
 	};
 }
 export function removeDuplicate(sourceDb, dbFile) {
 	return async (dispatch, getState) => {
-		sourceDb.deleteDb(dbFile);
+		sourceDb.deleteFile(dbFile);
 		dispatch(analyzeDuplicateRemove(dbFile));
 	};
 }
@@ -81,7 +79,7 @@ export function doAnalyze(sourceDb) {
 	return async dispatch => {
 		dispatch(startAnalyze());
 
-		const files = await sourceDb.allDocs(FilePropsDb);
+		const files = await sourceDb.getAll();
 		const duplicateList = new Map();
 		const filesHash = new Map();
 		dispatch(analyzeProgress("INDEXING", { value: 0, total: files.length }));

@@ -112,10 +112,10 @@ class Scanner {
 		this.assertLoaded();
 
 		const newFileProps = new FilePropsScan(fileProps);
-		let occurences = await this._sourceDb.find({ hash: fileProps.hash }, FilePropsDb);
+		let occurences = await this._sourceDb.getMatchingHash(fileProps.hash);
 		if (occurences.length === 0) {
 			// File not found in db... Search for files with similar properties
-			occurences = await this._sourceDb.find({ name: fileProps.name }, FilePropsDb);
+			occurences = await this._sourceDb.getMatchingName(fileProps.name);
 			newFileProps.setDbMatches(occurences);
 		} else {
 			if (occurences.length > 1) {
@@ -224,13 +224,9 @@ class Scanner {
 		newDbFile.modifiedMs = file.modifiedMs;
 		fs.utimesSync(dbFilePath, fs.statSync(dbFilePath).atime, new Date(newDbFile.modifiedMs));
 		try {
-			const updatedDoc = await this._sourceDb.updateDb(newDbFile);
-			if (updatedDoc[0] !== 1) {
-				console.error(updatedDoc, newDbFile);
+			const isUpdated = await this._sourceDb.updateFile(newDbFile);
+			if (isUpdated !== 1) {
 				throw Error(`Document ${newDbFile.relpath} not updated!!`);
-			} else if (updatedDoc[1].hash !== newDbFile.hash) {
-				console.error(updatedDoc, newDbFile);
-				throw Error(`Wrong document ${newDbFile.relpath} not updated!!`);
 			}
 			this._dbFilePropUpdated(newDbFile.id);
 		} catch (err) {
@@ -251,13 +247,9 @@ class Scanner {
 		}
 		fs.renameSync(dbFilePath, dbFileNewPath);
 		try {
-			const updatedDoc = await this._sourceDb.updateDb(newDbFile);
-			if (updatedDoc[0] !== 1) {
-				console.error(updatedDoc, newDbFile);
+			const isUpdated = await this._sourceDb.updateFile(newDbFile);
+			if (isUpdated !== 1) {
 				throw Error(`Document ${newDbFile.relpath} not updated!!`);
-			} else if (updatedDoc[1].hash !== newDbFile.hash) {
-				console.error(updatedDoc, newDbFile);
-				throw Error(`Wrong document ${newDbFile.relpath} not updated!!`);
 			}
 			this._dbFilePropUpdated(newDbFile.id);
 		} catch (err) {

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { connect } from "react-redux";
 
 import SourceContext from "../source/SourceContext";
-import { doScan, FilePropsDb } from "../../api/filesystem";
+import { doScan } from "../../api/filesystem";
 import { push } from "../../modules/router/routerActions";
 
 import routes from "../../utils/routes";
@@ -151,7 +151,7 @@ const processFileWithHash = (sourceDb, hashComputed, indexDuplicate) => async fi
 		// Should not happen...
 		throw new Error("Cannot process file when sourceDb not opened!!");
 	}
-	const occurences = await sourceDb.find({ relpath: fileProps.relpath }, FilePropsDb);
+	const occurences = await sourceDb.getMatchingRelpath(fileProps.relpath);
 	if (occurences.length) {
 		if (occurences.length > 1) {
 			console.error(
@@ -174,7 +174,7 @@ const processFileWithHash = (sourceDb, hashComputed, indexDuplicate) => async fi
 
 			// Then update the sourceDb and log
 			indexDuplicate(occurences[0], fileProps, diff);
-			await sourceDb.updateDb(occurences[0].cloneFromSamePath(fileProps));
+			await sourceDb.updateFile(occurences[0].cloneFromSamePath(fileProps));
 		}
 	} else {
 		if (!hashComputed) {
@@ -182,7 +182,7 @@ const processFileWithHash = (sourceDb, hashComputed, indexDuplicate) => async fi
 			console.info("Adding new file in sourceDb", fileProps);
 			indexDuplicate(undefined, fileProps, new Set(["new"]));
 		}
-		await sourceDb.insertDb(fileProps.toFilePropsDb());
+		await sourceDb.insertFile(fileProps.toFilePropsDb());
 	}
 };
 

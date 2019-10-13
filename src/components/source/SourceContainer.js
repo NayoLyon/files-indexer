@@ -4,14 +4,13 @@ import { connect } from "react-redux";
 
 import { push } from "../../modules/router/routerActions";
 import routes from "../../utils/routes";
-import { Db } from "../../api/database";
 
 import NotFound from "../NotFound";
 import IndexationContainer from "../indexation/IndexationContainer";
 import AnalyzeContainer from "../analyzeDb/AnalyzeContainer";
 import ScanContextContainer from "../scan/ScanContextContainer";
 
-import SourceContext from "./SourceContext";
+import SourceContext, { initializeDatabase } from "./SourceContext";
 
 const SourceContainer = ({ masterFolder, goHome }) => {
 	useEffect(() => {
@@ -22,21 +21,21 @@ const SourceContainer = ({ masterFolder, goHome }) => {
 	const [sourceContext, setSourceContext] = useState(null);
 	useEffect(() => {
 		let canceled = false;
-		let db = null;
+		let sourceDb = null;
 		const loadDb = async () => {
-			db = await Db.load(masterFolder);
+			sourceDb = await initializeDatabase(masterFolder);
 			if (!canceled) {
-				setSourceContext(db);
+				setSourceContext(sourceDb);
 			} else {
-				db.close();
+				sourceDb.close();
 			}
 		};
 		loadDb();
 
 		return () => {
 			canceled = false;
-			if (db) {
-				db.close();
+			if (sourceDb) {
+				sourceDb.close();
 			}
 		};
 	}, [masterFolder]);
