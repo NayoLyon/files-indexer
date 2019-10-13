@@ -11,17 +11,17 @@ import LoaderCustom from "../shared/LoaderCustom";
 import IndexationView from "./IndexationView";
 
 const IndexationContainer = ({ goToScan, goToAnalyzeDb, goToHome }) => {
-	const db = useContext(SourceContext);
+	const sourceDb = useContext(SourceContext);
 	const [dbLoaded, setDbLoaded] = useState(false);
 	const [dbSize, setDbSize] = useState(-1);
 	const [isIndexed, setIndexed] = useState(false);
 	useEffect(() => {
 		setDbLoaded(false);
 		setDbSize(-1);
-		if (db) {
+		if (sourceDb) {
 			let canceled = false;
 			const doLoadDb = async () => {
-				const dbSize = await db.getSize();
+				const dbSize = await sourceDb.getSize();
 				if (!canceled) {
 					setDbLoaded(true);
 					setDbSize(dbSize);
@@ -31,7 +31,7 @@ const IndexationContainer = ({ goToScan, goToAnalyzeDb, goToHome }) => {
 			doLoadDb();
 			return () => (canceled = true);
 		}
-	}, [db]);
+	}, [sourceDb]);
 	const [indexing, setIndexing] = useState(false);
 	const [progressState, setProgress] = useState({
 		step: "",
@@ -48,7 +48,7 @@ const IndexationContainer = ({ goToScan, goToAnalyzeDb, goToHome }) => {
 	useEffect(() => {
 		if (dbLoaded) {
 			let canceled = false;
-			const masterFolder = db ? db.folder : "";
+			const masterFolder = sourceDb ? sourceDb.folder : "";
 			const duplicatesMap = new Map();
 			const startIndexation = () => {
 				if (canceled) return; // Component has changed, stop now...
@@ -106,13 +106,13 @@ const IndexationContainer = ({ goToScan, goToAnalyzeDb, goToHome }) => {
 				startIndexation();
 				await doScan(
 					masterFolder,
-					processFileWithHash(db, withHash, indexDuplicate),
+					processFileWithHash(sourceDb, withHash, indexDuplicate),
 					indexProgress,
 					withHash,
 					() => canceled
 				);
 
-				const dbSize = await db.getSize();
+				const dbSize = await sourceDb.getSize();
 
 				endIndexation(dbSize);
 			});
@@ -120,7 +120,7 @@ const IndexationContainer = ({ goToScan, goToAnalyzeDb, goToHome }) => {
 		} else {
 			setStartIndexFunc(() => () => {});
 		}
-	}, [db, dbLoaded]);
+	}, [sourceDb, dbLoaded]);
 
 	if (!dbLoaded) {
 		return <LoaderCustom />;
@@ -131,7 +131,7 @@ const IndexationContainer = ({ goToScan, goToAnalyzeDb, goToHome }) => {
 		<IndexationView
 			index={startIndex(true)}
 			quickIndex={startIndex(false)}
-			masterFolder={(db && db.folder) || ""}
+			masterFolder={(sourceDb && sourceDb.folder) || ""}
 			dbSize={dbSize}
 			indexing={indexing}
 			isIndexed={isIndexed}
@@ -146,12 +146,12 @@ const IndexationContainer = ({ goToScan, goToAnalyzeDb, goToHome }) => {
 	);
 };
 
-const processFileWithHash = (db, hashComputed, indexDuplicate) => async fileProps => {
-	if (!db) {
+const processFileWithHash = (sourceDb, hashComputed, indexDuplicate) => async fileProps => {
+	if (!sourceDb) {
 		// Should not happen...
-		throw new Error("Cannot process file when db not opened!!");
+		throw new Error("Cannot process file when sourceDb not opened!!");
 	}
-	const occurences = await db.find({ relpath: fileProps.relpath }, FilePropsDb);
+	const occurences = await sourceDb.find({ relpath: fileProps.relpath }, FilePropsDb);
 	if (occurences.length) {
 		if (occurences.length > 1) {
 			console.error(
@@ -160,7 +160,7 @@ const processFileWithHash = (db, hashComputed, indexDuplicate) => async fileProp
 			console.error(occurences);
 		}
 
-		// File already indexed... Check that the file is correct in db or update it...
+		// File already indexed... Check that the file is correct in sourceDb or update it...
 		let diff = fileProps.compareToSamePath(occurences[0]);
 		if (!hashComputed) {
 			diff.delete("hash");
@@ -168,21 +168,21 @@ const processFileWithHash = (db, hashComputed, indexDuplicate) => async fileProp
 		if (diff.size) {
 			if (!hashComputed) {
 				// There are differences between the files... Recompute the hash and relaunch compare to include the hash
-				await fileProps.computeHash(db.folder);
+				await fileProps.computeHash(sourceDb.folder);
 				diff = fileProps.compareToSamePath(occurences[0]);
 			}
 
-			// Then update the db and log
+			// Then update the sourceDb and log
 			indexDuplicate(occurences[0], fileProps, diff);
-			await db.updateDb(occurences[0].cloneFromSamePath(fileProps));
+			await sourceDb.updateDb(occurences[0].cloneFromSamePath(fileProps));
 		}
 	} else {
 		if (!hashComputed) {
-			await fileProps.computeHash(db.folder);
-			console.info("Adding new file in db", fileProps);
+			await fileProps.computeHash(sourceDb.folder);
+			console.info("Adding new file in sourceDb", fileProps);
 			indexDuplicate(undefined, fileProps, new Set(["new"]));
 		}
-		await db.insertDb(fileProps.toFilePropsDb());
+		await sourceDb.insertDb(fileProps.toFilePropsDb());
 	}
 };
 

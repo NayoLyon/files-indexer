@@ -65,30 +65,30 @@ function analyzeDuplicateRemove(dbFile) {
 	};
 }
 
-export function removeMissing(db, dbFile) {
+export function removeMissing(sourceDb, dbFile) {
 	return async (dispatch, getState) => {
-		db.deleteDb(dbFile);
+		sourceDb.deleteDb(dbFile);
 		dispatch(analyzeMissingRemove(dbFile));
 	};
 }
-export function removeDuplicate(db, dbFile) {
+export function removeDuplicate(sourceDb, dbFile) {
 	return async (dispatch, getState) => {
-		db.deleteDb(dbFile);
+		sourceDb.deleteDb(dbFile);
 		dispatch(analyzeDuplicateRemove(dbFile));
 	};
 }
-export function doAnalyze(db) {
+export function doAnalyze(sourceDb) {
 	return async dispatch => {
 		dispatch(startAnalyze());
 
-		const files = await db.allDocs(FilePropsDb);
+		const files = await sourceDb.allDocs(FilePropsDb);
 		const duplicateList = new Map();
 		const filesHash = new Map();
 		dispatch(analyzeProgress("INDEXING", { value: 0, total: files.length }));
 		for (let index = 0; index < files.length; index++) {
 			const file = files[index];
 			dispatch(analyzeProgress("INDEXING", { value: index, total: files.length }));
-			const filePath = path.resolve(db.folder, file.relpath);
+			const filePath = path.resolve(sourceDb.folder, file.relpath);
 			const fileExists = await fsExists(filePath);
 			if (!fileExists) {
 				dispatch(analyzeMissingAdd(file));

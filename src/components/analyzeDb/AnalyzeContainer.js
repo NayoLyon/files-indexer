@@ -30,18 +30,18 @@ const AnalyzeContainer = ({
 	removeMissing,
 	removeDuplicate
 }) => {
-	const db = useContext(SourceContext);
+	const sourceDb = useContext(SourceContext);
 	useEffect(() => {
-		if (db) {
-			doAnalyze(db);
+		if (sourceDb) {
+			doAnalyze(sourceDb);
 		}
-	}, [db, doAnalyze]);
+	}, [sourceDb, doAnalyze]);
 
 	const openDbFolderFor = useCallback(
 		file => {
-			if (!db) return;
+			if (!sourceDb) return;
 
-			let filePath = path.resolve(db.folder, file.relpath);
+			let filePath = path.resolve(sourceDb.folder, file.relpath);
 			if (fs.existsSync(filePath)) {
 				openExplorerOn(filePath);
 			} else {
@@ -54,22 +54,22 @@ const AnalyzeContainer = ({
 				}
 			}
 		},
-		[db]
+		[sourceDb]
 	);
 
 	const removeFile = useCallback(
 		file => {
-			if (!db) return;
+			if (!sourceDb) return;
 
-			deleteFile(db.folder, file.relpath);
-			removeDuplicate(db, file);
+			deleteFile(sourceDb.folder, file.relpath);
+			removeDuplicate(sourceDb, file);
 		},
-		[db, removeDuplicate]
+		[sourceDb, removeDuplicate]
 	);
 
 	return (
 		<AnalyzeView
-			masterFolder={(db && db.folder) || ""}
+			masterFolder={(sourceDb && sourceDb.folder) || ""}
 			loading={loading}
 			isAnalyzed={isAnalyzed}
 			step={step}
@@ -77,7 +77,7 @@ const AnalyzeContainer = ({
 			missingList={missingList}
 			duplicateList={duplicateList}
 			openDbFolderFor={openDbFolderFor}
-			removeInDb={dbFile => removeMissing(db, dbFile)}
+			removeInDb={dbFile => removeMissing(sourceDb, dbFile)}
 			removeFile={removeFile}
 			goToScan={goToScan}
 			goToIndex={goToIndex}
