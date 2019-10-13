@@ -89,7 +89,7 @@ export default class FileDetailsView extends Component {
 				>
 					{/* <a> */}
 					<Label as="a" basic>
-						<Icon as="a" name="folder" />
+						<Icon name="folder" />
 						{this.getProp("relpath")}
 					</Label>
 					{/* </a> */}
