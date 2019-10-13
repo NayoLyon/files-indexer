@@ -43,6 +43,7 @@ export async function initializeDatabase(folder) {
 						loadedDb.push(
 							FilePropsDb.fromDb({
 								...doc,
+								hash: doc.size > 0 ? doc.hash : null,
 								relpath: doc.relpath.replace(/\\/g, "/"),
 								modifiedMs: doc.modified["$$date"],
 								changedMs: doc.changed["$$date"],

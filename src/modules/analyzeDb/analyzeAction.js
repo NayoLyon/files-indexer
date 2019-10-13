@@ -90,7 +90,7 @@ export function doAnalyze(sourceDb) {
 			const fileExists = await fsExists(filePath);
 			if (!fileExists) {
 				dispatch(analyzeMissingAdd(file));
-			} else {
+			} else if (file.hash) {
 				const otherFileSameHash = filesHash.get(file.hash);
 				if (otherFileSameHash) {
 					const fileDuplicates = duplicateList.get(file.hash);

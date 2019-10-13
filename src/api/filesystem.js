@@ -87,8 +87,12 @@ export class FileProps {
 		return new FilePropsDb({ ...this, _id: undefined });
 	}
 	async computeHash(rootFolder) {
-		/* Manage readCallback ? Need to send the size and the callback to computeHashForFile, to know how much reading, and how long it will be... */
-		this.hash = await computeHashForFile(path.resolve(rootFolder, this.relpath));
+		if (this.size > 0) {
+			/* Manage readCallback ? Need to send the size and the callback to computeHashForFile, to know how much reading, and how long it will be... */
+			this.hash = await computeHashForFile(path.resolve(rootFolder, this.relpath));
+		} else {
+			this.hash = null;
+		}
 	}
 	compareToSamePath(dbFile) {
 		const result = new Set();
